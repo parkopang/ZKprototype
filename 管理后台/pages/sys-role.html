@@ -1,0 +1,68 @@
+<!-- 系统管理：角色管理页面 -->
+<div class="breadcrumb">
+    <a href="#" onclick="showPage('home'); return false;">首页</a> / 系统管理 / 角色管理
+</div>
+<div class="page-header">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="请输入角色名称" id="sysRoleSearch">
+        </div>
+        <button class="toolbar-icon" title="筛选" onclick="toggleSysRoleFilter()">🔽</button>
+        <button class="toolbar-icon" title="设置" onclick="toggleTableSettings('sysRole', this)" style="position: relative;">⚙️</button>
+        <button class="create-btn" onclick="showCreateSysRoleForm()">
+            <span>➕</span>
+            <span>创建角色</span>
+        </button>
+    </div>
+</div>
+<div class="filter-panel" id="sys-role-filter-panel" style="display: none; background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e8e8e8;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">角色名称</label>
+            <input type="text" class="form-input" placeholder="请输入角色名称">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">角色编码</label>
+            <input type="text" class="form-input" placeholder="请输入角色编码">
+        </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-default" onclick="resetSysRoleFilter()">重置</button>
+        <button class="btn btn-primary" onclick="applySysRoleFilter()">查询</button>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>角色名称</th>
+                <th>角色编码</th>
+                <th>角色描述</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>绑定</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>管理员</td>
+                <td>admin</td>
+                <td>全量权限</td>
+                <td>2025-01-08 10:00</td>
+                <td>2025-01-08 10:00</td>
+                <td><a class="action-link" onclick="bindSysRole(1)">绑定</a></td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="viewSysRole(1)">查看</a>
+                        <a class="action-link" onclick="editSysRole(1)">编辑</a>
+                        <a class="action-link danger" onclick="deleteSysRole(1)">删除</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

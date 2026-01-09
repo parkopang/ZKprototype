@@ -1,0 +1,769 @@
+<!-- 科研超级智能体：文献阅读页面 -->
+<div class="literature-reading-page">
+    <div class="reading-header">
+        <div class="reading-title-section">
+            <div class="reading-icon">📖</div>
+            <h1 class="reading-title">文献阅读</h1>
+        </div>
+        <p class="reading-subtitle">智能阅读·精准标注·知识沉淀</p>
+    </div>
+    
+    <!-- 文献选择区域 -->
+    <div class="literature-selector-section">
+        <div class="selector-tabs">
+            <button class="tab-btn active" onclick="switchTab('library')">我的文献库</button>
+            <button class="tab-btn" onclick="switchTab('upload')">上传文献</button>
+            <button class="tab-btn" onclick="switchTab('search')">搜索文献</button>
+        </div>
+        
+        <!-- 文献库列表 -->
+        <div class="literature-library" id="libraryTab" style="display: block;">
+            <div class="library-toolbar">
+                <input type="text" class="library-search" placeholder="搜索文献标题、作者..." id="librarySearchInput">
+                <select class="library-filter" id="libraryFilter">
+                    <option value="all">全部</option>
+                    <option value="recent">最近阅读</option>
+                    <option value="favorite">收藏</option>
+                    <option value="annotated">已标注</option>
+                </select>
+            </div>
+            <div class="literature-list" id="literatureList">
+                <!-- 文献列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 上传文献 -->
+        <div class="literature-upload" id="uploadTab" style="display: none;">
+            <div class="upload-area" id="uploadArea" onclick="triggerFileUpload()">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">点击或拖拽文件到此处上传</div>
+                <div class="upload-hint">支持 PDF、DOC、DOCX 格式</div>
+                <input type="file" id="fileUploadInput" style="display: none;" accept=".pdf,.doc,.docx" onchange="handleFileUpload(event)">
+            </div>
+        </div>
+        
+        <!-- 搜索文献 -->
+        <div class="literature-search-tab" id="searchTab" style="display: none;">
+            <div class="search-input-group">
+                <input type="text" class="search-input" placeholder="输入文献标题、DOI或作者..." id="searchLiteratureInput">
+                <button class="search-btn" onclick="searchLiterature()">🔍 搜索</button>
+            </div>
+            <div class="search-results" id="searchResults">
+                <!-- 搜索结果将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 阅读器区域 -->
+    <div class="reading-viewer-section" id="readingViewer" style="display: none;">
+        <div class="viewer-header">
+            <div class="viewer-title-info">
+                <h2 class="viewer-title" id="viewerTitle">文献标题</h2>
+                <div class="viewer-meta" id="viewerMeta">
+                    <span>作者：</span>
+                    <span>期刊：</span>
+                    <span>年份：</span>
+                </div>
+            </div>
+            <div class="viewer-actions">
+                <button class="viewer-action-btn" onclick="toggleSidebar()" title="侧边栏">
+                    <span>📋</span>
+                </button>
+                <button class="viewer-action-btn" onclick="downloadLiterature()" title="下载">
+                    <span>📥</span>
+                </button>
+                <button class="viewer-action-btn" onclick="closeViewer()" title="关闭">
+                    <span>✕</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="viewer-content-wrapper">
+            <!-- 侧边栏（标注、笔记、目录） -->
+            <div class="viewer-sidebar" id="viewerSidebar" style="display: none;">
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" onclick="switchSidebarTab('annotations')">标注</button>
+                    <button class="sidebar-tab" onclick="switchSidebarTab('notes')">笔记</button>
+                    <button class="sidebar-tab" onclick="switchSidebarTab('outline')">目录</button>
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-panel" id="annotationsPanel">
+                        <div class="annotation-list" id="annotationList">
+                            <div class="empty-state-small">暂无标注</div>
+                        </div>
+                        <button class="add-annotation-btn" onclick="addAnnotation()">+ 添加标注</button>
+                    </div>
+                    <div class="sidebar-panel" id="notesPanel" style="display: none;">
+                        <div class="note-list" id="noteList">
+                            <div class="empty-state-small">暂无笔记</div>
+                        </div>
+                        <button class="add-note-btn" onclick="addNote()">+ 添加笔记</button>
+                    </div>
+                    <div class="sidebar-panel" id="outlinePanel" style="display: none;">
+                        <div class="outline-list" id="outlineList">
+                            <div class="outline-item">1. 摘要</div>
+                            <div class="outline-item">2. 引言</div>
+                            <div class="outline-item">3. 方法</div>
+                            <div class="outline-item">4. 结果</div>
+                            <div class="outline-item">5. 讨论</div>
+                            <div class="outline-item">6. 结论</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 主阅读区域 -->
+            <div class="viewer-main">
+                <div class="reading-content" id="readingContent">
+                    <div class="reading-placeholder">
+                        <div class="placeholder-icon">📄</div>
+                        <div class="placeholder-text">请从左侧选择文献开始阅读</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 文献阅读页面样式 */
+.literature-reading-page {
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.reading-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.reading-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.reading-icon {
+    font-size: 48px;
+}
+
+.reading-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.reading-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* 文献选择区域 */
+.literature-selector-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.selector-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    color: #1890ff;
+}
+
+.tab-btn.active {
+    color: #1890ff;
+    border-bottom-color: #1890ff;
+}
+
+/* 文献库 */
+.library-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.library-search {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.library-filter {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.literature-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.literature-item {
+    padding: 16px;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.literature-item:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.literature-item-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.literature-item-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.literature-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.item-action-btn {
+    padding: 4px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.item-action-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+/* 上传区域 */
+.literature-upload {
+    padding: 40px;
+}
+
+.upload-area {
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    padding: 60px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #1890ff;
+    background: #f0f7ff;
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.upload-text {
+    font-size: 16px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    font-size: 14px;
+    color: #999;
+}
+
+/* 搜索区域 */
+.literature-search-tab {
+    padding: 20px 0;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 10px 24px;
+    background: #1890ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.search-results {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 阅读器区域 */
+.reading-viewer-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #fafafa;
+}
+
+.viewer-title-info {
+    flex: 1;
+}
+
+.viewer-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.viewer-meta {
+    font-size: 14px;
+    color: #666;
+}
+
+.viewer-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.viewer-action-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.viewer-action-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.viewer-content-wrapper {
+    display: flex;
+    height: 600px;
+}
+
+.viewer-sidebar {
+    width: 300px;
+    border-right: 1px solid #e8e8e8;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.sidebar-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.sidebar-tab:hover {
+    color: #1890ff;
+}
+
+.sidebar-tab.active {
+    color: #1890ff;
+    border-bottom-color: #1890ff;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.sidebar-panel {
+    height: 100%;
+}
+
+.annotation-list, .note-list {
+    margin-bottom: 16px;
+}
+
+.annotation-item, .note-item {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.annotation-text, .note-text {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.annotation-meta, .note-meta {
+    font-size: 12px;
+    color: #999;
+}
+
+.empty-state-small {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+.add-annotation-btn, .add-note-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-annotation-btn:hover, .add-note-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.outline-list {
+    padding: 8px 0;
+}
+
+.outline-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.outline-item:hover {
+    background: #f0f0f0;
+}
+
+.viewer-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.reading-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.reading-placeholder {
+    text-align: center;
+    padding: 100px 20px;
+    color: #999;
+}
+
+.placeholder-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.placeholder-text {
+    font-size: 16px;
+}
+
+.reading-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #333;
+}
+</style>
+
+<script>
+// 当前选中的文献
+let currentLiterature = null;
+let sidebarVisible = false;
+
+// 模拟文献数据
+const mockLiteratures = [
+    {
+        id: 1,
+        title: '咳嗽变异性哮喘的中医证候学研究',
+        authors: ['罗社文', '李友林', '晁恩祥'],
+        journal: '现代中医临床',
+        year: 2021,
+        abstract: '本研究旨在探讨咳嗽变异性哮喘患者的中医证候特点及演变规律...'
+    },
+    {
+        id: 2,
+        title: '中西医结合防治支气管哮喘的探讨',
+        authors: ['沈自尹'],
+        journal: '中国中西医结合杂志',
+        year: 1995,
+        abstract: '本文探讨了中西医结合在支气管哮喘防治中的应用...'
+    },
+    {
+        id: 3,
+        title: '我国支气管哮喘防治指南解读',
+        authors: ['林江涛'],
+        journal: 'book',
+        year: 2011,
+        abstract: '本文解读了我国2008年修订的支气管哮喘防治指南...'
+    }
+];
+
+// 切换标签页
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    document.getElementById('libraryTab').style.display = tab === 'library' ? 'block' : 'none';
+    document.getElementById('uploadTab').style.display = tab === 'upload' ? 'block' : 'none';
+    document.getElementById('searchTab').style.display = tab === 'search' ? 'block' : 'none';
+}
+
+// 加载文献列表
+function loadLiteratureList() {
+    const list = document.getElementById('literatureList');
+    list.innerHTML = mockLiteratures.map(lit => `
+        <div class="literature-item" onclick="openLiterature(${lit.id})">
+            <div class="literature-item-title">${lit.title}</div>
+            <div class="literature-item-meta">作者：${lit.authors.join(', ')}</div>
+            <div class="literature-item-meta">期刊：${lit.journal} | 年份：${lit.year}</div>
+            <div class="literature-item-actions">
+                <button class="item-action-btn" onclick="event.stopPropagation(); favoriteLiterature(${lit.id})">⭐ 收藏</button>
+                <button class="item-action-btn" onclick="event.stopPropagation(); deleteLiterature(${lit.id})">🗑️ 删除</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 打开文献
+function openLiterature(id) {
+    const lit = mockLiteratures.find(l => l.id === id);
+    if (!lit) return;
+    
+    currentLiterature = lit;
+    
+    // 显示阅读器
+    document.getElementById('readingViewer').style.display = 'block';
+    document.getElementById('viewerTitle').textContent = lit.title;
+    document.getElementById('viewerMeta').innerHTML = `
+        <span>作者：${lit.authors.join(', ')}</span> | 
+        <span>期刊：${lit.journal}</span> | 
+        <span>年份：${lit.year}</span>
+    `;
+    
+    // 加载文献内容
+    loadLiteratureContent(lit);
+    
+    // 滚动到阅读器
+    document.getElementById('readingViewer').scrollIntoView({ behavior: 'smooth' });
+}
+
+// 加载文献内容
+function loadLiteratureContent(lit) {
+    const content = document.getElementById('readingContent');
+    content.innerHTML = `
+        <div class="reading-text">
+            <h2>摘要</h2>
+            <p>${lit.abstract}</p>
+            <h2>1. 引言</h2>
+            <p>本文旨在探讨${lit.title}的相关问题。该研究领域在近年来取得了显著进展...</p>
+            <h2>2. 方法</h2>
+            <p>本研究采用...方法，对...进行了分析...</p>
+            <h2>3. 结果</h2>
+            <p>研究结果显示...</p>
+            <h2>4. 讨论</h2>
+            <p>基于以上结果，我们讨论了...</p>
+            <h2>5. 结论</h2>
+            <p>综上所述，本研究得出以下结论...</p>
+        </div>
+    `;
+}
+
+// 关闭阅读器
+function closeViewer() {
+    document.getElementById('readingViewer').style.display = 'none';
+    currentLiterature = null;
+}
+
+// 切换侧边栏
+function toggleSidebar() {
+    sidebarVisible = !sidebarVisible;
+    document.getElementById('viewerSidebar').style.display = sidebarVisible ? 'flex' : 'none';
+}
+
+// 切换侧边栏标签
+function switchSidebarTab(tab) {
+    document.querySelectorAll('.sidebar-tab').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    document.getElementById('annotationsPanel').style.display = tab === 'annotations' ? 'block' : 'none';
+    document.getElementById('notesPanel').style.display = tab === 'notes' ? 'block' : 'none';
+    document.getElementById('outlinePanel').style.display = tab === 'outline' ? 'block' : 'none';
+}
+
+// 添加标注
+function addAnnotation() {
+    const text = prompt('请输入标注内容：');
+    if (text) {
+        const list = document.getElementById('annotationList');
+        if (list.querySelector('.empty-state-small')) {
+            list.innerHTML = '';
+        }
+        const annotation = document.createElement('div');
+        annotation.className = 'annotation-item';
+        annotation.innerHTML = `
+            <div class="annotation-text">${text}</div>
+            <div class="annotation-meta">${new Date().toLocaleString()}</div>
+        `;
+        list.appendChild(annotation);
+    }
+}
+
+// 添加笔记
+function addNote() {
+    const text = prompt('请输入笔记内容：');
+    if (text) {
+        const list = document.getElementById('noteList');
+        if (list.querySelector('.empty-state-small')) {
+            list.innerHTML = '';
+        }
+        const note = document.createElement('div');
+        note.className = 'note-item';
+        note.innerHTML = `
+            <div class="note-text">${text}</div>
+            <div class="note-meta">${new Date().toLocaleString()}</div>
+        `;
+        list.appendChild(note);
+    }
+}
+
+// 收藏文献
+function favoriteLiterature(id) {
+    alert('已收藏文献（模拟）');
+}
+
+// 删除文献
+function deleteLiterature(id) {
+    if (confirm('确定要删除这篇文献吗？')) {
+        alert('已删除文献（模拟）');
+        loadLiteratureList();
+    }
+}
+
+// 触发文件上传
+function triggerFileUpload() {
+    document.getElementById('fileUploadInput').click();
+}
+
+// 处理文件上传
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        alert(`文件 "${file.name}" 上传成功（模拟）\n\n实际应用中应调用上传API`);
+        // 可以在这里添加文件处理逻辑
+    }
+}
+
+// 搜索文献
+function searchLiterature() {
+    const keyword = document.getElementById('searchLiteratureInput').value.trim();
+    if (!keyword) {
+        alert('请输入搜索关键词');
+        return;
+    }
+    
+    const results = document.getElementById('searchResults');
+    results.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">正在搜索...</div>';
+    
+    setTimeout(() => {
+        results.innerHTML = mockLiteratures.filter(lit => 
+            lit.title.includes(keyword) || lit.authors.some(a => a.includes(keyword))
+        ).map(lit => `
+            <div class="literature-item" onclick="openLiterature(${lit.id})">
+                <div class="literature-item-title">${lit.title}</div>
+                <div class="literature-item-meta">作者：${lit.authors.join(', ')}</div>
+                <div class="literature-item-meta">期刊：${lit.journal} | 年份：${lit.year}</div>
+            </div>
+        `).join('') || '<div style="padding: 20px; text-align: center; color: #999;">未找到相关文献</div>';
+    }, 500);
+}
+
+// 下载文献
+function downloadLiterature() {
+    if (currentLiterature) {
+        alert(`正在下载文献：${currentLiterature.title}\n\n（实际应用中应调用下载API）`);
+    }
+}
+
+// 初始化页面
+function initPage_research_literature_reading() {
+    console.log('文献阅读页面已加载');
+    loadLiteratureList();
+}
+</script>

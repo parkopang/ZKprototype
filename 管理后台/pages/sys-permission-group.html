@@ -1,0 +1,61 @@
+<!-- 系统管理：权限组管理页面 -->
+<div class="breadcrumb">
+    <a href="#" onclick="showPage('home'); return false;">首页</a> / 系统管理 / 权限组管理
+</div>
+<div class="page-header">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="请输入权限组名称" id="sysPermissionGroupSearch">
+        </div>
+        <button class="toolbar-icon" title="筛选" onclick="toggleSysPermissionGroupFilter()">🔽</button>
+        <button class="toolbar-icon" title="设置" onclick="toggleTableSettings('sysPermissionGroup', this)" style="position: relative;">⚙️</button>
+        <button class="create-btn" onclick="showCreateSysPermissionGroupForm()">
+            <span>➕</span>
+            <span>新增权限组</span>
+        </button>
+    </div>
+</div>
+<div class="filter-panel" id="sys-permission-group-filter-panel" style="display: none; background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e8e8e8;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">权限组名称</label>
+            <input type="text" class="form-input" placeholder="请输入权限组名称">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">描述</label>
+            <input type="text" class="form-input" placeholder="请输入描述">
+        </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-default" onclick="resetSysPermissionGroupFilter()">重置</button>
+        <button class="btn btn-primary" onclick="applySysPermissionGroupFilter()">查询</button>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>权限组名称</th>
+                <th>描述</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>管理员组</td>
+                <td>拥有全部权限</td>
+                <td>2025-01-08 10:00</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="editSysPermissionGroup(1)">编辑</a>
+                        <a class="action-link danger" onclick="deleteSysPermissionGroup(1)">删除</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

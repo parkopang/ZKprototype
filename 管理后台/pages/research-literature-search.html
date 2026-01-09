@@ -1,0 +1,1586 @@
+<!-- 科研超级智能体：文献检索页面 -->
+<div class="literature-search-page">
+    <div class="literature-header">
+        <div class="literature-title-section">
+            <div class="literature-icon">📚</div>
+            <h1 class="literature-title">文献检索</h1>
+        </div>
+        <p class="literature-subtitle">智能筛选·多维检索·精准定位</p>
+    </div>
+    
+    <div class="literature-search-section">
+        <div class="literature-search-box">
+            <input type="text" class="literature-search-input" placeholder="请输入关键词、标题、作者或DOI进行检索" id="literatureSearchKeyword">
+            <div class="literature-search-actions">
+                <button class="literature-advanced-btn" onclick="toggleAdvancedSearch()" title="高级检索">⚙️</button>
+                <button class="literature-search-btn" onclick="event.preventDefault(); event.stopPropagation(); performLiteratureSearch(); return false;">🔍</button>
+            </div>
+        </div>
+        
+        <!-- 高级检索面板 -->
+        <div class="advanced-search-panel" id="advancedSearchPanel" style="display: none;">
+            <div class="advanced-search-content">
+                <div class="advanced-search-row">
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">标题</label>
+                        <input type="text" class="advanced-input" placeholder="请输入标题关键词" id="titleKeyword">
+                    </div>
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">作者</label>
+                        <input type="text" class="advanced-input" placeholder="请输入作者姓名" id="authorKeyword">
+                    </div>
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">期刊/会议</label>
+                        <input type="text" class="advanced-input" placeholder="请输入期刊或会议名称" id="journalKeyword">
+                    </div>
+                </div>
+                <div class="advanced-search-row">
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">发表年份</label>
+                        <div class="year-range">
+                            <input type="number" class="advanced-input" placeholder="起始年份" id="yearFrom" min="1900" max="2025">
+                            <span>至</span>
+                            <input type="number" class="advanced-input" placeholder="结束年份" id="yearTo" min="1900" max="2025">
+                        </div>
+                    </div>
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">文献类型</label>
+                        <select class="advanced-select" id="literatureType">
+                            <option value="">全部</option>
+                            <option value="article">期刊论文</option>
+                            <option value="conference">会议论文</option>
+                            <option value="book">图书</option>
+                            <option value="thesis">学位论文</option>
+                            <option value="patent">专利</option>
+                        </select>
+                    </div>
+                    <div class="advanced-search-item">
+                        <label class="advanced-label">语言</label>
+                        <select class="advanced-select" id="language">
+                            <option value="">全部</option>
+                            <option value="zh">中文</option>
+                            <option value="en">英文</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="advanced-search-actions">
+                    <button class="btn btn-default" onclick="resetAdvancedSearch()">重置</button>
+                    <button class="btn btn-primary" onclick="applyAdvancedSearch()">应用筛选</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 筛选工具栏 -->
+    <div class="literature-filter-bar">
+        <div class="filter-left">
+            <span class="filter-label">排序：</span>
+            <select class="filter-select" id="sortBy" onchange="performLiteratureSearch()">
+                <option value="relevance">相关度</option>
+                <option value="date_desc">最新发表</option>
+                <option value="date_asc">最早发表</option>
+                <option value="citation_desc">引用次数（高到低）</option>
+                <option value="citation_asc">引用次数（低到高）</option>
+            </select>
+            <button class="smart-filter-btn" onclick="openSmartFilter()">
+                <span>🔍</span>
+                <span>智能筛选</span>
+            </button>
+        </div>
+        <div class="filter-right">
+            <span class="result-count" id="resultCount">共找到 0 条结果</span>
+        </div>
+    </div>
+    
+    <!-- 智能筛选模态框 -->
+    <div class="smart-filter-modal" id="smartFilterModal" style="display: none;">
+        <div class="smart-filter-overlay" onclick="closeSmartFilter()"></div>
+        <div class="smart-filter-content">
+            <div class="smart-filter-header">
+                <h3 class="smart-filter-title">筛选</h3>
+                <button class="smart-filter-close" onclick="closeSmartFilter()">×</button>
+            </div>
+            <div class="smart-filter-body">
+                <!-- 语言类型 -->
+                <div class="filter-section">
+                    <label class="filter-section-label">语言类型</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="languageType" value="all" checked>
+                            <span>不限</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="languageType" value="zh">
+                            <span>中文</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="languageType" value="en">
+                            <span>英文</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 发布时间 -->
+                <div class="filter-section">
+                    <label class="filter-section-label">发布时间</label>
+                    <div class="range-slider-container">
+                        <div class="range-slider">
+                            <input type="range" id="yearRangeMin" min="1920" max="2025" value="1920" class="range-input">
+                            <input type="range" id="yearRangeMax" min="1920" max="2025" value="2025" class="range-input">
+                        </div>
+                        <div class="range-labels">
+                            <span id="yearMinLabel">1920</span>
+                            <span>至</span>
+                            <span id="yearMaxLabel">2025</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 期刊等级 -->
+                <div class="filter-section">
+                    <label class="filter-section-label">期刊等级</label>
+                    <div class="range-slider-container">
+                        <div class="journal-level-slider">
+                            <input type="range" id="journalLevelMin" min="0" max="4" value="0" step="1" class="range-input">
+                            <input type="range" id="journalLevelMax" min="0" max="4" value="4" step="1" class="range-input">
+                        </div>
+                        <div class="journal-level-labels">
+                            <span>Q1</span>
+                            <span>Q2</span>
+                            <span>Q3</span>
+                            <span>Q4</span>
+                            <span>All</span>
+                        </div>
+                        <div class="range-labels">
+                            <span id="journalLevelMinLabel">Q1</span>
+                            <span>至</span>
+                            <span id="journalLevelMaxLabel">All</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 期刊标签 -->
+                <div class="filter-section">
+                    <label class="filter-section-label">期刊标签</label>
+                    <div class="tag-input-container">
+                        <input type="text" class="tag-input" id="journalTagInput" placeholder="输入标签，按回车添加">
+                        <div class="tag-list" id="journalTagList">
+                            <!-- 标签将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 有无PDF -->
+                <div class="filter-section">
+                    <label class="filter-section-label">有无PDF</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="hasPDF">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="smart-filter-footer">
+                <button class="btn btn-default" onclick="resetSmartFilter()">重置</button>
+                <button class="btn btn-primary" onclick="applySmartFilter()">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 检索结果列表 -->
+    <div class="literature-results-section" id="literatureResults">
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📖</div>
+            <div class="empty-text">请输入关键词开始检索</div>
+            <div class="empty-desc">支持标题、作者、关键词、摘要等多维度检索</div>
+        </div>
+        
+        <div class="literature-results-list" id="literatureResultsList" style="display: none;">
+            <!-- 结果将通过JavaScript动态生成 -->
+        </div>
+    </div>
+    
+    <!-- 分页 -->
+    <div class="literature-pagination" id="literaturePagination" style="display: none;">
+        <button class="pagination-btn" id="prevPage" onclick="changePage(-1)">上一页</button>
+        <span class="pagination-info" id="pageInfo">第 1 页，共 1 页</span>
+        <button class="pagination-btn" id="nextPage" onclick="changePage(1)">下一页</button>
+    </div>
+</div>
+
+<style>
+.literature-search-page {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.literature-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.literature-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.literature-icon {
+    font-size: 32px;
+}
+
+.literature-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.literature-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.literature-search-section {
+    margin-bottom: 24px;
+}
+
+.literature-search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: border-color 0.3s;
+}
+
+.literature-search-box:focus-within {
+    border-color: #1890ff;
+}
+
+.literature-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 8px 0;
+}
+
+.literature-search-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.literature-advanced-btn,
+.literature-search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.literature-advanced-btn:hover,
+.literature-search-btn:hover {
+    background: #f5f5f5;
+}
+
+/* 高级检索面板 */
+.advanced-search-panel {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.advanced-search-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.advanced-search-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.advanced-search-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.advanced-label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.advanced-input,
+.advanced-select {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.advanced-input:focus,
+.advanced-select:focus {
+    outline: none;
+    border-color: #1890ff;
+}
+
+.year-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.year-range input {
+    flex: 1;
+}
+
+.advanced-search-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-default {
+    background: #fff;
+    color: #333;
+}
+
+.btn-default:hover {
+    background: #f5f5f5;
+}
+
+.btn-primary {
+    background: #1890ff;
+    color: #fff;
+    border-color: #1890ff;
+}
+
+.btn-primary:hover {
+    background: #40a9ff;
+    border-color: #40a9ff;
+}
+
+/* 筛选工具栏 */
+.literature-filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.filter-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.filter-select {
+    padding: 6px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.smart-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border: 1px solid #1890ff;
+    border-radius: 6px;
+    background: #fff;
+    color: #1890ff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 16px;
+}
+
+.smart-filter-btn:hover {
+    background: #e6f7ff;
+    border-color: #40a9ff;
+}
+
+.filter-right {
+    font-size: 14px;
+    color: #666;
+}
+
+.result-count {
+    font-weight: 500;
+    color: #333;
+}
+
+/* 检索结果 */
+.literature-results-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    min-height: 400px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.empty-text {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.empty-desc {
+    font-size: 14px;
+    color: #999;
+}
+
+.literature-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.literature-result-item {
+    padding: 20px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.literature-result-item:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.result-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.result-item-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1890ff;
+    margin: 0;
+    flex: 1;
+    line-height: 1.5;
+}
+
+.result-item-title:hover {
+    text-decoration: underline;
+}
+
+.result-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.result-item-action-btn {
+    padding: 6px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.result-item-action-btn:hover {
+    background: #f5f5f5;
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.result-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+.result-item-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.result-item-abstract {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.result-item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.result-item-tag {
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* 分页 */
+.literature-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.pagination-btn {
+    padding: 8px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f5f5f5;
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 智能筛选模态框 */
+.smart-filter-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.smart-filter-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.smart-filter-content {
+    position: relative;
+    width: 400px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+    overflow-y: auto;
+}
+
+.smart-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.smart-filter-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.smart-filter-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.smart-filter-close:hover {
+    color: #333;
+}
+
+.smart-filter-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.filter-section {
+    margin-bottom: 24px;
+}
+
+.filter-section-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+/* 单选按钮组 */
+.radio-group {
+    display: flex;
+    gap: 16px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.radio-label input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* 范围滑块 */
+.range-slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.range-slider {
+    position: relative;
+    height: 6px;
+    background: #e8e8e8;
+    border-radius: 3px;
+}
+
+.range-slider .range-input {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+}
+
+.range-slider .range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #1890ff;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+    position: relative;
+    z-index: 2;
+}
+
+.range-slider .range-input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #1890ff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.range-slider .range-input:first-of-type {
+    z-index: 3;
+}
+
+.range-slider .range-input:last-of-type {
+    z-index: 1;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 期刊等级滑块 */
+.journal-level-slider {
+    position: relative;
+    height: 6px;
+    background: #e8e8e8;
+    border-radius: 3px;
+    margin-bottom: 8px;
+}
+
+.journal-level-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.journal-level-slider .range-input {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+}
+
+.journal-level-slider .range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #1890ff;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+    position: relative;
+    z-index: 2;
+}
+
+.journal-level-slider .range-input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #1890ff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+/* 标签输入 */
+.tag-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tag-input {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.tag-input:focus {
+    outline: none;
+    border-color: #1890ff;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #1890ff;
+}
+
+.tag-remove {
+    background: none;
+    border: none;
+    color: #1890ff;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tag-remove:hover {
+    color: #40a9ff;
+}
+
+/* 开关切换 */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #1890ff;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.smart-filter-footer {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid #e8e8e8;
+    justify-content: flex-end;
+}
+</style>
+
+<script>
+// 当前页码
+let currentPage = 1;
+let totalPages = 1;
+let currentResults = [];
+
+// 执行文献检索
+function performLiteratureSearch() {
+    try {
+        const keyword = document.getElementById('literatureSearchKeyword')?.value.trim() || '';
+        
+        // 显示加载状态
+        const resultsList = document.getElementById('literatureResultsList');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (!resultsList || !emptyState) {
+            console.error('文献检索页面元素未找到', { resultsList: !!resultsList, emptyState: !!emptyState });
+            alert('页面元素加载异常，请刷新页面重试');
+            return;
+        }
+        
+        emptyState.style.display = 'none';
+        resultsList.style.display = 'block';
+        resultsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">正在检索文献...</div>';
+        
+        // 获取筛选条件
+        const sortBy = document.getElementById('sortBy')?.value || 'relevance';
+    
+    // 模拟检索结果（基于实际网站数据）
+    setTimeout(() => {
+        const mockResults = [
+            {
+                title: '咳嗽变异性哮喘的中医证候学研究',
+                authors: ['罗社文', '李友林', '晁恩祥'],
+                journal: '现代中医临床',
+                year: 2021,
+                citation: 69,
+                abstract: '本研究旨在探讨咳嗽变异性哮喘患者的中医证候特点及演变规律，通过文献复习和临床实践对265例患者进行了研究。',
+                doi: '',
+                url: 'https://xblc.bucm.edu.cn/zh/article/18466683/',
+                tags: ['中医', '哮喘', '证候学'],
+                partition: '中国科技核心'
+            },
+            {
+                title: '中西医结合防治支气管哮喘的探讨',
+                authors: ['沈自尹'],
+                journal: '中国中西医结合杂志',
+                year: 1995,
+                citation: 63,
+                abstract: '本文探讨了中西医结合在支气管哮喘防治中的应用，并区分了发作期和缓解期的治疗策略，指出中医在缓解期治疗的优势。',
+                doi: '',
+                url: 'http://www.cjim.cn/zxyjhcn/zxyjhcn/ch/reader/view_abstract.aspx?file_no=19950722',
+                tags: ['中西医结合', '支气管哮喘', '防治'],
+                partition: 'CSCD, 北大中文核心, 中国科技核心'
+            },
+            {
+                title: '我国支气管哮喘防治指南解读',
+                authors: ['林江涛'],
+                journal: 'book',
+                year: 2011,
+                citation: 49,
+                abstract: '本文解读了我国2008年修订的支气管哮喘防治指南，强调了肺功能测定在哮喘诊断和评估中的重要性。',
+                doi: '',
+                url: 'http://medi-guide.meditool.cn/guidepdf/E6C3E652-C8EB-C648-3265-683E3668CF11.pdf',
+                tags: ['哮喘', '防治指南', '解读'],
+                partition: ''
+            },
+            {
+                title: '中国儿童支气管哮喘防治指南修订要点的探讨',
+                authors: ['洪建国'],
+                journal: '临床儿科杂志',
+                year: 2014,
+                citation: 48,
+                abstract: '本文探讨了2008年制定的《儿童支气管哮喘诊断与防治指南》的修订要点，并指出了随着对哮喘认识的深入，儿童哮喘的诊治技术也在不断发展。',
+                doi: '',
+                url: 'https://jcp.xinhuamed.com.cn/CN/Y2014/V32/I2/101',
+                tags: ['儿童哮喘', '防治指南', '修订'],
+                partition: 'CSCD, 北大中文核心, 中国科技核心'
+            },
+            {
+                title: '白三烯与支气管哮喘',
+                authors: ['黄丽萍', '方凤'],
+                journal: 'book',
+                year: 2005,
+                citation: 46,
+                abstract: '本文介绍了哮喘作为一种慢性炎症疾病，以及白三烯在其中作为一种重要的炎症介质的作用。',
+                doi: '',
+                url: 'https://www.researchgate.net/profile/Liping-Huang-12/publication/343375145_Population_pharmacokinetic_study_of_caffeine_citrate_in_Chinese_premature_infants_with_apnea/links/607842128ea909241efea9bb/Population-pharmacokinetic-study-of-caffeine-citrate-in-Chinese-premature-infants-with-apnea.pdf',
+                tags: ['白三烯', '支气管哮喘', '炎症介质'],
+                partition: ''
+            },
+            {
+                title: '小儿哮喘中医诊疗指南',
+                authors: ['赵霞', '汪受传', '韩新民', '虞舜', '倪光夏', '李燕宁', '王力宁'],
+                journal: 'book',
+                year: 2008,
+                citation: 46,
+                abstract: '本指南从认识小儿哮喘的病机、治疗现状、存在问题及未来发展方向等方面，探讨了小儿哮喘的局部治疗与整体调节。',
+                doi: '',
+                url: 'https://dlweb.sogoucdn.com/mydocs/201912/80000048.pdf',
+                tags: ['小儿哮喘', '中医诊疗', '指南'],
+                partition: ''
+            },
+            {
+                title: '支气管哮喘的病因研究进展',
+                authors: ['窦秀莉', '唐华平', '韩伟'],
+                journal: '实用临床医药杂志',
+                year: 2009,
+                citation: 41,
+                abstract: '本文综述了支气管哮喘的病因研究进展，指出哮喘患病率在全球范围内呈上升趋势，已成为常见的慢性呼吸道疾病。',
+                doi: '',
+                url: 'https://jcmp.yzu.edu.cn/article/doi/10.3969/j.issn.1672-2353.2009.05.006',
+                tags: ['支气管哮喘', '病因', '研究进展'],
+                partition: '中国科技核心'
+            },
+            {
+                title: '吸入沙美特罗替卡松干粉剂与联合吸入两种干粉剂治疗成人哮喘的疗效和安全性的对照研究',
+                authors: ['钟南山', '郑劲平', '刘晓青', '肖正伦', '姚婉贞', '韩翔', '王虹'],
+                journal: 'book',
+                year: 2002,
+                citation: 149,
+                abstract: '国外已有关于上述两种产品联合治疗哮喘或上述两种产品制成复方制剂治疗哮喘的临床研究。本研究的目的是比较SM/FP复方制剂与SM和FP联合应用治疗我国哮喘患者的疗效和安全性。',
+                doi: '',
+                url: '',
+                tags: ['哮喘', '沙美特罗替卡松', '临床研究'],
+                partition: ''
+            },
+            {
+                title: '小儿哮喘的免疫学发病机制及其对策',
+                authors: ['杨锡强'],
+                journal: 'book',
+                year: 2001,
+                citation: 98,
+                abstract: '本文探讨了哮喘作为一种气道慢性炎症性疾病，其发病中异常免疫反应的重要作用，并关注了哮喘发病率的上升趋势。',
+                doi: '',
+                url: 'http://www.zgddek.com/CN/article/downloadArticleFile.do?attachType=PDF&id=11498',
+                tags: ['小儿哮喘', '免疫学', '发病机制'],
+                partition: ''
+            },
+            {
+                title: '普米克气雾剂治疗儿童哮喘疗效观察',
+                authors: ['陈强', '朱绿绮', '刘建梅', '郭德华', '余定英', '黄薇'],
+                journal: '中国当代儿科杂志',
+                year: 2000,
+                citation: 93,
+                abstract: '本研究观察了普米克气雾剂在治疗儿童哮喘中的疗效，研究对象为符合中华医学会儿童哮喘诊断标准的113例哮喘儿童。',
+                doi: '',
+                url: 'http://www.zgddek.com/EN/article/downloadArticleFile.do?attachType=PDF&id=11814',
+                tags: ['儿童哮喘', '普米克气雾剂', '疗效观察'],
+                partition: ''
+            }
+        ];
+        
+        currentResults = mockResults;
+        totalPages = 1;
+        currentPage = 1;
+        
+        try {
+            displayResults(mockResults);
+            updateResultCount(mockResults.length);
+            updatePagination();
+        } catch (error) {
+            console.error('显示检索结果时出错:', error);
+            resultsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #f5222d;">检索结果加载失败，请重试</div>';
+        }
+    }, 1000); // 缩短等待时间到1秒
+    } catch (error) {
+        console.error('执行文献检索时出错:', error);
+        alert('检索过程中发生错误，请重试');
+    }
+}
+
+// 页面加载时自动显示示例数据（不需要输入关键词）
+function showDefaultResults() {
+    const resultsList = document.getElementById('literatureResultsList');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (!resultsList || !emptyState) {
+        return;
+    }
+    
+    // 直接显示模拟数据，不需要输入关键词
+    const mockResults = [
+        {
+            title: '咳嗽变异性哮喘的中医证候学研究',
+            authors: ['罗社文', '李友林', '晁恩祥'],
+            journal: '现代中医临床',
+            year: 2021,
+            citation: 69,
+            abstract: '本研究旨在探讨咳嗽变异性哮喘患者的中医证候特点及演变规律，通过文献复习和临床实践对265例患者进行了研究。',
+            doi: '',
+            url: 'https://xblc.bucm.edu.cn/zh/article/18466683/',
+            tags: ['中医', '哮喘', '证候学'],
+            partition: '中国科技核心'
+        },
+        {
+            title: '中西医结合防治支气管哮喘的探讨',
+            authors: ['沈自尹'],
+            journal: '中国中西医结合杂志',
+            year: 1995,
+            citation: 63,
+            abstract: '本文探讨了中西医结合在支气管哮喘防治中的应用，并区分了发作期和缓解期的治疗策略，指出中医在缓解期治疗的优势。',
+            doi: '',
+            url: 'http://www.cjim.cn/zxyjhcn/zxyjhcn/ch/reader/view_abstract.aspx?file_no=19950722',
+            tags: ['中西医结合', '支气管哮喘', '防治'],
+            partition: 'CSCD, 北大中文核心, 中国科技核心'
+        },
+        {
+            title: '我国支气管哮喘防治指南解读',
+            authors: ['林江涛'],
+            journal: 'book',
+            year: 2011,
+            citation: 49,
+            abstract: '本文解读了我国2008年修订的支气管哮喘防治指南，强调了肺功能测定在哮喘诊断和评估中的重要性。',
+            doi: '',
+            url: 'http://medi-guide.meditool.cn/guidepdf/E6C3E652-C8EB-C648-3265-683E3668CF11.pdf',
+            tags: ['哮喘', '防治指南', '解读'],
+            partition: ''
+        },
+        {
+            title: '中国儿童支气管哮喘防治指南修订要点的探讨',
+            authors: ['洪建国'],
+            journal: '临床儿科杂志',
+            year: 2014,
+            citation: 48,
+            abstract: '本文探讨了2008年制定的《儿童支气管哮喘诊断与防治指南》的修订要点，并指出了随着对哮喘认识的深入，儿童哮喘的诊治技术也在不断发展。',
+            doi: '',
+            url: 'https://jcp.xinhuamed.com.cn/CN/Y2014/V32/I2/101',
+            tags: ['儿童哮喘', '防治指南', '修订'],
+            partition: 'CSCD, 北大中文核心, 中国科技核心'
+        },
+        {
+            title: '白三烯与支气管哮喘',
+            authors: ['黄丽萍', '方凤'],
+            journal: 'book',
+            year: 2005,
+            citation: 46,
+            abstract: '本文介绍了哮喘作为一种慢性炎症疾病，以及白三烯在其中作为一种重要的炎症介质的作用。',
+            doi: '',
+            url: 'https://www.researchgate.net/profile/Liping-Huang-12/publication/343375145_Population_pharmacokinetic_study_of_caffeine_citrate_in_Chinese_premature_infants_with_apnea/links/607842128ea909241efea9bb/Population-pharmacokinetic-study-of-caffeine-citrate-in-Chinese-premature-infants-with-apnea.pdf',
+            tags: ['白三烯', '支气管哮喘', '炎症介质'],
+            partition: ''
+        },
+        {
+            title: '小儿哮喘中医诊疗指南',
+            authors: ['赵霞', '汪受传', '韩新民', '虞舜', '倪光夏', '李燕宁', '王力宁'],
+            journal: 'book',
+            year: 2008,
+            citation: 46,
+            abstract: '本指南从认识小儿哮喘的病机、治疗现状、存在问题及未来发展方向等方面，探讨了小儿哮喘的局部治疗与整体调节。',
+            doi: '',
+            url: 'https://dlweb.sogoucdn.com/mydocs/201912/80000048.pdf',
+            tags: ['小儿哮喘', '中医诊疗', '指南'],
+            partition: ''
+        },
+        {
+            title: '支气管哮喘的病因研究进展',
+            authors: ['窦秀莉', '唐华平', '韩伟'],
+            journal: '实用临床医药杂志',
+            year: 2009,
+            citation: 41,
+            abstract: '本文综述了支气管哮喘的病因研究进展，指出哮喘患病率在全球范围内呈上升趋势，已成为常见的慢性呼吸道疾病。',
+            doi: '',
+            url: 'https://jcmp.yzu.edu.cn/article/doi/10.3969/j.issn.1672-2353.2009.05.006',
+            tags: ['支气管哮喘', '病因', '研究进展'],
+            partition: '中国科技核心'
+        },
+        {
+            title: '吸入沙美特罗替卡松干粉剂与联合吸入两种干粉剂治疗成人哮喘的疗效和安全性的对照研究',
+            authors: ['钟南山', '郑劲平', '刘晓青', '肖正伦', '姚婉贞', '韩翔', '王虹'],
+            journal: 'book',
+            year: 2002,
+            citation: 149,
+            abstract: '国外已有关于上述两种产品联合治疗哮喘或上述两种产品制成复方制剂治疗哮喘的临床研究。本研究的目的是比较SM/FP复方制剂与SM和FP联合应用治疗我国哮喘患者的疗效和安全性。',
+            doi: '',
+            url: '',
+            tags: ['哮喘', '沙美特罗替卡松', '临床研究'],
+            partition: ''
+        },
+        {
+            title: '小儿哮喘的免疫学发病机制及其对策',
+            authors: ['杨锡强'],
+            journal: 'book',
+            year: 2001,
+            citation: 98,
+            abstract: '本文探讨了哮喘作为一种气道慢性炎症性疾病，其发病中异常免疫反应的重要作用，并关注了哮喘发病率的上升趋势。',
+            doi: '',
+            url: 'http://www.zgddek.com/CN/article/downloadArticleFile.do?attachType=PDF&id=11498',
+            tags: ['小儿哮喘', '免疫学', '发病机制'],
+            partition: ''
+        },
+        {
+            title: '普米克气雾剂治疗儿童哮喘疗效观察',
+            authors: ['陈强', '朱绿绮', '刘建梅', '郭德华', '余定英', '黄薇'],
+            journal: '中国当代儿科杂志',
+            year: 2000,
+            citation: 93,
+            abstract: '本研究观察了普米克气雾剂在治疗儿童哮喘中的疗效，研究对象为符合中华医学会儿童哮喘诊断标准的113例哮喘儿童。',
+            doi: '',
+            url: 'http://www.zgddek.com/EN/article/downloadArticleFile.do?attachType=PDF&id=11814',
+            tags: ['儿童哮喘', '普米克气雾剂', '疗效观察'],
+            partition: ''
+        }
+    ];
+    
+    currentResults = mockResults;
+    totalPages = 1;
+    currentPage = 1;
+    
+    emptyState.style.display = 'none';
+    resultsList.style.display = 'block';
+    displayResults(mockResults);
+    updateResultCount(mockResults.length);
+    updatePagination();
+}
+
+// 显示检索结果
+function displayResults(results) {
+    try {
+        const resultsList = document.getElementById('literatureResultsList');
+        
+        if (!resultsList) {
+            console.error('literatureResultsList 元素未找到');
+            return;
+        }
+        
+        if (!results || results.length === 0) {
+            resultsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">未找到相关文献</div>';
+            return;
+        }
+        
+        resultsList.innerHTML = results.map((result, index) => `
+        <div class="literature-result-item" onclick="viewLiteratureDetail(${index})">
+            <div class="result-item-header">
+                <h3 class="result-item-title">${result.title}</h3>
+                <div class="result-item-actions">
+                    <button class="result-item-action-btn" onclick="event.stopPropagation(); downloadLiterature(${index})">📥 下载</button>
+                    <button class="result-item-action-btn" onclick="event.stopPropagation(); saveLiterature(${index})">⭐ 收藏</button>
+                </div>
+            </div>
+            <div class="result-item-meta">
+                <span class="result-item-meta-item">
+                    <strong>作者：</strong>${result.authors.join(', ')}
+                </span>
+                <span class="result-item-meta-item">
+                    <strong>期刊：</strong>${result.journal}
+                </span>
+                <span class="result-item-meta-item">
+                    <strong>发表年份：</strong>${result.year}
+                </span>
+                <span class="result-item-meta-item">
+                    <strong>引用量：</strong>${result.citation}
+                </span>
+                ${result.partition ? `<span class="result-item-meta-item"><strong>分区：</strong>${result.partition}</span>` : ''}
+                ${result.doi ? `<span class="result-item-meta-item"><strong>DOI：</strong>${result.doi}</span>` : ''}
+            </div>
+            <div class="result-item-abstract">
+                ${result.abstract}
+            </div>
+            <div class="result-item-tags">
+                ${result.tags.map(tag => `<span class="result-item-tag">${tag}</span>`).join('')}
+            </div>
+        </div>
+    `).join('');
+    } catch (error) {
+        console.error('渲染检索结果时出错:', error);
+        const resultsList = document.getElementById('literatureResultsList');
+        if (resultsList) {
+            resultsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #f5222d;">结果渲染失败，请重试</div>';
+        }
+    }
+}
+
+// 更新结果数量
+function updateResultCount(count) {
+    try {
+        const resultCountEl = document.getElementById('resultCount');
+        if (resultCountEl) {
+            resultCountEl.textContent = `共找到 ${count} 条结果`;
+        }
+    } catch (error) {
+        console.error('更新结果数量时出错:', error);
+    }
+}
+
+// 更新分页
+function updatePagination() {
+    const pagination = document.getElementById('literaturePagination');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    
+    if (totalPages > 1) {
+        pagination.style.display = 'flex';
+        pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+    } else {
+        pagination.style.display = 'none';
+    }
+}
+
+// 切换页面
+function changePage(delta) {
+    const newPage = currentPage + delta;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        // 重新执行检索（实际应该调用API获取对应页的数据）
+        performLiteratureSearch();
+    }
+}
+
+// 切换高级检索面板
+function toggleAdvancedSearch() {
+    const panel = document.getElementById('advancedSearchPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+// 重置高级检索
+function resetAdvancedSearch() {
+    document.getElementById('titleKeyword').value = '';
+    document.getElementById('authorKeyword').value = '';
+    document.getElementById('journalKeyword').value = '';
+    document.getElementById('yearFrom').value = '';
+    document.getElementById('yearTo').value = '';
+    document.getElementById('literatureType').value = '';
+    document.getElementById('language').value = '';
+}
+
+// 应用高级检索
+function applyAdvancedSearch() {
+    // 收集高级检索条件
+    const advancedConditions = {
+        title: document.getElementById('titleKeyword').value,
+        author: document.getElementById('authorKeyword').value,
+        journal: document.getElementById('journalKeyword').value,
+        yearFrom: document.getElementById('yearFrom').value,
+        yearTo: document.getElementById('yearTo').value,
+        type: document.getElementById('literatureType').value,
+        language: document.getElementById('language').value
+    };
+    
+    // 执行检索（实际应该将高级检索条件传递给API）
+    performLiteratureSearch();
+    
+    // 关闭高级检索面板
+    document.getElementById('advancedSearchPanel').style.display = 'none';
+}
+
+// 查看文献详情
+function viewLiteratureDetail(index) {
+    const result = currentResults[index];
+    alert(`查看文献详情：\n\n标题：${result.title}\n作者：${result.authors.join(', ')}\n期刊：${result.journal}\n年份：${result.year}\nDOI：${result.doi}\n\n（实际应用中应打开详情页面）`);
+}
+
+// 下载文献
+function downloadLiterature(index) {
+    const result = currentResults[index];
+    alert(`正在下载文献：${result.title}\n\n（实际应用中应调用下载API）`);
+}
+
+// 收藏文献
+function saveLiterature(index) {
+    const result = currentResults[index];
+    alert(`已收藏文献：${result.title}\n\n（实际应用中应调用收藏API）`);
+}
+
+// 打开智能筛选
+function openSmartFilter() {
+    document.getElementById('smartFilterModal').style.display = 'flex';
+    // 初始化范围滑块
+    initRangeSliders();
+}
+
+// 关闭智能筛选
+function closeSmartFilter() {
+    document.getElementById('smartFilterModal').style.display = 'none';
+}
+
+// 初始化范围滑块
+function initRangeSliders() {
+    // 年份范围滑块
+    const yearMin = document.getElementById('yearRangeMin');
+    const yearMax = document.getElementById('yearRangeMax');
+    const yearMinLabel = document.getElementById('yearMinLabel');
+    const yearMaxLabel = document.getElementById('yearMaxLabel');
+    
+    yearMin.addEventListener('input', function() {
+        if (parseInt(this.value) > parseInt(yearMax.value)) {
+            yearMax.value = this.value;
+        }
+        yearMinLabel.textContent = this.value;
+        updateYearRange();
+    });
+    
+    yearMax.addEventListener('input', function() {
+        if (parseInt(this.value) < parseInt(yearMin.value)) {
+            yearMin.value = this.value;
+        }
+        yearMaxLabel.textContent = this.value;
+        updateYearRange();
+    });
+    
+    // 期刊等级滑块
+    const journalMin = document.getElementById('journalLevelMin');
+    const journalMax = document.getElementById('journalLevelMax');
+    const journalMinLabel = document.getElementById('journalLevelMinLabel');
+    const journalMaxLabel = document.getElementById('journalLevelMaxLabel');
+    const journalLabels = ['Q1', 'Q2', 'Q3', 'Q4', 'All'];
+    
+    journalMin.addEventListener('input', function() {
+        if (parseInt(this.value) > parseInt(journalMax.value)) {
+            journalMax.value = this.value;
+        }
+        journalMinLabel.textContent = journalLabels[parseInt(this.value)];
+        updateJournalLevelRange();
+    });
+    
+    journalMax.addEventListener('input', function() {
+        if (parseInt(this.value) < parseInt(journalMin.value)) {
+            journalMin.value = this.value;
+        }
+        journalMaxLabel.textContent = journalLabels[parseInt(this.value)];
+        updateJournalLevelRange();
+    });
+    
+    // 标签输入
+    const tagInput = document.getElementById('journalTagInput');
+    const tagList = document.getElementById('journalTagList');
+    
+    tagInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+            addTag(this.value.trim());
+            this.value = '';
+        }
+    });
+}
+
+// 更新年份范围显示
+function updateYearRange() {
+    const yearMin = document.getElementById('yearRangeMin').value;
+    const yearMax = document.getElementById('yearRangeMax').value;
+    // 可以在这里更新滑块之间的填充颜色
+}
+
+// 更新期刊等级范围显示
+function updateJournalLevelRange() {
+    const journalMin = document.getElementById('journalLevelMin').value;
+    const journalMax = document.getElementById('journalLevelMax').value;
+    // 可以在这里更新滑块之间的填充颜色
+}
+
+// 添加标签
+function addTag(tagText) {
+    const tagList = document.getElementById('journalTagList');
+    const tagItem = document.createElement('div');
+    tagItem.className = 'tag-item';
+    tagItem.innerHTML = `
+        <span>${tagText}</span>
+        <button class="tag-remove" onclick="removeTag(this)">×</button>
+    `;
+    tagList.appendChild(tagItem);
+}
+
+// 移除标签
+function removeTag(button) {
+    button.parentElement.remove();
+}
+
+// 重置智能筛选
+function resetSmartFilter() {
+    // 重置语言类型
+    document.querySelector('input[name="languageType"][value="all"]').checked = true;
+    
+    // 重置年份范围
+    document.getElementById('yearRangeMin').value = 1920;
+    document.getElementById('yearRangeMax').value = 2025;
+    document.getElementById('yearMinLabel').textContent = '1920';
+    document.getElementById('yearMaxLabel').textContent = '2025';
+    
+    // 重置期刊等级
+    document.getElementById('journalLevelMin').value = 0;
+    document.getElementById('journalLevelMax').value = 4;
+    document.getElementById('journalLevelMinLabel').textContent = 'Q1';
+    document.getElementById('journalLevelMaxLabel').textContent = 'All';
+    
+    // 清空标签
+    document.getElementById('journalTagList').innerHTML = '';
+    
+    // 重置PDF开关
+    document.getElementById('hasPDF').checked = false;
+}
+
+// 应用智能筛选
+function applySmartFilter() {
+    // 收集筛选条件
+    const filterConditions = {
+        languageType: document.querySelector('input[name="languageType"]:checked').value,
+        yearMin: document.getElementById('yearRangeMin').value,
+        yearMax: document.getElementById('yearRangeMax').value,
+        journalLevelMin: document.getElementById('journalLevelMin').value,
+        journalLevelMax: document.getElementById('journalLevelMax').value,
+        tags: Array.from(document.querySelectorAll('.tag-item span')).map(span => span.textContent),
+        hasPDF: document.getElementById('hasPDF').checked
+    };
+    
+    console.log('应用筛选条件：', filterConditions);
+    
+    // 关闭模态框
+    closeSmartFilter();
+    
+    // 重新执行检索（实际应该将筛选条件传递给API）
+    performLiteratureSearch();
+}
+
+// 初始化页面
+function initPage_research_literature_search() {
+    // 页面加载时的初始化逻辑
+    console.log('文献检索页面已加载');
+    
+    // 阻止模态框内容区域的点击事件冒泡
+    const filterContent = document.querySelector('.smart-filter-content');
+    if (filterContent) {
+        filterContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // 页面加载时自动显示示例数据
+    setTimeout(() => {
+        showDefaultResults();
+    }, 500);
+}
+</script>

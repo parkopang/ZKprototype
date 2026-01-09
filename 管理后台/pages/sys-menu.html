@@ -1,0 +1,85 @@
+<!-- 系统管理：菜单管理页面 -->
+<div class="breadcrumb">
+    <a href="#" onclick="showPage('home'); return false;">首页</a> / 系统管理 / 菜单管理
+</div>
+<div class="page-header">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="请输入菜单名称" id="sysMenuSearch">
+        </div>
+        <button class="toolbar-icon" title="筛选" onclick="toggleSysMenuFilter()">🔽</button>
+        <button class="toolbar-icon" title="设置" onclick="toggleTableSettings('sysMenu', this)" style="position: relative;">⚙️</button>
+        <button class="create-btn" onclick="showCreateSysMenuForm()">
+            <span>➕</span>
+            <span>创建菜单</span>
+        </button>
+    </div>
+</div>
+<div class="filter-panel" id="sys-menu-filter-panel" style="display: none; background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e8e8e8;">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">菜单名称</label>
+            <input type="text" class="form-input" placeholder="请输入菜单名称">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">菜单级别</label>
+            <select class="form-input">
+                <option>全部</option>
+                <option>一级</option>
+                <option>二级</option>
+                <option>三级</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">菜单展示</label>
+            <select class="form-input">
+                <option>全部</option>
+                <option>显示</option>
+                <option>隐藏</option>
+            </select>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-default" onclick="resetSysMenuFilter()">重置</button>
+        <button class="btn btn-primary" onclick="applySysMenuFilter()">查询</button>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>菜单编码</th>
+                <th>菜单名称</th>
+                <th>菜单级别</th>
+                <th>接口url</th>
+                <th>类型</th>
+                <th>菜单展示</th>
+                <th>备注</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>sys_home</td>
+                <td>我的首页</td>
+                <td>一级</td>
+                <td>/home</td>
+                <td>菜单</td>
+                <td>显示</td>
+                <td>-</td>
+                <td>2025-01-08 10:00</td>
+                <td>2025-01-08 10:00</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="viewSysMenu(1)">查看</a>
+                        <a class="action-link" onclick="editSysMenu(1)">编辑</a>
+                        <a class="action-link danger" onclick="deleteSysMenu(1)">删除</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

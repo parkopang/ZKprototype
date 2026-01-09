@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!--
+    【用途说明】
+    本段为「iMDT 管理后台 UI 原型生成 Prompt」，用于后续在 Cursor / 其他 AI 中快速生成高保真原型页面。
+    建议：长期维护版本可以同时放一份到本目录的 `README.md` 中，便于纯文档浏览；这里作为就近提示。
+
+    ============================================================
+    一、产品背景与定位
+    ============================================================
+    - 产品名称：iMDT 管理平台（管理后台）
+    - 应用类型：面向运营、管理员、项目方的 Web 管理后台
+    - 使用场景：
+      * 为「区域性乳腺癌 MDT 协作平台」及后续多疾病 iMDT 项目提供统一运营与配置后台
+      * 支撑医生侧 IMDT 入口、小程序、企业微信入口等前台产品的账号、权限、数据与活动管理
+    - 目标用户角色（至少涵盖）：
+      * 超级管理员：平台级配置、账号/角色/权限体系维护
+      * 运营人员：内容配置、活动运营、MDT 项目日常管理
+      * 医院/项目管理员：机构、科室、医生账号与病例流转管理
+      * 工业/企业侧运营：查看项目数据、MDT 执行情况（可按后续版本支持）
+    - 科研工具的Prompt遵循：角色设定 + 问题情境 + 任务指令 + 约束条件
+
+    ============================================================
+    二、项目模块组成
+    ============================================================
+    该项目由以下几大模块组成：
+    - iMDT 模块：区域性 MDT 协作平台相关功能
+    - 专业助手：面向医生的专业辅助工具
+    - 科研助手：科研相关的辅助功能
+    - 患管助手：患者管理相关功能
+
+    注：目前各模块功能仍在持续补充中，请基于现有原型地址 https://backstage-imdt-sit.zmnyun.cn 的结构进行 UI 原型设计。登录密码在 `docs/登录账号记录.md` 文件中。
+
+    ============================================================
+    三、UI 设计规范（Web 管理后台）
+    ============================================================
+    - 画布尺寸与布局：
+      * 以 1440 × 900 或 1280 × 800 桌面宽屏布局为主，顶部固定导航 + 左侧固定侧边栏 + 右侧主内容区
+      * 采用响应式栅格（Tailwind）设计，保证在 1280–1920 宽度下观感良好
+    - 视觉风格：
+      * 现代化、医疗场景友好、偏冷静专业：以浅灰/深蓝/青绿色为主色，适度点缀品牌色
+      * 使用「玻璃拟态」卡片：半透明背景、毛玻璃模糊、亮色描边 + 柔和多层阴影
+      * 多层阴影系统：区分层级（基础卡片阴影、悬浮浮层阴影、模态/抽屉的更深阴影）
+    - 组件规范：
+      * 表格：支持固定表头、斑马纹、Hover 高亮行、操作列按钮（图标+文字）
+      * 筛选条：位于列表上方，采用紧凑横向排列，带 Tag 式已选条件展示与一键重置
+      * 表单：分组标题 + 双列/三列布局，支持必填标记与校验提示
+      * 反馈组件：Toast / Message / Empty 状态（插画或图标 + 文案）
+
+    ============================================================
+    四、交互细节要求
+    ============================================================
+    - 悬停与聚焦：
+      * 所有可点击卡片、主要按钮、导航项：Hover 时进行 2–3% 微缩放（scale），并提升阴影层级
+      * 输入框、搜索框聚焦时：增加柔和的外发光（box-shadow）光晕，采用过渡动画（transition）实现渐入/渐出
+    - 动效与过渡：
+      * 使用 Tailwind 的 transition / transform 实现导航切换、折叠菜单、抽屉/弹窗的平滑过渡
+      * 子菜单展开/收起使用高度过渡与透明度渐变，避免“闪现”
+    - 列表操作：
+      * 表格行 Hover 显示操作按钮（查看详情 / 编辑 / 更多）
+      * 重要操作采用二次确认弹窗，并在弹窗中突出风险提示
+    - 多窗口/浮层：
+      * 使用右侧抽屉展示「详情 + 编辑」页面，保持列表上下文不丢失
+      * 全屏图表/详情采用居中模态框，背景加模糊与遮罩
+
+    ============================================================
+    五、技术规范
+    ============================================================
+    - 前端技术栈：
+      * 使用原生 HTML + Tailwind CSS（CDN 引入）构建所有后台原型
+      * 使用 Font Awesome（CDN）作为主要图标库，不使用带有背景色块/底板/外框的图标
+      * 图表可选：采用 ECharts / Chart.js 的 CDN（只需写出占位容器及示例配置，不必接真实数据）
+    - 资源规范：
+      * 图片统一使用开源图片网站（如 Unsplash、Pexels）在线链接，仅作为配图/封面，不嵌入真实患者信息
+      * 严禁在示例中出现真实隐私数据，可用虚构医院/医生姓名（如「某三甲医院」「张医生」等）
+
+    ============================================================
+    六、输出规范与文件组织
+    ============================================================
+    - **文件行数限制（重要）**：
+      * 每个 HTML 文件不超过 2000 行，超出时需要拆分
+      * 拆分方式：将页面内容拆分为独立的 HTML 片段文件，使用 JavaScript 动态加载
+      * 主骨架文件：只保留基本结构（头部、侧边栏、主容器），< 1000 行
+      * 页面片段：每个页面片段文件 < 500 行
+      * JavaScript 逻辑：独立 JS 文件，< 1000 行
+    
+    - **文件组织结构**：
+      * `imdt_admin_index.html` - 主入口文件（骨架结构）
+      * `pages/` - 存放各页面 HTML 片段
+        * `home.html` - 首页
+        * `contract-verification.html` - 合同审核列表
+        * `doctor-library.html` - 医生信息库
+        * 等等...
+      * `js/` - JavaScript 文件目录
+        * `app.js` - 主应用逻辑（页面路由、动态加载等）
+        * `imdt_admin.js` - 其他JS文件（如有）
+      * `css/` - CSS 样式文件目录
+        * `imdt_admin.css` - 主样式文件
+      * `docs/` - 文档文件目录
+        * `README.md` - 项目说明文档
+        * `登录账号记录.md` - 登录账号信息
+        * 其他检查记录和文档等...
+    
+    - **页面粒度**：
+      * 每个核心业务视图单独输出为一个 HTML 片段文件（例如：pages/home.html、pages/mdt_list.html 等）
+      * 列表页与详情/编辑页尽量拆分为独立片段，或通过清晰的布局区域区分
+    
+    - **汇总展示页**：
+      * 使用 `show.html` 作为后台原型的汇总展示页面
+      * 通过 `<iframe>` 方式嵌入各个页面的 HTML 文件，将多个后台界面在单页中平铺展示
+      * `show.html` 不需要写需求说明，只展示各页面界面缩略（可在每个 iframe 上方加简短标题）
+    
+    - **代码风格**：
+      * 使用语义化 HTML 标签（header / nav / main / section / aside / footer 等）
+      * Tailwind 类名适度分组与换行，保证可读性
+      * 避免内联大量 HTML 字符串，使用外部文件 + 动态加载
+
+    使用方式示例：
+    - 「请根据上述后台产品定义与 UI/交互/技术/输出规范，先为 iMDT 管理平台管理后台生成以下页面的高保真 HTML+Tailwind 原型：1）Dashboard 总览页 2）MDT 申请列表与详情 3）医生信息库列表页与抽屉详情。注意：每个文件不超过 2000 行，如超出请拆分为多个文件。」
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMDT管理平台</title>
+    <link rel="stylesheet" href="css/imdt_admin.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="logo-separator"></div>
+            <div class="platform-name">管理平台</div>
+        </div>
+        <div class="header-right">
+            <div class="font-size-selector">
+                <span>字号:</span>
+                <select>
+                    <option>小号</option>
+                    <option>中号</option>
+                    <option>大号</option>
+                </select>
+            </div>
+            <button class="header-icon-btn" title="通知" onclick="showNotifications()" style="position: relative;">
+                🔔
+                <span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ff4d4f; border-radius: 50%; border: 2px solid #fff;"></span>
+            </button>
+            <button class="header-icon-btn" title="全屏" onclick="toggleFullscreen()">⛶</button>
+            <div class="user-info" id="userInfoDropdown" style="position: relative;">
+                <div class="user-avatar">A</div>
+                <span class="user-name">admin</span>
+                <span>▼</span>
+                <div id="userDropdownMenu" class="dropdown-menu" style="display: none;">
+                    <div class="dropdown-item" onclick="showPersonalCenter()">个人中心</div>
+                    <div class="dropdown-item" onclick="logout()" style="color: #ff4d4f;">退出登录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="menu-list">
+                <div class="menu-item active" data-page="home">
+                    <div class="menu-icon">🏠</div>
+                    <span class="menu-text">我的首页</span>
+                </div>
+                <!-- 合同（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">📑</div>
+                    <span class="menu-text">合同</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="contract-verification">
+                        <div class="menu-icon">📋</div>
+                        <span class="menu-text">审核列表</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="contract-template">
+                        <div class="menu-icon">📝</div>
+                        <span class="menu-text">合同模板</span>
+                    </div>
+                </div>
+                <!-- 机构管理（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">🏢</div>
+                    <span class="menu-text">机构管理</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="organization">
+                        <div class="menu-icon">🏛️</div>
+                        <span class="menu-text">机构信息</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="project">
+                        <div class="menu-icon">📊</div>
+                        <span class="menu-text">项目信息</span>
+                    </div>
+                </div>
+                <!-- 系统管理（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">⚙️</div>
+                    <span class="menu-text">系统管理</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="sys-account">
+                        <div class="menu-icon">👤</div>
+                        <span class="menu-text">账号管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="sys-role">
+                        <div class="menu-icon">🛡️</div>
+                        <span class="menu-text">角色管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="sys-menu">
+                        <div class="menu-icon">📋</div>
+                        <span class="menu-text">菜单管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="sys-permission-group">
+                        <div class="menu-icon">🔗</div>
+                        <span class="menu-text">权限组管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="sys-disease">
+                        <div class="menu-icon">🦠</div>
+                        <span class="menu-text">病种管理</span>
+                    </div>
+                </div>
+                <!-- 主数据管理（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">📦</div>
+                    <span class="menu-text">主数据管理</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="master-region">
+                        <div class="menu-icon">🗺️</div>
+                        <span class="menu-text">区域管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="master-hospital">
+                        <div class="menu-icon">🏥</div>
+                        <span class="menu-text">医院管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="master-department">
+                        <div class="menu-icon">🏛️</div>
+                        <span class="menu-text">科室管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="master-title">
+                        <div class="menu-icon">👔</div>
+                        <span class="menu-text">职称管理</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="master-tag">
+                        <div class="menu-icon">🏷️</div>
+                        <span class="menu-text">系统标签管理</span>
+                    </div>
+                </div>
+                <div class="menu-item" data-page="doctor-library">
+                    <div class="menu-icon">👨‍⚕️</div>
+                    <span class="menu-text">医生信息库</span>
+                </div>
+                <div class="menu-item" data-page="bi-config">
+                    <div class="menu-icon">📈</div>
+                    <span class="menu-text">BI配置</span>
+                </div>
+                <div class="menu-item" data-page="wechat-website">
+                    <div class="menu-icon">🌐</div>
+                    <span class="menu-text">公众号网站管理</span>
+                </div>
+                <!-- 申请管理（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">📋</div>
+                    <span class="menu-text">申请管理</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="application-consultation">
+                        <div class="menu-icon">🩺</div>
+                        <span class="menu-text">会诊申请</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="application-cooperation">
+                        <div class="menu-icon">🤝</div>
+                        <span class="menu-text">合作申请</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="application-settlement">
+                        <div class="menu-icon">🏢</div>
+                        <span class="menu-text">入驻申请</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="application-register">
+                        <div class="menu-icon">📝</div>
+                        <span class="menu-text">注册申请</span>
+                    </div>
+                </div>
+                <div class="menu-item" data-page="form-library">
+                    <div class="menu-icon">📝</div>
+                    <span class="menu-text">表单库</span>
+                </div>
+                <div class="menu-item" data-page="image-recognition">
+                    <div class="menu-icon">🖼️</div>
+                    <span class="menu-text">图像识别管理</span>
+                </div>
+                <div class="menu-item" data-page="followup">
+                    <div class="menu-icon">🔧</div>
+                    <span class="menu-text">随访管理</span>
+                </div>
+                <div class="menu-item" data-page="activity">
+                    <div class="menu-icon">🎯</div>
+                    <span class="menu-text">活动管理</span>
+                </div>
+                <div class="menu-item" data-page="activity-user">
+                    <div class="menu-icon">👥</div>
+                    <span class="menu-text">活动用户管理</span>
+                </div>
+                <div class="menu-item" data-page="activity-topic">
+                    <div class="menu-icon">📰</div>
+                    <span class="menu-text">活动专题管理</span>
+                </div>
+                <div class="menu-item" data-page="activity-data">
+                    <div class="menu-icon">📊</div>
+                    <span class="menu-text">活动数据列表</span>
+                </div>
+                <div class="menu-item" data-page="activity-analysis">
+                    <div class="menu-icon">📈</div>
+                    <span class="menu-text">活动运营分析</span>
+                </div>
+                <div class="menu-item" data-page="quality-control">
+                    <div class="menu-icon">⭐</div>
+                    <span class="menu-text">质控评分管理</span>
+                </div>
+                <!-- 科研超级智能体（有子菜单） -->
+                <div class="menu-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="menu-icon">🔬</div>
+                    <span class="menu-text">科研超级智能体</span>
+                    <span class="submenu-arrow">▼</span>
+                </div>
+                <div class="submenu" style="display: none;">
+                    <div class="menu-item submenu-item" data-page="research-ai-selection">
+                        <div class="menu-icon">📝</div>
+                        <span class="menu-text">AI 选题</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="research-literature-search">
+                        <div class="menu-icon">🔍</div>
+                        <span class="menu-text">文献检索</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="research-literature-reading">
+                        <div class="menu-icon">📖</div>
+                        <span class="menu-text">文献阅读</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="research-academic-qa">
+                        <div class="menu-icon">🎓</div>
+                        <span class="menu-text">学术问答</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="research-assistant-writing">
+                        <div class="menu-icon">✏️</div>
+                        <span class="menu-text">辅助写作</span>
+                    </div>
+                    <div class="menu-item submenu-item" data-page="research-ai-cloud">
+                        <div class="menu-icon">☁️</div>
+                        <span class="menu-text">AI 云盘</span>
+                    </div>
+                </div>
+                <!-- 外部链接：病例模拟 -->
+                <div class="menu-item external-link" data-url="https://simulation-imdt-sit.zmnyun.cn/#/quick-login/?token=eyJhbGciOiJIUzUxMiJ9.eyJwaG9uZSI6IjEzNTcwMjU3NTg0Iiwicm9sZUNvZGUiOiJhZG1pbiIsImV4cCI6MTc2ODQ1NTk4MywidXNlcklkIjo0MDEsImlhdCI6MTc2Nzg1MTE4MywidXNlcm5hbWUiOiJhZG1pbjEifQ.yWqWEmo3RaWa2Wtnc2V2mo6TD4oMX-DZ_gcWF625ul_qVXFbL6k7m_AMmH13knWGCO3Cqdf-Bou5zcDHwQjtdQ&userId=401&redirect=%2F">
+                    <div class="menu-icon">🧪</div>
+                    <span class="menu-text">病例模拟</span>
+                </div>
+            </div>
+            <div class="menu-collapse">
+                <span>◀</span>
+                <span>收起菜单</span>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="content-area">
+            <!-- Tab标签栏 -->
+            <div class="tab-bar" id="tabBar">
+                <!-- Tab 将通过 JavaScript 动态创建 -->
+            </div>
+
+            <!-- 内容面板 -->
+            <div class="content-panel">
+                <!-- 首页内容（直接内联，避免fetch CORS问题） -->
+                <div id="page-home" class="page-content active">
+                    <div class="home-content">
+                        <h1 class="home-title">Hi，我是iMDT病历智能体</h1>
+                        <p class="home-desc">我能帮您，快速创建患者档案，并能智能识别、整理病历报告，快速完成资料录入</p>
+                        <div class="home-actions">
+                            <button class="action-btn" onclick="alert('新建患者档案功能开发中...')">
+                                <span>📄</span>
+                                <span>新建患者档案</span>
+                            </button>
+                            <button class="action-btn" onclick="App.showPage('patient')">
+                                <span>🔍</span>
+                                <span>检索患者档案</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+    <!-- 页面内容已移至独立的 HTML 文件中，通过 JavaScript 动态加载 -->
+
+    <!-- 模态框容器 -->
+    <div id="modalContainer"></div>
+
+    <!-- 引入主应用逻辑（必须先加载，定义 App 对象） -->
+    <script src="js/app.js"></script>
+    <!-- 引入页面内容加载器（在 App 对象定义后加载） -->
+    <script src="js/pages-loader.js"></script>
+</body>
+</html>

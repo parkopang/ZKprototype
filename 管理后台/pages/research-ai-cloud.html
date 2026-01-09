@@ -1,0 +1,1106 @@
+<!-- 科研超级智能体：AI 云盘页面 -->
+<div class="ai-cloud-page">
+    <div class="cloud-header">
+        <div class="cloud-title-section">
+            <div class="cloud-icon">☁️</div>
+            <h1 class="cloud-title">AI 云盘</h1>
+        </div>
+        <p class="cloud-subtitle">智能存储·文件管理·知识沉淀</p>
+    </div>
+    
+    <!-- 搜索栏 -->
+    <div class="cloud-search-bar">
+        <input type="text" class="cloud-search-input" placeholder="搜索文件或资源（标题和正文）" id="cloudSearchInput">
+        <button class="cloud-search-btn" onclick="performCloudSearch()">🔍</button>
+    </div>
+    
+    <!-- 标签页导航 -->
+    <div class="cloud-tabs">
+        <button class="cloud-tab active" onclick="switchCloudTab('drive')" id="tabDrive">
+            AI 云盘
+        </button>
+        <button class="cloud-tab" onclick="switchCloudTab('smart')" id="tabSmart">
+            智能列表
+        </button>
+        <button class="cloud-tab" onclick="switchCloudTab('excerpts')" id="tabExcerpts">
+            摘录笔记
+        </button>
+        <button class="cloud-tab" onclick="switchCloudTab('tags')" id="tabTags">
+            我的标签
+        </button>
+        <button class="cloud-tab" onclick="switchCloudTab('citations')" id="tabCitations">
+            引用管理
+        </button>
+    </div>
+    
+    <!-- 工具栏 -->
+    <div class="cloud-toolbar">
+        <div class="toolbar-left">
+            <button class="toolbar-icon-btn" onclick="showFilterOptions()" title="筛选">
+                <span>🔽</span>
+            </button>
+            <button class="toolbar-icon-btn" onclick="toggleViewMode()" title="视图切换">
+                <span>📋</span>
+            </button>
+            <button class="toolbar-icon-btn" onclick="showViewOptions()" title="查看">
+                <span>👁️</span>
+            </button>
+            <button class="toolbar-icon-btn" onclick="showShareOptions()" title="分享">
+                <span>🔗</span>
+            </button>
+            <button class="toolbar-icon-btn" onclick="showDeleteOptions()" title="删除">
+                <span>🗑️</span>
+            </button>
+        </div>
+        <div class="toolbar-right">
+            <div class="new-item-dropdown">
+                <button class="toolbar-btn secondary" onclick="toggleNewItemMenu()" id="newItemBtn">
+                    <span>+</span>
+                    <span>新建</span>
+                </button>
+                <div class="new-item-menu" id="newItemMenu" style="display: none;">
+                    <div class="menu-item" onclick="createFolder()">
+                        <div class="menu-item-icon">📁</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">文件夹</div>
+                        </div>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item" onclick="createOnlineNote()">
+                        <div class="menu-item-icon">📝</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">新建在线笔记</div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="createMindMap()">
+                        <div class="menu-item-icon">🗺️</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">新建思维导图</div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="createWhiteboard()">
+                        <div class="menu-item-icon">🖼️</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">新建在线白板</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="upload-dropdown">
+                <button class="toolbar-btn primary" onclick="toggleUploadMenu()" id="uploadBtn">
+                    <span>上传</span>
+                </button>
+                <div class="upload-menu" id="uploadMenu" style="display: none;">
+                    <div class="menu-item" onclick="showUploadDialog('file')">
+                        <div class="menu-item-icon">📄</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">
+                                上传资料
+                                <span class="menu-item-hint" title="支持PDF等多种格式文件资料">ℹ️</span>
+                            </div>
+                            <div class="menu-item-desc">支持PDF等多种格式文件资料</div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="showUploadDialog('folder')">
+                        <div class="menu-item-icon">📁</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">上传文件夹</div>
+                            <div class="menu-item-desc">文件夹小于500M, 且不超过50个文件</div>
+                        </div>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-item" onclick="importBibtex()">
+                        <div class="menu-item-icon">📚</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Bibtex 解析导入</div>
+                            <div class="menu-item-desc">解析Bibtex题录，创建文献元数据</div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="importDOI()">
+                        <div class="menu-item-icon">🔍</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">DOI 查询导入</div>
+                            <div class="menu-item-desc">查询外文文献DOI，创建文献元数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI 云盘内容区域 -->
+    <div class="cloud-content">
+        <!-- AI 云盘标签页 -->
+        <div class="cloud-tab-content active" id="contentDrive">
+            <div class="cloud-file-list" id="cloudFileList">
+                <!-- 文件列表将通过JavaScript动态生成 -->
+            </div>
+            <div class="cloud-empty-state" id="cloudEmptyState">
+                <div class="empty-icon">☁️📄</div>
+                <div class="empty-text">点击【上传】添加资料</div>
+                <div class="empty-hint">支持 PDF、DOC、DOCX、TXT 等格式</div>
+            </div>
+        </div>
+        
+        <!-- 智能列表标签页 -->
+        <div class="cloud-tab-content" id="contentSmart" style="display: none;">
+            <div class="smart-list" id="smartList">
+                <div class="empty-state-small">暂无智能列表</div>
+            </div>
+        </div>
+        
+        <!-- 摘录笔记标签页 -->
+        <div class="cloud-tab-content" id="contentExcerpts" style="display: none;">
+            <div class="excerpts-list" id="excerptsList">
+                <div class="empty-state-small">暂无摘录笔记</div>
+            </div>
+        </div>
+        
+        <!-- 我的标签标签页 -->
+        <div class="cloud-tab-content" id="contentTags" style="display: none;">
+            <div class="tags-manager" id="tagsManager">
+                <div class="empty-state-small">暂无标签</div>
+            </div>
+        </div>
+        
+        <!-- 引用管理标签页 -->
+        <div class="cloud-tab-content" id="contentCitations" style="display: none;">
+            <div class="citations-list" id="citationsList">
+                <div class="empty-state-small">暂无引用记录</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部状态栏 -->
+    <div class="cloud-footer">
+        <div class="cloud-status" id="cloudStatus">已全部加载，共 0 个</div>
+    </div>
+    
+    <!-- 上传对话框 -->
+    <div class="upload-dialog" id="uploadDialog" style="display: none;">
+        <div class="upload-dialog-overlay" onclick="closeUploadDialog()"></div>
+        <div class="upload-dialog-content">
+            <div class="upload-dialog-header">
+                <h3>上传文件</h3>
+                <button class="upload-dialog-close" onclick="closeUploadDialog()">×</button>
+            </div>
+            <div class="upload-dialog-body">
+                <div class="upload-area-large" id="uploadAreaLarge" onclick="triggerFileUpload()">
+                    <div class="upload-icon-large">📄</div>
+                    <div class="upload-text-large">点击或拖拽文件到此处上传</div>
+                    <div class="upload-hint-large">支持 PDF、DOC、DOCX、TXT、PPT、PPTX 等格式</div>
+                    <input type="file" id="fileUploadInput" style="display: none;" multiple accept=".pdf,.doc,.docx,.txt,.ppt,.pptx" onchange="handleFileUpload(event)">
+                </div>
+                <div class="upload-file-list" id="uploadFileList">
+                    <!-- 待上传文件列表 -->
+                </div>
+            </div>
+            <div class="upload-dialog-footer">
+                <button class="btn btn-default" onclick="closeUploadDialog()">取消</button>
+                <button class="btn btn-primary" onclick="confirmUpload()">开始上传</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* AI 云盘页面样式 */
+.ai-cloud-page {
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.cloud-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.cloud-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.cloud-icon {
+    font-size: 48px;
+}
+
+.cloud-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.cloud-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* 搜索栏 */
+.cloud-search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cloud-search-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.cloud-search-input:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.cloud-search-btn {
+    padding: 12px 24px;
+    background: #1890ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.cloud-search-btn:hover {
+    background: #40a9ff;
+}
+
+/* 标签页 */
+.cloud-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.cloud-tab {
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.cloud-tab:hover {
+    color: #1890ff;
+}
+
+.cloud-tab.active {
+    color: #1890ff;
+    border-bottom-color: #1890ff;
+    font-weight: 600;
+}
+
+/* 工具栏 */
+.cloud-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.toolbar-left {
+    display: flex;
+    gap: 8px;
+}
+
+.toolbar-right {
+    display: flex;
+    gap: 12px;
+}
+
+.toolbar-btn {
+    padding: 8px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.toolbar-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.toolbar-btn.secondary {
+    background: #f5f5f5;
+}
+
+.toolbar-btn.primary {
+    background: #722ed1;
+    color: #fff;
+    border-color: #722ed1;
+}
+
+.toolbar-btn.primary:hover {
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.toolbar-icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.toolbar-icon-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+/* 新建下拉菜单 */
+.new-item-dropdown,
+.upload-dropdown {
+    position: relative;
+}
+
+.upload-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 280px;
+    padding: 8px 0;
+}
+
+.new-item-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 280px;
+    padding: 8px 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: #f5f5f5;
+}
+
+.menu-item-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.menu-item-content {
+    flex: 1;
+}
+
+.menu-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.menu-item-hint {
+    font-size: 12px;
+    color: #999;
+    cursor: help;
+}
+
+.menu-item-desc {
+    font-size: 12px;
+    color: #999;
+    line-height: 1.4;
+}
+
+.menu-divider {
+    height: 1px;
+    background: #e8e8e8;
+    margin: 8px 0;
+}
+
+/* 内容区域 */
+.cloud-content {
+    min-height: 400px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.cloud-tab-content {
+    min-height: 400px;
+}
+
+/* 文件列表 */
+.cloud-file-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.cloud-file-item {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.cloud-file-item:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.file-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.file-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-meta {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.file-action-btn {
+    padding: 4px 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-action-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+/* 空状态 */
+.cloud-empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    display: none;
+}
+
+.cloud-empty-state.show {
+    display: block;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.empty-text {
+    font-size: 18px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.empty-hint {
+    font-size: 14px;
+    color: #999;
+}
+
+.empty-state-small {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* 底部状态栏 */
+.cloud-footer {
+    margin-top: 20px;
+    padding: 12px 0;
+    text-align: center;
+    border-top: 1px solid #e8e8e8;
+}
+
+.cloud-status {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 上传对话框 */
+.upload-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.upload-dialog-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.upload-dialog-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.upload-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.upload-dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.upload-dialog-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.upload-dialog-close:hover {
+    color: #1a1a1a;
+}
+
+.upload-dialog-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.upload-area-large {
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    padding: 60px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.upload-area-large:hover {
+    border-color: #1890ff;
+    background: #f0f7ff;
+}
+
+.upload-icon-large {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.upload-text-large {
+    font-size: 16px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.upload-hint-large {
+    font-size: 14px;
+    color: #999;
+}
+
+.upload-file-list {
+    margin-top: 20px;
+}
+
+.upload-file-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.upload-file-name {
+    flex: 1;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.upload-file-size {
+    font-size: 12px;
+    color: #999;
+}
+
+.upload-file-remove {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.upload-file-remove:hover {
+    color: #f5222d;
+}
+
+.upload-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.btn {
+    padding: 8px 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-default {
+    background: #fff;
+    color: #666;
+}
+
+.btn-default:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.btn-primary {
+    background: #1890ff;
+    color: #fff;
+    border-color: #1890ff;
+}
+
+.btn-primary:hover {
+    background: #40a9ff;
+    border-color: #40a9ff;
+}
+</style>
+
+<script>
+// 当前选中的标签页
+let currentTab = 'drive';
+let fileList = [];
+
+// 切换标签页
+function switchCloudTab(tab) {
+    currentTab = tab;
+    
+    // 更新标签页状态
+    document.querySelectorAll('.cloud-tab').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    
+    // 更新内容区域
+    document.querySelectorAll('.cloud-tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+    
+    // 根据标签页加载内容
+    loadTabContent(tab);
+}
+
+// 加载标签页内容
+function loadTabContent(tab) {
+    switch(tab) {
+        case 'drive':
+            loadFileList();
+            break;
+        case 'smart':
+            loadSmartList();
+            break;
+        case 'excerpts':
+            loadExcerpts();
+            break;
+        case 'tags':
+            loadTags();
+            break;
+        case 'citations':
+            loadCitations();
+            break;
+    }
+}
+
+// 加载文件列表
+function loadFileList() {
+    const fileListEl = document.getElementById('cloudFileList');
+    const emptyState = document.getElementById('cloudEmptyState');
+    
+    if (fileList.length === 0) {
+        fileListEl.style.display = 'none';
+        emptyState.classList.add('show');
+    } else {
+        fileListEl.style.display = 'grid';
+        emptyState.classList.remove('show');
+        
+        fileListEl.innerHTML = fileList.map((file, index) => `
+            <div class="cloud-file-item" onclick="openFile(${index})">
+                <div class="file-icon">${getFileIcon(file.type)}</div>
+                <div class="file-name" title="${file.name}">${file.name}</div>
+                <div class="file-meta">
+                    <div>大小：${formatFileSize(file.size)}</div>
+                    <div>上传时间：${file.uploadTime}</div>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action-btn" onclick="event.stopPropagation(); downloadFile(${index})">下载</button>
+                    <button class="file-action-btn" onclick="event.stopPropagation(); deleteFile(${index})">删除</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    updateStatus();
+}
+
+// 获取文件图标
+function getFileIcon(type) {
+    const icons = {
+        'pdf': '📄',
+        'doc': '📝',
+        'docx': '📝',
+        'txt': '📃',
+        'ppt': '📊',
+        'pptx': '📊'
+    };
+    return icons[type] || '📄';
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// 加载智能列表
+function loadSmartList() {
+    // 模拟数据
+    document.getElementById('smartList').innerHTML = '<div class="empty-state-small">暂无智能列表</div>';
+}
+
+// 加载摘录笔记
+function loadExcerpts() {
+    // 模拟数据
+    document.getElementById('excerptsList').innerHTML = '<div class="empty-state-small">暂无摘录笔记</div>';
+}
+
+// 加载标签
+function loadTags() {
+    // 模拟数据
+    document.getElementById('tagsManager').innerHTML = '<div class="empty-state-small">暂无标签</div>';
+}
+
+// 加载引用
+function loadCitations() {
+    // 模拟数据
+    document.getElementById('citationsList').innerHTML = '<div class="empty-state-small">暂无引用记录</div>';
+}
+
+// 更新状态栏
+function updateStatus() {
+    const statusEl = document.getElementById('cloudStatus');
+    statusEl.textContent = `已全部加载，共 ${fileList.length} 个`;
+}
+
+// 执行搜索
+function performCloudSearch() {
+    const keyword = document.getElementById('cloudSearchInput').value.trim();
+    if (!keyword) {
+        alert('请输入搜索关键词');
+        return;
+    }
+    
+    // 模拟搜索
+    alert(`搜索关键词：${keyword}\n\n（实际应用中应调用搜索API）`);
+}
+
+// 显示上传对话框
+function showUploadDialog(type) {
+    document.getElementById('uploadDialog').style.display = 'block';
+    if (type === 'folder') {
+        // 如果是上传文件夹，需要设置multiple和webkitdirectory属性
+        const input = document.getElementById('fileUploadInput');
+        input.setAttribute('webkitdirectory', '');
+        input.setAttribute('multiple', '');
+    } else {
+        const input = document.getElementById('fileUploadInput');
+        input.removeAttribute('webkitdirectory');
+    }
+    // 关闭上传菜单
+    document.getElementById('uploadMenu').style.display = 'none';
+}
+
+// 关闭上传对话框
+function closeUploadDialog() {
+    document.getElementById('uploadDialog').style.display = 'none';
+    document.getElementById('uploadFileList').innerHTML = '';
+}
+
+// 触发文件上传
+function triggerFileUpload() {
+    document.getElementById('fileUploadInput').click();
+}
+
+// 处理文件上传
+function handleFileUpload(event) {
+    const files = Array.from(event.target.files);
+    const fileListEl = document.getElementById('uploadFileList');
+    
+    fileListEl.innerHTML = files.map((file, index) => `
+        <div class="upload-file-item">
+            <div class="upload-file-name">${file.name}</div>
+            <div class="upload-file-size">${formatFileSize(file.size)}</div>
+            <button class="upload-file-remove" onclick="removeUploadFile(${index})">×</button>
+        </div>
+    `).join('');
+}
+
+// 移除待上传文件
+function removeUploadFile(index) {
+    // 实际应用中需要从文件列表中移除
+    alert('移除文件（模拟）');
+}
+
+// 确认上传
+function confirmUpload() {
+    const files = document.getElementById('fileUploadInput').files;
+    if (files.length === 0) {
+        alert('请选择要上传的文件');
+        return;
+    }
+    
+    // 模拟上传
+    Array.from(files).forEach(file => {
+        fileList.push({
+            name: file.name,
+            type: file.name.split('.').pop().toLowerCase(),
+            size: file.size,
+            uploadTime: new Date().toLocaleString('zh-CN')
+        });
+    });
+    
+    closeUploadDialog();
+    loadFileList();
+    alert('文件上传成功（模拟）');
+}
+
+// 打开文件
+function openFile(index) {
+    const file = fileList[index];
+    alert(`打开文件：${file.name}\n\n（实际应用中应调用文件预览API）`);
+}
+
+// 下载文件
+function downloadFile(index) {
+    const file = fileList[index];
+    alert(`正在下载：${file.name}\n\n（实际应用中应调用下载API）`);
+}
+
+// 删除文件
+function deleteFile(index) {
+    if (confirm('确定要删除这个文件吗？')) {
+        fileList.splice(index, 1);
+        loadFileList();
+    }
+}
+
+// 切换新建菜单
+function toggleNewItemMenu() {
+    const menu = document.getElementById('newItemMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// 点击外部关闭菜单
+document.addEventListener('click', function(e) {
+    const newBtn = document.getElementById('newItemBtn');
+    const newMenu = document.getElementById('newItemMenu');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadMenu = document.getElementById('uploadMenu');
+    
+    if (newBtn && newMenu && !newBtn.contains(e.target) && !newMenu.contains(e.target)) {
+        newMenu.style.display = 'none';
+    }
+    
+    if (uploadBtn && uploadMenu && !uploadBtn.contains(e.target) && !uploadMenu.contains(e.target)) {
+        uploadMenu.style.display = 'none';
+    }
+});
+
+// 创建文件夹
+function createFolder() {
+    document.getElementById('newItemMenu').style.display = 'none';
+    const folderName = prompt('请输入文件夹名称：');
+    if (folderName) {
+        alert(`创建文件夹：${folderName}\n\n（实际应用中应调用创建文件夹API）`);
+    }
+}
+
+// 新建在线笔记
+function createOnlineNote() {
+    document.getElementById('newItemMenu').style.display = 'none';
+    alert('新建在线笔记（模拟）\n\n（实际应用中应打开在线笔记编辑器）');
+}
+
+// 新建思维导图
+function createMindMap() {
+    document.getElementById('newItemMenu').style.display = 'none';
+    alert('新建思维导图（模拟）\n\n（实际应用中应打开思维导图编辑器）');
+}
+
+// 新建在线白板
+function createWhiteboard() {
+    document.getElementById('newItemMenu').style.display = 'none';
+    alert('新建在线白板（模拟）\n\n（实际应用中应打开在线白板编辑器）');
+}
+
+// 切换上传菜单
+function toggleUploadMenu() {
+    const menu = document.getElementById('uploadMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    // 关闭新建菜单
+    document.getElementById('newItemMenu').style.display = 'none';
+}
+
+// Bibtex 解析导入
+function importBibtex() {
+    document.getElementById('uploadMenu').style.display = 'none';
+    alert('Bibtex 解析导入（模拟）\n\n（实际应用中应打开Bibtex导入对话框）');
+}
+
+// DOI 查询导入
+function importDOI() {
+    document.getElementById('uploadMenu').style.display = 'none';
+    alert('DOI 查询导入（模拟）\n\n（实际应用中应打开DOI查询对话框）');
+}
+
+// 切换视图模式
+function toggleViewMode() {
+    alert('切换视图模式（模拟）\n\n（实际应用中应在网格视图和列表视图之间切换）');
+}
+
+// 显示查看选项
+function showViewOptions() {
+    alert('查看选项（模拟）');
+}
+
+// 显示分享选项
+function showShareOptions() {
+    alert('分享选项（模拟）');
+}
+
+// 显示筛选选项
+function showFilterOptions() {
+    alert('筛选选项（模拟）');
+}
+
+// 显示排序选项
+function showSortOptions() {
+    alert('排序选项（模拟）');
+}
+
+// 显示删除选项
+function showDeleteOptions() {
+    alert('批量删除（模拟）');
+}
+
+// 初始化页面
+function initPage_research_ai_cloud() {
+    console.log('AI 云盘页面已加载');
+    loadFileList();
+}
+</script>

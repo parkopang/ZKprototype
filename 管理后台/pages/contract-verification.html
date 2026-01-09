@@ -1,0 +1,195 @@
+<!-- 合同审核列表页面 -->
+<div class="breadcrumb">
+    <a href="#" onclick="showPage('home'); return false;">首页</a> / 审核列表
+</div>
+<div class="page-header">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="请输入专家名称" id="contractVerificationSearch">
+        </div>
+        <button class="toolbar-icon" title="筛选" onclick="toggleContractVerificationFilter()">🔽</button>
+        <button class="toolbar-icon" title="设置" onclick="toggleTableSettings('contractVerification', this)" style="position: relative;">⚙️</button>
+        <div id="contractVerificationTableSettings" class="table-settings-tooltip" style="display: none;">
+            <div class="table-settings-header">
+                <div style="font-weight: 500; font-size: 14px;">表头设置</div>
+                <button class="modal-close" onclick="closeTableSettings('contractVerification')" style="position: static; width: 20px; height: 20px; font-size: 14px;">×</button>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <div class="search-box" style="max-width: 100%;">
+                    <span>🔍</span>
+                    <input type="text" placeholder="搜索字段" id="contractVerificationFieldSearch" onkeyup="filterTableFields('contractVerification', this.value)" style="width: 100%;">
+                </div>
+            </div>
+            <div style="max-height: 300px; overflow-y: auto;">
+                <div style="font-weight: 500; margin-bottom: 12px; color: #666; font-size: 12px;">显示字段</div>
+                <div id="contractVerificationFieldList" style="display: grid; gap: 8px;">
+                    <label class="field-item" data-field="序号"><span>序号</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '序号', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="模板名称"><span>模板名称</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '模板名称', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="专家名字"><span>专家名字</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '专家名字', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="状态"><span>状态</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '状态', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="是否已绑定医生"><span>是否已绑定医生</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '是否已绑定医生', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="职称"><span>职称</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '职称', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="单位"><span>单位</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '单位', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="手机号码"><span>手机号码</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '手机号码', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="身份证号"><span>身份证号</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '身份证号', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="银行卡号"><span>银行卡号</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '银行卡号', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="开户行信息"><span>开户行信息</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '开户行信息', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="提交时间"><span>提交时间</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '提交时间', this.checked)"><span class="switch-slider"></span></label></label>
+                    <label class="field-item" data-field="操作"><span>操作</span><label class="switch"><input type="checkbox" class="field-toggle" checked onchange="toggleTableField('contractVerification', '操作', this.checked)"><span class="switch-slider"></span></label></label>
+                </div>
+            </div>
+        </div>
+        <button class="toolbar-icon" title="下载" onclick="exportContractVerification()">📥</button>
+    </div>
+</div>
+<!-- 筛选面板 -->
+<div id="contract-verification-filter-panel" class="filter-panel" style="display: none; background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e8e8e8;">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">专家名称</label>
+            <input type="text" class="form-input" placeholder="请输入专家名称">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">状态</label>
+            <select class="form-input">
+                <option>全部</option>
+                <option>未审核</option>
+                <option>审核通过</option>
+                <option>审核拒绝</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">是否已绑定医生</label>
+            <select class="form-input">
+                <option>全部</option>
+                <option>已绑定</option>
+                <option>未绑定</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">提交时间范围</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="date" class="form-input" style="flex: 1;">
+                <span>至</span>
+                <input type="date" class="form-input" style="flex: 1;">
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-default" onclick="resetContractVerificationFilter()">重置</button>
+        <button class="btn btn-primary" onclick="applyContractVerificationFilter()">查询</button>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>模板名称</th>
+                <th>专家名字</th>
+                <th>状态</th>
+                <th>是否已绑定医生</th>
+                <th>职称</th>
+                <th>单位</th>
+                <th>手机号码</th>
+                <th>身份证号</th>
+                <th>银行卡号</th>
+                <th>开户行信息</th>
+                <th>提交时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>青蓝之约劳务协议-20251218</td>
+                <td>测试</td>
+                <td><span class="status-tag">未审核</span></td>
+                <td>未绑定</td>
+                <td>测试</td>
+                <td>测试</td>
+                <td>13570257584</td>
+                <td>123456789101112</td>
+                <td>22222222</td>
+                <td>天河</td>
+                <td>2025-12-19 20:06:51</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="previewContractVerification(1)">预览</a>
+                        <a class="action-link" onclick="auditContractVerification(1)">审核</a>
+                        <a class="action-link" onclick="bindDoctorContractVerification(1)">绑定</a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>2025艰难梭菌治疗交流协议-20251215</td>
+                <td>钟楚红</td>
+                <td><span class="status-tag">未审核</span></td>
+                <td>未绑定</td>
+                <td>演员</td>
+                <td>香港</td>
+                <td>13535239647</td>
+                <td>440823199605047845</td>
+                <td>6212006425458754</td>
+                <td>天河支行</td>
+                <td>2025-12-16 15:39:30</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="previewContractVerification(2)">预览</a>
+                        <a class="action-link" onclick="auditContractVerification(2)">审核</a>
+                        <a class="action-link" onclick="bindDoctorContractVerification(2)">绑定</a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>和黄医路肠优劳务协议-20250729</td>
+                <td>邹测试</td>
+                <td><span class="status-tag complete">审核通过</span></td>
+                <td>未绑定</td>
+                <td>测试</td>
+                <td>测试</td>
+                <td>13640129681</td>
+                <td>440221199403123512</td>
+                <td>1</td>
+                <td>测试测试</td>
+                <td>2025-07-29 20:30:36</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="previewContractVerification(11)">预览</a>
+                        <a class="action-link" onclick="viewContractVerification(11)">查看</a>
+                        <a class="action-link" onclick="bindDoctorContractVerification(11)">绑定</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    <div class="pagination-info">共 110 条</div>
+    <div class="pagination-controls">
+        <button class="pagination-btn" disabled>◀</button>
+        <span class="pagination-page active">1</span>
+        <span class="pagination-page">2</span>
+        <span class="pagination-page">3</span>
+        <span class="pagination-page">4</span>
+        <span class="pagination-page">5</span>
+        <span class="pagination-page">•••</span>
+        <span class="pagination-page">8</span>
+        <button class="pagination-btn">▶</button>
+        <div class="pagination-size">
+            <select>
+                <option>15 条/页</option>
+                <option>30 条/页</option>
+                <option>50 条/页</option>
+            </select>
+        </div>
+        <div style="margin-left: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>跳至</span>
+            <input type="number" style="width: 60px; padding: 4px; border: 1px solid #d9d9d9; border-radius: 4px;">
+            <span>页</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+<!-- 项目信息页面 -->
+<div class="breadcrumb">
+    <a href="#" onclick="showPage('home'); return false;">首页</a> / 项目信息
+</div>
+<div class="page-header">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="请输入项目名称" id="projectSearch">
+        </div>
+        <button class="toolbar-icon" title="筛选" onclick="toggleProjectFilter()">🔽</button>
+        <button class="toolbar-icon" title="设置" onclick="toggleTableSettings('project', this)" style="position: relative;">⚙️</button>
+        <button class="create-btn" onclick="showCreateProjectForm()">
+            <span>➕</span>
+            <span>创建项目</span>
+        </button>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>项目名称</th>
+                <th>所属机构</th>
+                <th>项目类型</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><a class="action-link" onclick="viewProjectDetail(1)" style="text-decoration: none;">乳腺癌MDT项目</a></td>
+                <td>江苏省人民医院</td>
+                <td>MDT项目</td>
+                <td>2025-01-05 10:30</td>
+                <td>
+                    <div class="action-btns">
+                        <a class="action-link" onclick="viewProjectDetail(1)">查看</a>
+                        <a class="action-link" onclick="editProject(1)">编辑</a>
+                        <a class="action-link danger" onclick="deleteProject(1)">删除</a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    <div class="pagination-info">共 15 条</div>
+    <div class="pagination-controls">
+        <button class="pagination-btn" disabled>◀</button>
+        <span class="pagination-page active">1</span>
+        <button class="pagination-btn">▶</button>
+        <div class="pagination-size">
+            <select>
+                <option>15 条/页</option>
+                <option>30 条/页</option>
+            </select>
+        </div>
+    </div>
+</div>

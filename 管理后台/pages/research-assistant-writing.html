@@ -1,0 +1,1258 @@
+<!-- 科研超级智能体：辅助写作页面 -->
+<div class="assistant-writing-page">
+    <!-- 页面标题 -->
+    <div class="writing-header">
+        <div class="writing-title-section">
+            <div class="writing-icon">✏️</div>
+            <h1 class="writing-title">辅助写作超级智能体</h1>
+        </div>
+    </div>
+    
+    <!-- 主要输入区域 -->
+    <div class="writing-input-section" id="writingInputSection">
+        <div class="writing-input-container">
+            <!-- 功能按钮（在输入框内部，默认隐藏） -->
+            <div class="feature-btn-inline" id="featureBtnInline" style="display: none;">
+                <button class="feature-btn-tag" onclick="clearFeature()">
+                    <span class="feature-btn-title" id="featureBtnTitle">功能名称</span>
+                    <span class="feature-btn-desc" id="featureBtnDesc">功能描述</span>
+                    <span class="feature-btn-close">×</span>
+                </button>
+            </div>
+            
+            <textarea 
+                class="writing-input" 
+                id="writingQuestionInput"
+                placeholder="询问任何问题, 提出任何需求 (输入@快速添加知识库)"
+                rows="4"
+            ></textarea>
+            <div class="writing-input-actions">
+                <button class="writing-action-btn" onclick="addKnowledgeBase()">
+                    <span>+</span>
+                    <span>添加知识库</span>
+                </button>
+                <div class="writing-input-icons">
+                    <button class="writing-icon-btn" onclick="attachFile()" title="附件">
+                        <span>📎</span>
+                    </button>
+                    <button class="writing-icon-btn" onclick="startVoiceInput()" title="语音输入">
+                        <span>🎤</span>
+                    </button>
+                    <button class="writing-icon-btn writing-submit-btn" onclick="submitQuestion()" title="提交">
+                        <span>→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 示例列表（当选择功能时显示） -->
+        <div class="feature-examples-section" id="featureExamplesSection" style="display: none;">
+            <div class="section-title">
+                <h3>示例</h3>
+            </div>
+            <div class="feature-examples-list" id="featureExamplesList">
+                <!-- 示例列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 热门任务 -->
+    <div class="hot-tasks-section">
+        <div class="section-title">
+            <span class="title-icon">🔥</span>
+            <h2>热门任务</h2>
+        </div>
+        <div class="hot-tasks-grid">
+            <div class="task-card" onclick="openTask('topic-selection')">
+                <div class="task-icon">⏰</div>
+                <div class="task-title">寻找选题</div>
+                <div class="task-desc">聚焦热点·洞察趋势·启发灵感</div>
+                <div class="task-benefit">
+                    <span class="benefit-icon">📊</span>
+                    <span class="benefit-text">平均缩短60%选题周期</span>
+                </div>
+            </div>
+            <div class="task-card" onclick="openTask('literature-search')">
+                <div class="task-icon">⏰</div>
+                <div class="task-title">检索文献</div>
+                <div class="task-desc">智能筛选·多维检索·精准定位</div>
+                <div class="task-benefit">
+                    <span class="benefit-icon">📊</span>
+                    <span class="benefit-text">平均节省80%检索时间</span>
+                </div>
+            </div>
+            <div class="task-card" onclick="openTask('literature-download')">
+                <div class="task-icon">⬇️</div>
+                <div class="task-title">下载文献</div>
+                <div class="task-desc">一键获取·批量下载·自动整理</div>
+                <div class="task-benefit">
+                    <span class="benefit-icon">📊</span>
+                    <span class="benefit-text">支持95%以上文献下载</span>
+                </div>
+            </div>
+            <div class="task-card" onclick="openTask('literature-review')">
+                <div class="task-icon">📈</div>
+                <div class="task-title">文献综述</div>
+                <div class="task-desc">智能分析·框架生成·趋势把握</div>
+                <div class="task-benefit">
+                    <span class="benefit-icon">📊</span>
+                    <span class="benefit-text">综述效率提升70%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 可以从这里开始 -->
+    <div class="start-here-section" id="startHereSection">
+        <div class="section-title">
+            <h2>可以从这里开始</h2>
+        </div>
+        <div class="start-here-grid">
+            <!-- 研究准备 -->
+            <div class="category-column">
+                <div class="category-title">研究准备</div>
+                <div class="category-items">
+                    <div class="category-item" onclick="openFeature('search-literature')">
+                        <div class="item-icon">🔍</div>
+                        <div class="item-text">检索文献</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('download-literature')">
+                        <div class="item-icon">📁</div>
+                        <div class="item-text">文献下载</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('read-literature')">
+                        <div class="item-icon">📖</div>
+                        <div class="item-text">文献阅读</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('topic-selection')">
+                        <div class="item-icon">💡</div>
+                        <div class="item-text">选题</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('organize-notes')">
+                        <div class="item-icon">📋</div>
+                        <div class="item-text">笔记整理</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 写作与发表 -->
+            <div class="category-column">
+                <div class="category-title">写作与发表</div>
+                <div class="category-items">
+                    <div class="category-item" onclick="openFeature('generate-outline')">
+                        <div class="item-icon">📄</div>
+                        <div class="item-text">出提纲</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('writing')">
+                        <div class="item-icon">✏️</div>
+                        <div class="item-text">写作</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('polish')">
+                        <div class="item-icon">⭐</div>
+                        <div class="item-text">润色</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('translate')">
+                        <div class="item-icon">🌐</div>
+                        <div class="item-text">翻译</div>
+                    </div>
+                    <div class="category-item" onclick="openFeature('literature-review')">
+                        <div class="item-icon">📊</div>
+                        <div class="item-text">文献综述</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 研究辅助（暂时禁用） -->
+            <div class="category-column disabled">
+                <div class="category-title">研究辅助</div>
+                <div class="category-items">
+                    <div class="category-item disabled" title="功能开发中">
+                        <div class="item-icon">📄</div>
+                        <div class="item-text">调研报告</div>
+                    </div>
+                    <div class="category-item disabled" title="功能开发中">
+                        <div class="item-icon">📊</div>
+                        <div class="item-text">数据分析</div>
+                    </div>
+                    <div class="category-item disabled" title="功能开发中">
+                        <div class="item-icon">🗺️</div>
+                        <div class="item-text">脑图梳理</div>
+                    </div>
+                    <div class="category-item disabled" title="功能开发中">
+                        <div class="item-icon">🧪</div>
+                        <div class="item-text">研究设计</div>
+                    </div>
+                    <div class="category-item disabled" title="功能开发中">
+                        <div class="item-icon">❓</div>
+                        <div class="item-text">调研问卷</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加参考资料模态框 -->
+    <div class="add-kb-modal" id="addKnowledgeBaseModal" style="display: none;">
+        <div class="add-kb-overlay" onclick="closeAddKBModal()"></div>
+        <div class="add-kb-content">
+            <div class="add-kb-header">
+                <h3 class="add-kb-title">添加参考资料</h3>
+                <button class="add-kb-close" onclick="closeAddKBModal()">×</button>
+            </div>
+            <div class="add-kb-body">
+                <p class="add-kb-desc">选择知识库、文档、摘录、笔记，让学术超级智能体围绕知识库回答</p>
+                <div class="add-kb-search">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" class="add-kb-search-input" placeholder="搜索知识库内容..." id="kbSearchInput">
+                </div>
+                <div class="add-kb-list" id="kbList">
+                    <div class="add-kb-empty">暂无知识库</div>
+                </div>
+            </div>
+            <div class="add-kb-footer">
+                <div class="add-kb-count" id="kbSelectedCount">已选 0/5 项</div>
+                <div class="add-kb-actions">
+                    <button class="btn btn-default" onclick="closeAddKBModal()">取消</button>
+                    <button class="btn btn-primary" id="confirmAddKB" onclick="confirmAddKB()" disabled>确认添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 辅助写作页面样式 */
+.assistant-writing-page {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.writing-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.writing-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.writing-icon {
+    font-size: 48px;
+}
+
+.writing-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+
+/* 输入区域 */
+.writing-input-section {
+    margin-bottom: 40px;
+}
+
+/* 功能按钮（输入框内部） */
+.feature-btn-inline {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+}
+
+.feature-btn-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 13px;
+}
+
+.feature-btn-tag:hover {
+    background: #bae7ff;
+    border-color: #1890ff;
+}
+
+.feature-btn-title {
+    font-weight: 600;
+    color: #1890ff;
+}
+
+.feature-btn-desc {
+    color: #666;
+    font-size: 12px;
+}
+
+.feature-btn-close {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    margin-left: 4px;
+    transition: color 0.3s;
+}
+
+.feature-btn-tag:hover .feature-btn-close {
+    color: #1a1a1a;
+}
+
+.writing-input-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.writing-input {
+    width: 100%;
+    padding: 16px 200px 16px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+/* 当有功能按钮时，调整输入框内边距 */
+.writing-input-container.has-feature .writing-input {
+    padding-top: 50px;
+}
+
+.writing-input:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.writing-input-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.writing-action-btn {
+    padding: 8px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.writing-action-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.writing-input-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.writing-icon-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s;
+}
+
+.writing-icon-btn:hover {
+    background: #e0e0e0;
+}
+
+.writing-submit-btn {
+    background: #1890ff;
+    color: #fff;
+}
+
+.writing-submit-btn:hover {
+    background: #40a9ff;
+}
+
+/* 热门任务 */
+.hot-tasks-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.title-icon {
+    font-size: 24px;
+}
+
+.section-title h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.hot-tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.task-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.task-card:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.task-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.task-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.task-desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.task-benefit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #999;
+}
+
+.benefit-icon {
+    font-size: 14px;
+}
+
+/* 可以从这里开始 */
+.start-here-section {
+    margin-bottom: 40px;
+}
+
+.start-here-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.category-column {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.category-column.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.category-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.category-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.category-item:hover:not(.disabled) {
+    border-color: #1890ff;
+    background: #f0f7ff;
+}
+
+.category-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+.item-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.item-text {
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.category-item.disabled .item-text {
+    color: #999;
+}
+
+/* 示例区域（在输入区域下方） */
+.feature-examples-section {
+    margin-top: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-examples-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature-example-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.feature-example-item:hover {
+    background: #e6f7ff;
+    border: 1px solid #1890ff;
+}
+
+.example-text {
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.example-arrow {
+    font-size: 16px;
+    color: #1890ff;
+}
+
+/* 添加参考资料模态框 */
+.add-kb-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-kb-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.add-kb-content {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.add-kb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.add-kb-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.add-kb-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-kb-close:hover {
+    color: #1a1a1a;
+}
+
+.add-kb-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.add-kb-desc {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.add-kb-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.search-icon {
+    font-size: 16px;
+    color: #999;
+}
+
+.add-kb-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.add-kb-list {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.add-kb-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+.add-kb-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-kb-item:hover {
+    border-color: #1890ff;
+    background: #f0f7ff;
+}
+
+.add-kb-item.selected {
+    border-color: #1890ff;
+    background: #e6f7ff;
+}
+
+.add-kb-item-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d9d9d9;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-kb-item.selected .add-kb-item-checkbox {
+    background: #1890ff;
+    border-color: #1890ff;
+}
+
+.add-kb-item.selected .add-kb-item-checkbox::after {
+    content: '✓';
+    color: #fff;
+    font-size: 12px;
+}
+
+.add-kb-item-info {
+    flex: 1;
+}
+
+.add-kb-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.add-kb-item-desc {
+    font-size: 12px;
+    color: #999;
+}
+
+.add-kb-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.add-kb-count {
+    font-size: 14px;
+    color: #666;
+}
+
+.add-kb-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 8px 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-default {
+    background: #fff;
+    color: #666;
+}
+
+.btn-default:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.btn-primary {
+    background: #1890ff;
+    color: #fff;
+    border-color: #1890ff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.btn-primary:disabled {
+    background: #d9d9d9;
+    border-color: #d9d9d9;
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+</style>
+
+<script>
+// 打开任务（使用与openFeature相同的逻辑）
+function openTask(taskType) {
+    // 直接调用openFeature，因为热门任务的功能也在featureConfig中
+    openFeature(taskType);
+}
+
+// 当前选中的功能
+let currentFeature = null;
+
+// 功能配置
+const featureConfig = {
+    // 热门任务
+    'topic-selection': {
+        title: '寻找选题',
+        desc: '聚焦热点·洞察趋势·启发灵感',
+        placeholder: '输入研究领域或感兴趣的方向，获得选题建议',
+        examples: [
+            '热点选题推荐',
+            '创新选题挖掘',
+            '选题可行性分析'
+        ]
+    },
+    'literature-search': {
+        title: '检索文献',
+        desc: '智能筛选·多维检索·精准定位',
+        placeholder: '输入关键词、标题、作者或DOI进行文献检索',
+        examples: [
+            '基于关键词的精准检索',
+            '多维度组合检索',
+            '高级检索技巧'
+        ]
+    },
+    'literature-download': {
+        title: '下载文献',
+        desc: '一键获取·批量下载·自动整理',
+        placeholder: '输入文献标题、DOI或链接，一键下载文献',
+        examples: [
+            '批量下载相关文献',
+            '根据DOI下载',
+            '从链接下载文献'
+        ]
+    },
+    'literature-review': {
+        title: '文献综述',
+        desc: '智能分析·框架生成·趋势把握',
+        placeholder: '输入您想写的文献综述的主题和字数等要求',
+        examples: [
+            'PRISMA 标准系统性综述',
+            '荟萃分析统计综合',
+            '领域理论演进脉络梳理'
+        ]
+    },
+    // 研究准备
+    'search-literature': {
+        title: '检索文献',
+        desc: '输入关键词、标题、作者或DOI进行文献检索',
+        placeholder: '输入关键词、标题、作者或DOI进行文献检索',
+        examples: [
+            '基于关键词的精准检索',
+            '多维度组合检索',
+            '高级检索技巧'
+        ]
+    },
+    'download-literature': {
+        title: '文献下载',
+        desc: '输入文献标题、DOI或链接，一键下载文献',
+        placeholder: '输入文献标题、DOI或链接，一键下载文献',
+        examples: [
+            '批量下载相关文献',
+            '根据DOI下载',
+            '从链接下载文献'
+        ]
+    },
+    'read-literature': {
+        title: '文献阅读',
+        desc: '上传或输入文献，进行智能阅读和分析',
+        placeholder: '上传或输入文献，进行智能阅读和分析',
+        examples: [
+            '文献摘要提取',
+            '关键信息提取',
+            '文献结构分析'
+        ]
+    },
+    'topic-selection': {
+        title: '选题',
+        desc: '输入研究领域或方向，获得选题建议',
+        placeholder: '输入研究领域或方向，获得选题建议',
+        examples: [
+            '热点选题推荐',
+            '创新选题挖掘',
+            '选题可行性分析'
+        ]
+    },
+    'organize-notes': {
+        title: '笔记整理',
+        desc: '整理和归纳研究笔记，形成知识体系',
+        placeholder: '整理和归纳研究笔记，形成知识体系',
+        examples: [
+            '笔记分类整理',
+            '知识图谱构建',
+            '笔记关联分析'
+        ]
+    },
+    // 写作与发表
+    'generate-outline': {
+        title: '出提纲',
+        desc: '输入研究主题或论文方向, 获得逻辑清晰的提纲',
+        placeholder: '输入研究主题或论文方向, 获得逻辑清晰的提纲',
+        examples: [
+            '论文逻辑树状提纲设计',
+            '问题导向型论文提纲构建',
+            '突出创新点的提纲设计'
+        ]
+    },
+    'writing': {
+        title: '写作',
+        desc: '输入写作主题或写作要求，开始生成学术文本',
+        placeholder: '输入写作主题或写作要求，开始生成学术文本',
+        examples: [
+            'IMRAD 结构学术论文写作',
+            '团队协作写作方案设计',
+            '基于数据的快速论文生成'
+        ]
+    },
+    'polish': {
+        title: '润色',
+        desc: '粘贴需要润色的文本，优化表达，提升学术规范性',
+        placeholder: '粘贴需要润色的文本，优化表达，提升学术规范性',
+        examples: [
+            '三轮递进式论文润色',
+            '期刊同行评议模拟审查',
+            '学术英语风格优化'
+        ]
+    },
+    'translate': {
+        title: '翻译',
+        desc: '粘贴原文并明确目标语言,快速获取学术翻译',
+        placeholder: '粘贴原文并明确目标语言,快速获取学术翻译',
+        examples: [
+            '学术论文规范化翻译',
+            '中英双语对照校验',
+            '跨文化翻译适配'
+        ]
+    },
+    'literature-review': {
+        title: '文献综述',
+        desc: '输入您想写的文献综述的主题和字数等要求',
+        placeholder: '输入您想写的文献综述的主题和字数等要求',
+        examples: [
+            'PRISMA 标准系统性综述',
+            '荟萃分析统计综合',
+            '领域理论演进脉络梳理'
+        ]
+    }
+};
+
+// 打开功能（在输入框内显示功能按钮）
+function openFeature(featureType) {
+    try {
+        // 处理所有配置的功能
+        if (!featureConfig[featureType]) {
+            alert(`打开功能：${featureType}\n\n（实际应用中应跳转到对应功能页面）`);
+            return;
+        }
+        
+        currentFeature = featureType;
+        const config = featureConfig[featureType];
+        
+        // 获取元素
+        const featureBtnInline = document.getElementById('featureBtnInline');
+        const featureBtnTitle = document.getElementById('featureBtnTitle');
+        const featureBtnDesc = document.getElementById('featureBtnDesc');
+        const featureExamplesSection = document.getElementById('featureExamplesSection');
+        const examplesList = document.getElementById('featureExamplesList');
+        const writingInput = document.getElementById('writingQuestionInput');
+        
+        // 显示功能按钮（在输入框内部）
+        if (featureBtnInline) {
+            featureBtnInline.style.display = 'block';
+            if (featureBtnTitle) featureBtnTitle.textContent = config.title;
+            if (featureBtnDesc) featureBtnDesc.textContent = config.desc;
+            
+            // 添加has-feature类，调整输入框内边距
+            const inputContainer = featureBtnInline.closest('.writing-input-container');
+            if (inputContainer) {
+                inputContainer.classList.add('has-feature');
+            }
+        }
+        
+        // 更新输入框占位符
+        if (writingInput) {
+            writingInput.placeholder = config.placeholder;
+        }
+        
+        // 显示并更新示例列表
+        if (featureExamplesSection) {
+            featureExamplesSection.style.display = 'block';
+        }
+        if (examplesList) {
+            examplesList.innerHTML = config.examples.map(example => {
+                const escapedExample = example.replace(/'/g, "\\'");
+                return `
+                    <div class="feature-example-item" onclick="useExample('${escapedExample}')">
+                        <span class="example-text">${example}</span>
+                        <span class="example-arrow">→</span>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error('打开功能时出错:', error);
+        alert('打开功能时发生错误，请重试');
+    }
+}
+
+// 清除功能（恢复默认状态）
+function clearFeature() {
+    try {
+        const featureBtnInline = document.getElementById('featureBtnInline');
+        const featureExamplesSection = document.getElementById('featureExamplesSection');
+        const writingInput = document.getElementById('writingQuestionInput');
+        
+        if (featureBtnInline) {
+            featureBtnInline.style.display = 'none';
+            // 移除has-feature类，恢复输入框内边距
+            const inputContainer = featureBtnInline.closest('.writing-input-container');
+            if (inputContainer) {
+                inputContainer.classList.remove('has-feature');
+            }
+        }
+        if (featureExamplesSection) featureExamplesSection.style.display = 'none';
+        if (writingInput) {
+            writingInput.placeholder = '询问任何问题, 提出任何需求 (输入@快速添加知识库)';
+            writingInput.value = '';
+        }
+        
+        currentFeature = null;
+    } catch (error) {
+        console.error('清除功能时出错:', error);
+    }
+}
+
+// 使用示例
+function useExample(example) {
+    try {
+        const writingInput = document.getElementById('writingQuestionInput');
+        if (writingInput) {
+            writingInput.value = example;
+            // 聚焦到输入框
+            writingInput.focus();
+        }
+    } catch (error) {
+        console.error('使用示例时出错:', error);
+    }
+}
+
+// 添加知识库
+function addKnowledgeBase() {
+    document.getElementById('addKnowledgeBaseModal').style.display = 'flex';
+}
+
+// 附件
+function attachFile() {
+    alert('添加附件（模拟）\n\n（实际应用中应打开文件选择对话框）');
+}
+
+// 语音输入
+function startVoiceInput() {
+    alert('语音输入（模拟）\n\n（实际应用中应调用语音识别API）');
+}
+
+// 提交问题
+function submitQuestion() {
+    const input = document.getElementById('writingQuestionInput');
+    const question = input.value.trim();
+    
+    if (!question) {
+        alert('请输入您的问题或需求');
+        return;
+    }
+    
+    // 如果有选中的功能，显示功能信息
+    if (currentFeature) {
+        const config = featureConfig[currentFeature];
+        alert(`提交${config.title}请求：${question}\n\n（实际应用中应调用AI生成API）`);
+    } else {
+        alert(`提交问题：${question}\n\n（实际应用中应调用AI问答API）`);
+    }
+    
+    // 不清空输入框，让用户可以继续编辑
+}
+
+// 关闭添加知识库模态框
+function closeAddKBModal() {
+    document.getElementById('addKnowledgeBaseModal').style.display = 'none';
+    // 重置选择
+    selectedKBItems = [];
+    updateKBSelection();
+}
+
+// 选中的知识库项
+let selectedKBItems = [];
+
+// 更新知识库选择状态
+function updateKBSelection() {
+    const count = selectedKBItems.length;
+    document.getElementById('kbSelectedCount').textContent = `已选 ${count}/5 项`;
+    document.getElementById('confirmAddKB').disabled = count === 0;
+    
+    // 更新列表项样式
+    document.querySelectorAll('.add-kb-item').forEach((item, index) => {
+        if (selectedKBItems.includes(index)) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+// 切换知识库项选择
+function toggleKBItem(index) {
+    if (selectedKBItems.includes(index)) {
+        selectedKBItems = selectedKBItems.filter(i => i !== index);
+    } else {
+        if (selectedKBItems.length < 5) {
+            selectedKBItems.push(index);
+        } else {
+            alert('最多只能选择5项');
+            return;
+        }
+    }
+    updateKBSelection();
+}
+
+// 确认添加知识库
+function confirmAddKB() {
+    if (selectedKBItems.length === 0) {
+        alert('请至少选择一项');
+        return;
+    }
+    
+    alert(`已添加 ${selectedKBItems.length} 项参考资料\n\n（实际应用中应调用API添加知识库）`);
+    closeAddKBModal();
+}
+
+// 搜索知识库
+function searchKB() {
+    const keyword = document.getElementById('kbSearchInput').value.trim();
+    // 模拟搜索
+    loadKBList(keyword);
+}
+
+// 加载知识库列表
+function loadKBList(keyword = '') {
+    const kbList = document.getElementById('kbList');
+    
+    // 模拟数据（实际应用中应从API获取）
+    const mockKBItems = [
+        { name: '医学文献库', desc: '包含1000+篇医学相关文献' },
+        { name: '临床案例库', desc: '收录500+临床案例' },
+        { name: '研究笔记', desc: '个人研究笔记和摘录' }
+    ];
+    
+    if (mockKBItems.length === 0) {
+        kbList.innerHTML = '<div class="add-kb-empty">暂无知识库</div>';
+        return;
+    }
+    
+    const filteredItems = keyword 
+        ? mockKBItems.filter(item => item.name.includes(keyword) || item.desc.includes(keyword))
+        : mockKBItems;
+    
+    if (filteredItems.length === 0) {
+        kbList.innerHTML = '<div class="add-kb-empty">未找到相关知识库</div>';
+        return;
+    }
+    
+    kbList.innerHTML = filteredItems.map((item, index) => `
+        <div class="add-kb-item" onclick="toggleKBItem(${index})">
+            <div class="add-kb-item-checkbox"></div>
+            <div class="add-kb-item-info">
+                <div class="add-kb-item-name">${item.name}</div>
+                <div class="add-kb-item-desc">${item.desc}</div>
+            </div>
+        </div>
+    `).join('');
+    
+    updateKBSelection();
+}
+
+// 初始化页面
+function initPage_research_assistant_writing() {
+    console.log('辅助写作页面已加载');
+    
+    // 确保功能按钮和示例区域初始隐藏
+    const featureBtnInline = document.getElementById('featureBtnInline');
+    const featureExamplesSection = document.getElementById('featureExamplesSection');
+    
+    if (featureBtnInline) featureBtnInline.style.display = 'none';
+    if (featureExamplesSection) featureExamplesSection.style.display = 'none';
+    
+    // 初始化知识库搜索
+    const kbSearchInput = document.getElementById('kbSearchInput');
+    if (kbSearchInput) {
+        kbSearchInput.addEventListener('input', function() {
+            searchKB();
+        });
+    }
+    
+    // 打开模态框时加载知识库列表
+    const modal = document.getElementById('addKnowledgeBaseModal');
+    if (modal) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    if (modal.style.display === 'flex') {
+                        loadKBList();
+                    }
+                }
+            });
+        });
+        observer.observe(modal, { attributes: true });
+    }
+    
+    // 确保函数在全局作用域
+    if (typeof window.openFeature === 'undefined') {
+        window.openFeature = openFeature;
+    }
+    if (typeof window.clearFeature === 'undefined') {
+        window.clearFeature = clearFeature;
+    }
+    if (typeof window.useExample === 'undefined') {
+        window.useExample = useExample;
+    }
+}
+</script>

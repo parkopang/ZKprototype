@@ -1,0 +1,597 @@
+<!-- 科研超级智能体：学术问答页面 -->
+<div class="academic-qa-page">
+    <div class="academic-qa-header">
+        <div class="academic-qa-title-section">
+            <div class="academic-qa-icon">🎓</div>
+            <h1 class="academic-qa-title">学术问答</h1>
+        </div>
+        <p class="academic-qa-subtitle">学术问答，严谨作答</p>
+    </div>
+    
+    <!-- 问答模式选择器 -->
+    <div class="qa-mode-selector">
+        <button class="mode-btn" id="modeFullWeb" onclick="switchQAMode('fullweb')">全网</button>
+        <button class="mode-btn active" id="modeAcademic" onclick="switchQAMode('academic')">学术</button>
+    </div>
+    
+    <!-- 问题输入区域 -->
+    <div class="qa-input-section">
+        <div class="qa-input-container">
+            <textarea 
+                class="qa-input" 
+                id="qaQuestionInput"
+                placeholder="询问任何问题，提出任何需求"
+                rows="4"
+            ></textarea>
+            <div class="qa-input-actions">
+                <button class="qa-action-btn" id="qaVoiceBtn" onclick="startVoiceInput()" title="语音输入">
+                    <span>🎤</span>
+                </button>
+                <button class="qa-action-btn qa-submit-btn" id="qaSubmitBtn" onclick="submitQuestion()" title="提交">
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 研究模式和模型选择 -->
+        <div class="qa-options-bar">
+            <button class="qa-option-btn" id="deepResearchBtn" onclick="toggleDeepResearch()">
+                <span>深度研究</span>
+            </button>
+            <div class="qa-model-selector">
+                <button class="qa-option-btn" id="modelSelectBtn" onclick="toggleModelDropdown()">
+                    <span>标准模型</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="model-dropdown" id="modelDropdown" style="display: none;">
+                    <div class="model-option" onclick="selectModel('standard')">标准模型</div>
+                    <div class="model-option" onclick="selectModel('advanced')">高级模型</div>
+                    <div class="model-option" onclick="selectModel('expert')">专家模型</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 学术资源Logo -->
+        <div class="academic-resources">
+            <div class="resources-label">支持的学术资源：</div>
+            <div class="resources-logos">
+                <div class="resource-logo" title="PubMed - 生物医学文献数据库">
+                    <div class="logo-text">PubMed</div>
+                    <div class="logo-url">pubmed.ncbi.nlm.nih.gov</div>
+                </div>
+                <div class="resource-logo" title="IEEE Xplore - 电子电气工程数据库">
+                    <div class="logo-text">IEEE</div>
+                    <div class="logo-url">ieeexplore.ieee.org</div>
+                </div>
+                <div class="resource-logo" title="ACM Digital Library - 计算机科学数据库">
+                    <div class="logo-text">ACM</div>
+                    <div class="logo-url">dl.acm.org</div>
+                </div>
+                <div class="resource-logo" title="Science - 科学期刊">
+                    <div class="logo-text">Science</div>
+                    <div class="logo-url">science.org</div>
+                </div>
+                <div class="resource-logo" title="Wiley Online Library - 多学科期刊数据库">
+                    <div class="logo-text">WILEY</div>
+                    <div class="logo-url">onlinelibrary.wiley.com</div>
+                </div>
+                <div class="resource-logo" title="Springer Nature - 科学出版商">
+                    <div class="logo-text">SPRINGER NATURE</div>
+                    <div class="logo-url">springernature.com</div>
+                </div>
+                <div class="resource-logo" title="arXiv - 预印本服务器">
+                    <div class="logo-text">arXiv</div>
+                    <div class="logo-url">arxiv.org</div>
+                </div>
+            </div>
+            <!-- 研发说明区域 -->
+            <div class="dev-notes">
+                <div class="dev-notes-title">📌 研发说明：数据来源网站</div>
+                <div class="dev-notes-content">
+                    <div class="dev-note-item">
+                        <strong>PubMed</strong>：https://pubmed.ncbi.nlm.nih.gov/ - 美国国立医学图书馆（NLM）生物医学文献数据库
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>IEEE Xplore</strong>：https://ieeexplore.ieee.org/ - 电气和电子工程师协会全文数据库（电子、电气、计算机、信息技术）
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>ACM Digital Library</strong>：https://dl.acm.org/ - 美国计算机协会数字图书馆（计算机科学期刊、会议论文）
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>Science</strong>：https://www.science.org/ - 美国科学促进会（AAAS）科学期刊
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>Wiley Online Library</strong>：https://onlinelibrary.wiley.com/ - Wiley出版集团在线图书馆（多学科期刊和电子书）
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>Springer Nature</strong>：https://www.springernature.com/ - Springer和Nature合并的全球科学出版商
+                    </div>
+                    <div class="dev-note-item">
+                        <strong>arXiv</strong>：https://arxiv.org/ - 康奈尔大学开放获取预印本服务器（物理、数学、计算机科学）
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 问答历史/结果区域 -->
+    <div class="qa-results-section" id="qaResultsSection" style="display: none;">
+        <div class="qa-conversation" id="qaConversation">
+            <!-- 对话内容将通过JavaScript动态生成 -->
+        </div>
+    </div>
+</div>
+
+<style>
+/* 学术问答页面样式 */
+.academic-qa-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.academic-qa-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.academic-qa-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.academic-qa-icon {
+    font-size: 48px;
+}
+
+.academic-qa-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+
+.academic-qa-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* 问答模式选择器 */
+.qa-mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.mode-btn {
+    padding: 8px 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 20px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.mode-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.mode-btn.active {
+    background: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
+}
+
+/* 问题输入区域 */
+.qa-input-section {
+    margin-bottom: 32px;
+}
+
+.qa-input-container {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.qa-input {
+    width: 100%;
+    padding: 16px 80px 16px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.qa-input:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.qa-input-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.qa-action-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s;
+}
+
+.qa-action-btn:hover {
+    background: #e0e0e0;
+}
+
+.qa-submit-btn {
+    background: #1890ff;
+    color: #fff;
+}
+
+.qa-submit-btn:hover {
+    background: #40a9ff;
+}
+
+/* 选项栏 */
+.qa-options-bar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.qa-option-btn {
+    padding: 8px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.qa-option-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.qa-model-selector {
+    position: relative;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+.model-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    min-width: 120px;
+}
+
+.model-option {
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.model-option:hover {
+    background: #f0f0f0;
+}
+
+.model-option:first-child {
+    border-radius: 6px 6px 0 0;
+}
+
+.model-option:last-child {
+    border-radius: 0 0 6px 6px;
+}
+
+/* 学术资源Logo */
+.academic-resources {
+    text-align: center;
+}
+
+.resources-label {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+}
+
+.resources-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.resource-logo {
+    padding: 10px 16px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s;
+    text-align: center;
+    min-width: 120px;
+}
+
+.resource-logo:hover {
+    background: #e6f7ff;
+    color: #1890ff;
+}
+
+.logo-text {
+    white-space: nowrap;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.logo-url {
+    font-size: 10px;
+    color: #999;
+    white-space: nowrap;
+}
+
+/* 研发说明区域 */
+.dev-notes {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f9f9f9;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    border-left: 4px solid #1890ff;
+}
+
+.dev-notes-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.dev-notes-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dev-note-item {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    padding: 8px;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.dev-note-item strong {
+    color: #1890ff;
+    font-weight: 600;
+}
+
+/* 问答结果区域 */
+.qa-results-section {
+    margin-top: 32px;
+}
+
+.qa-conversation {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.qa-message {
+    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.qa-message.user {
+    background: #e6f7ff;
+    margin-left: 20%;
+}
+
+.qa-message.assistant {
+    background: #f5f5f5;
+    margin-right: 20%;
+}
+
+.qa-message-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.qa-message-content {
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.qa-loading {
+    text-align: center;
+    padding: 24px;
+    color: #999;
+}
+</style>
+
+<script>
+// 当前问答模式
+let currentQAMode = 'academic';
+let currentModel = 'standard';
+let isDeepResearch = false;
+
+// 切换问答模式
+function switchQAMode(mode) {
+    currentQAMode = mode;
+    document.getElementById('modeFullWeb').classList.toggle('active', mode === 'fullweb');
+    document.getElementById('modeAcademic').classList.toggle('active', mode === 'academic');
+}
+
+// 切换深度研究
+function toggleDeepResearch() {
+    isDeepResearch = !isDeepResearch;
+    const btn = document.getElementById('deepResearchBtn');
+    if (isDeepResearch) {
+        btn.style.background = '#1890ff';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#1890ff';
+    } else {
+        btn.style.background = '#fff';
+        btn.style.color = '#666';
+        btn.style.borderColor = '#d9d9d9';
+    }
+}
+
+// 切换模型下拉菜单
+function toggleModelDropdown() {
+    const dropdown = document.getElementById('modelDropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+// 选择模型
+function selectModel(model) {
+    currentModel = model;
+    const btn = document.getElementById('modelSelectBtn');
+    const modelNames = {
+        'standard': '标准模型',
+        'advanced': '高级模型',
+        'expert': '专家模型'
+    };
+    btn.querySelector('span:first-child').textContent = modelNames[model];
+    document.getElementById('modelDropdown').style.display = 'none';
+}
+
+// 开始语音输入
+function startVoiceInput() {
+    alert('语音输入功能（模拟）\n\n实际应用中应调用语音识别API');
+}
+
+// 提交问题
+function submitQuestion() {
+    const input = document.getElementById('qaQuestionInput');
+    const question = input.value.trim();
+    
+    if (!question) {
+        alert('请输入您的问题');
+        return;
+    }
+    
+    // 显示结果区域
+    const resultsSection = document.getElementById('qaResultsSection');
+    resultsSection.style.display = 'block';
+    
+    // 添加用户问题
+    addMessage('user', question);
+    
+    // 清空输入框
+    input.value = '';
+    
+    // 显示加载状态
+    const loadingId = addMessage('assistant', '正在思考中...', true);
+    
+    // 模拟AI回答
+    setTimeout(() => {
+        const mockAnswer = generateMockAnswer(question);
+        updateMessage(loadingId, 'assistant', mockAnswer);
+    }, 2000);
+}
+
+// 添加消息
+function addMessage(role, content, isLoading = false) {
+    const conversation = document.getElementById('qaConversation');
+    const messageId = 'msg-' + Date.now();
+    const messageClass = isLoading ? 'qa-loading' : 'qa-message ' + role;
+    
+    const messageHTML = `
+        <div class="${messageClass}" id="${messageId}">
+            <div class="qa-message-header">${role === 'user' ? '您的问题' : 'AI回答'}</div>
+            <div class="qa-message-content">${content}</div>
+        </div>
+    `;
+    
+    conversation.insertAdjacentHTML('beforeend', messageHTML);
+    
+    // 滚动到底部
+    conversation.scrollTop = conversation.scrollHeight;
+    
+    return messageId;
+}
+
+// 更新消息
+function updateMessage(messageId, role, content) {
+    const messageEl = document.getElementById(messageId);
+    if (messageEl) {
+        messageEl.className = 'qa-message ' + role;
+        messageEl.querySelector('.qa-message-content').textContent = content;
+    }
+}
+
+// 生成模拟回答
+function generateMockAnswer(question) {
+    const answers = [
+        `根据您的问题"${question}"，我为您整理了以下学术观点：\n\n1. 相关研究显示，该领域在近年来取得了显著进展。\n2. 多项研究表明，该问题涉及多个维度的考量。\n3. 建议进一步查阅相关文献以获得更深入的理解。\n\n参考文献：\n- Author A, et al. (2023). Title of Study. Journal Name.\n- Author B, et al. (2022). Another Study. Journal Name.`,
+        `关于"${question}"这个问题，学术界有以下主要观点：\n\n• 主流观点认为...\n• 部分学者提出...\n• 最新研究显示...\n\n需要注意的是，该领域仍存在一些争议，建议结合具体研究场景进行判断。`,
+        `针对您的问题，我基于学术数据库检索到以下信息：\n\n根据PubMed、IEEE等数据库的相关文献，该问题可以从以下几个角度分析：\n\n1. 理论基础\n2. 实证研究\n3. 应用实践\n\n以上内容基于当前学术资源整理，仅供参考。`
+    ];
+    
+    return answers[Math.floor(Math.random() * answers.length)];
+}
+
+// 点击外部关闭下拉菜单
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('modelDropdown');
+    const btn = document.getElementById('modelSelectBtn');
+    if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
+});
+
+// 支持Enter键提交（Ctrl+Enter）
+document.getElementById('qaQuestionInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+        submitQuestion();
+    }
+});
+
+// 初始化页面
+function initPage_research_academic_qa() {
+    console.log('学术问答页面已加载');
+}
+</script>

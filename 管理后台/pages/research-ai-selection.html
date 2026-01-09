@@ -1,0 +1,2475 @@
+<!-- 科研超级智能体：AI选题页面 -->
+<div class="research-ai-selection-page">
+    <div class="research-header">
+        <div class="research-title-section">
+            <div class="research-icon">🤖</div>
+            <h1 class="research-title">AI选题</h1>
+        </div>
+        <p class="research-subtitle">前沿为标，文献为纲</p>
+    </div>
+    
+    <div class="research-search-section">
+        <div class="research-search-box">
+            <input type="text" class="research-search-input" placeholder="请输入选题方向的核心关键词" id="aiSelectionKeyword">
+            <div class="research-search-actions">
+                <button class="research-voice-btn" title="语音输入">🎤</button>
+                <button class="research-search-btn" onclick="performAISelection()">🔍</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="research-config-section">
+        <div class="research-config-header">
+            <p class="research-config-tip">您好,使用以下信息可以帮助我更好的为您分析选题哦~</p>
+        </div>
+        <div class="research-config-content">
+            <div class="research-config-row">
+                <div class="research-config-item">
+                    <span class="config-label">我是</span>
+                    <select class="config-select" id="userRole">
+                        <option>请选择您的角色</option>
+                        <option>本科生</option>
+                        <option>研究生</option>
+                        <option>博士生</option>
+                        <option>小初高中教师</option>
+                        <option>大学教师</option>
+                        <option>医生</option>
+                        <option>护士</option>
+                        <option>科研工作者</option>
+                        <option>其他</option>
+                    </select>
+                    <span class="config-punctuation">,</span>
+                </div>
+                <div class="research-config-item">
+                    <span class="config-label">我需要研究的领域是</span>
+                    <div class="config-multi-select">
+                        <select class="config-select" id="researchField1">
+                            <option>请选择一级研究领域</option>
+                            <option value="医学">医学</option>
+                            <option value="工学">工学</option>
+                            <option value="理学">理学</option>
+                            <option value="农学">农学</option>
+                            <option value="经济学">经济学</option>
+                            <option value="教育学">教育学</option>
+                            <option value="文学">文学</option>
+                            <option value="法学">法学</option>
+                            <option value="艺术学">艺术学</option>
+                            <option value="管理学">管理学</option>
+                            <option value="历史学">历史学</option>
+                            <option value="哲学">哲学</option>
+                            <option value="军事学">军事学</option>
+                            <option value="交叉学科">交叉学科</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <select class="config-select" id="researchField2" disabled>
+                            <option>请选择二级研究领域</option>
+                        </select>
+                        <select class="config-select" id="researchField3" disabled>
+                            <option>请选择三级研究领域</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="research-config-row">
+                <div class="research-config-item">
+                    <span class="config-label">我的写作目标是</span>
+                    <select class="config-select" id="writingGoal">
+                        <option>请选择写作目标</option>
+                        <option>毕业论文</option>
+                        <option>申报基金项目</option>
+                        <option>投稿国内普刊</option>
+                        <option>投稿国内核心期刊</option>
+                        <option>投稿sci期刊</option>
+                        <option>投稿外刊（需要英文题目）</option>
+                        <option>会议</option>
+                        <option>兴趣研究</option>
+                        <option>其他</option>
+                    </select>
+                    <span class="config-punctuation">,</span>
+                </div>
+                <div class="research-config-item">
+                    <span class="config-label">我希望的研究方法是</span>
+                    <select class="config-select" id="researchMethod">
+                        <option>请选择研究方法</option>
+                        <option>问卷</option>
+                        <option>访谈</option>
+                        <option>案例分析</option>
+                        <option>实验</option>
+                        <option>数据建模</option>
+                        <option>文献综述</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="research-config-row">
+                <div class="research-config-item">
+                    <label class="config-checkbox-label">
+                        <input type="checkbox" id="useConfigInfo" checked>
+                        <span>使用这些信息</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提示信息 -->
+    <div class="research-tip-section" id="researchTipSection" style="display: none;">
+        <div class="research-tip-box">
+            <span class="research-tip-icon">💡</span>
+            <span class="research-tip-text">提示：点击搜索按钮（🔍）后，系统将生成选题建议，您可以在下方查看结果</span>
+        </div>
+    </div>
+    
+    <div class="research-results-section" id="aiSelectionResults" style="display: none;">
+        <div class="research-results-header">
+            <h3 class="research-results-title">选题建议</h3>
+            <button class="research-clear-cache-btn" onclick="changeApproach()" title="换个思路，更换LLM模型并重新生成选题建议">
+                <span class="clear-cache-icon">🔄</span>
+                <span class="clear-cache-text">换个思路</span>
+            </button>
+        </div>
+        <div class="research-results-list" id="aiSelectionResultsList">
+            <!-- 结果将通过JavaScript动态生成 -->
+        </div>
+        
+        <!-- 文献参考表格区域 -->
+        <div class="research-literature-table-section" id="literatureTableSection" style="display: none;">
+            <div class="literature-table-header">
+                <h4 class="literature-table-title">📚 相关文献参考</h4>
+                <div class="literature-table-count" id="literatureTableCount">共 0 篇文献</div>
+            </div>
+            <div class="literature-table-container">
+                <table class="literature-table" id="literatureTable">
+                    <thead>
+                        <tr>
+                            <th class="col-index">序号</th>
+                            <th class="col-title">文献名称</th>
+                            <th class="col-author">作者</th>
+                            <th class="col-journal">期刊</th>
+                            <th class="col-year">年份</th>
+                            <th class="col-level">期刊等级</th>
+                            <th class="col-citation">被引用次数</th>
+                            <th class="col-link">链接</th>
+                        </tr>
+                    </thead>
+                    <tbody id="literatureTableBody">
+                        <!-- 文献数据将通过JavaScript动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 用户反馈区域 -->
+        <div class="research-feedback-section" id="researchFeedbackSection" style="display: none;">
+            <div class="research-feedback-title">您感觉本次AI选题的结果如何?</div>
+            <div class="research-feedback-buttons">
+                <button class="feedback-btn feedback-positive" onclick="submitFeedback('positive')">
+                    <span class="feedback-icon">👍</span>
+                    <span>很好</span>
+                </button>
+                <button class="feedback-btn feedback-neutral" onclick="submitFeedback('neutral')">
+                    <span class="feedback-icon">😐</span>
+                    <span>一般</span>
+                </button>
+                <button class="feedback-btn feedback-negative" onclick="submitFeedback('negative')">
+                    <span class="feedback-icon">👎</span>
+                    <span>不满意</span>
+                </button>
+            </div>
+            <div class="research-feedback-thanks" id="feedbackThanks" style="display: none;">
+                感谢您的反馈！
+            </div>
+            <div class="research-feedback-guide" id="feedbackGuide" style="display: none;">
+                <div class="feedback-guide-content">
+                    <div class="feedback-guide-icon">💡</div>
+                    <div class="feedback-guide-text">
+                        <div class="feedback-guide-title">想要获得不同的选题建议？</div>
+                        <div class="feedback-guide-desc">您可以点击右上角的"换个思路"按钮，系统将清除缓存并更换LLM模型，为您重新生成选题建议。</div>
+                        <button class="feedback-guide-btn" onclick="scrollToChangeApproach()">去换个思路</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI选题运算规则与技术实现说明 -->
+    <div class="ai-selection-rules-section">
+        <div class="rules-header">
+            <div class="rules-title-wrapper">
+                <div class="rules-badge">📖 原型说明文档</div>
+                <h3 class="rules-title">AI选题运算规则与技术实现</h3>
+                <p class="rules-subtitle">以下内容是对上述原型的详细说明和技术实现方案，帮助理解原型的功能设计、交互流程和技术架构</p>
+            </div>
+            <button class="rules-toggle-btn" onclick="toggleRulesSection()" id="rulesToggleBtn">收起</button>
+        </div>
+        <div class="rules-content" id="rulesContent" style="display: block;">
+            <!-- 一、用户路径流程图 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">一、用户路径流程图</h4>
+                <div class="rule-text" style="margin-bottom: 20px;">
+                    <p>以下流程图展示了用户使用AI选题功能的完整路径，帮助理解整个交互流程。</p>
+                </div>
+                <div class="user-flow-diagram">
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">1</div>
+                        <div class="flow-content">
+                            <div class="flow-title">输入关键词</div>
+                            <div class="flow-desc">用户在搜索框输入选题方向的核心关键词</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">2</div>
+                        <div class="flow-content">
+                            <div class="flow-title">配置个人信息</div>
+                            <div class="flow-desc">选择用户角色、研究领域、写作目标、研究方法等配置信息</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">3</div>
+                        <div class="flow-content">
+                            <div class="flow-title">点击搜索</div>
+                            <div class="flow-desc">点击搜索按钮（🔍），系统检查缓存，如有缓存直接返回，否则调用LLM API生成选题建议</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">4</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看结果</div>
+                            <div class="flow-desc">系统展示3-6个选题建议，每个包含研究价值、研究内容、研究难点、相关文献</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">5</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看文献</div>
+                            <div class="flow-desc">查看完整的文献参考表格，包含所有相关文献的详细信息</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large flow-step-optional">
+                        <div class="flow-number-large">6</div>
+                        <div class="flow-content">
+                            <div class="flow-title">换个思路（可选）</div>
+                            <div class="flow-desc">如果对结果不满意，可点击"换个思路"按钮，清除缓存并更换LLM模型，系统重新生成选题建议</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large flow-arrow-optional">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">7</div>
+                        <div class="flow-content">
+                            <div class="flow-title">提交反馈</div>
+                            <div class="flow-desc">对本次AI选题结果进行评价（很好/一般/不满意）</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large flow-step-branch">
+                        <div class="flow-number-large">8</div>
+                        <div class="flow-content">
+                            <div class="flow-title">反馈处理</div>
+                            <div class="flow-desc">如果选择"一般"或"不满意"，系统记录反馈并引导用户使用"换个思路"功能</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 换个思路循环流程说明 -->
+                <div class="flow-branch-diagram" style="margin-top: 24px; padding: 20px; background: #fff7e6; border-radius: 8px; border-left: 4px solid #faad14;">
+                    <div class="flow-branch-title" style="font-weight: 600; color: #d46b08; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔄</span>
+                        <span>"换个思路"循环流程说明</span>
+                    </div>
+                    <div class="flow-branch-content" style="color: #666; line-height: 1.8;">
+                        <p style="margin: 0 0 8px 0;"><strong>流程说明：</strong></p>
+                        <ol style="margin: 0; padding-left: 20px;">
+                            <li>用户查看结果后，如果对选题建议不满意，可以点击"换个思路"按钮</li>
+                            <li>系统弹出确认提示，用户确认后清除当前输入的缓存结果</li>
+                            <li>系统可以更换LLM模型（如从GPT-4切换到Claude、文心一言等），利用不同模型的特点生成多样化的选题建议</li>
+                            <li>系统重新调用LLM API生成新的选题建议，返回步骤4（查看结果）</li>
+                            <li>用户可以继续查看新结果，如果仍不满意，可以再次点击"换个思路"，形成循环流程</li>
+                            <li>如果对结果满意，可以继续到步骤7（提交反馈）</li>
+                        </ol>
+                        <p style="margin: 12px 0 0 0; padding: 12px; background: #fff; border-radius: 4px; border-left: 3px solid #faad14;">
+                            <strong>💡 成本优化提示：</strong>如果用户不点击"换个思路"，相同输入参数每次都会返回相同的缓存结果，不再调用LLM API，从而节约token成本。只有在用户主动选择"换个思路"时，系统才会清除缓存并重新调用LLM API。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 反馈引导流程说明 -->
+                <div class="flow-branch-diagram" style="margin-top: 24px; padding: 20px; background: #f0f8ff; border-radius: 8px; border-left: 4px solid #1890ff;">
+                    <div class="flow-branch-title" style="font-weight: 600; color: #1890ff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>📝</span>
+                        <span>反馈引导流程说明</span>
+                    </div>
+                    <div class="flow-branch-content" style="color: #666; line-height: 1.8;">
+                        <p style="margin: 0 0 8px 0;"><strong>流程说明：</strong></p>
+                        <ol style="margin: 0; padding-left: 20px;">
+                            <li>用户在步骤7提交反馈，选择"很好"、"一般"或"不满意"</li>
+                            <li><strong>如果选择"很好"：</strong>系统显示感谢信息，流程结束</li>
+                            <li><strong>如果选择"一般"或"不满意"：</strong>
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    <li>系统记录用户反馈（实际应用中发送到后端进行数据分析）</li>
+                                    <li>系统显示感谢信息："感谢您的反馈！我们已记录您的意见。"</li>
+                                    <li>系统自动显示引导提示，引导用户使用"换个思路"功能</li>
+                                    <li>引导提示包含："想要获得不同的选题建议？您可以点击右上角的'换个思路'按钮..."</li>
+                                    <li>提供"去换个思路"按钮，点击后自动滚动到"换个思路"按钮并高亮显示</li>
+                                </ul>
+                            </li>
+                            <li>用户点击"去换个思路"按钮后，系统滚动到"换个思路"按钮，用户可以继续使用"换个思路"功能（返回步骤6）</li>
+                            <li>如果用户对新的结果满意，可以再次提交反馈，选择"很好"，流程结束</li>
+                        </ol>
+                        <p style="margin: 12px 0 0 0; padding: 12px; background: #fff; border-radius: 4px; border-left: 3px solid #1890ff;">
+                            <strong>📊 数据价值：</strong>通过记录用户反馈（特别是"一般"和"不满意"），系统可以分析用户满意度，优化LLM提示词和模型选择策略，持续改进选题质量。
+                        </p>
+                    </div>
+                </div>
+                <div class="rule-text" style="margin-top: 20px; padding: 12px; background: #f0f8ff; border-left: 3px solid #1890ff; border-radius: 4px;">
+                    <strong>原型使用提示：</strong>在原型页面中，点击搜索按钮（🔍）后，系统会显示模拟的选题建议结果。您可以查看完整的选题内容、相关文献、反馈功能和"换个思路"按钮，以便更好地理解整个AI选题功能的交互流程。
+                </div>
+                <div class="rule-text" style="margin-top: 12px; padding: 12px; background: #fff7e6; border-left: 3px solid #faad14; border-radius: 4px;">
+                    <strong>"换个思路"功能说明：</strong>在结果页面标题右侧提供"换个思路"按钮（🔄）。系统采用缓存机制优化性能：<strong>如果不清除缓存，相同输入参数每次生成的结果都是一样的，直接返回缓存结果，不再调用LLM API，从而节约token成本</strong>。用户点击"换个思路"后，系统会清除当前输入的缓存结果，并可以更换LLM模型，重新调用LLM API生成新的选题建议，为用户提供不同的选题思路。
+                </div>
+                <div class="rule-text" style="margin-top: 12px; padding: 12px; background: #f0f8ff; border-left: 3px solid #1890ff; border-radius: 4px;">
+                    <strong>反馈引导功能说明：</strong>当用户对选题结果进行反馈时，如果选择"一般"或"不满意"，系统会记录用户反馈并自动显示引导提示，引导用户使用"换个思路"功能。引导提示包含说明文字和"去换个思路"按钮，点击后自动滚动到"换个思路"按钮并高亮显示，帮助用户快速找到并使用该功能，提升用户体验和功能使用率。
+                </div>
+            </div>
+            
+            <!-- 二、功能概述 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">二、功能概述</h4>
+                <div class="rule-text" style="margin-bottom: 16px;">
+                    <p style="margin-bottom: 12px;"><strong>功能目标：</strong></p>
+                    <p style="margin-left: 20px; margin-bottom: 12px;">AI选题功能旨在通过深入了解用户的个人背景和研究兴趣，更准确地理解用户的研究需求，并提供有针对性的选题建议。同时，通过明确用户对选题的期望和限制条件，能够更有效地协助用户确定符合其实际情况的论文选题。</p>
+                </div>
+                <div class="rule-text">
+                    <p style="margin-bottom: 12px;"><strong>实现方式：</strong></p>
+                    <p style="margin-left: 20px;">系统通过对接外部LLM（大语言模型），整合用户的多维度信息（角色、研究领域、写作目标、研究方法、核心关键词等），结合学术规范和最佳实践，生成3-6个高质量的、个性化的选题建议。每个选题建议包含完整的背景说明、研究内容、创新点、可行性分析和文献检索关键词。同时，系统会从已有的文献库中自动检索并推荐与每个选题高度相关的文献（每个选题5-10篇），并提供完整的文献参考表格，帮助用户快速定位研究方向并获取权威文献支持。</p>
+                    <p style="margin-left: 20px; margin-top: 12px;"><strong>缓存机制与"换个思路"功能：</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 8px;">
+                        <li><strong>缓存机制：</strong>相同输入参数的请求结果会被缓存，后续相同输入直接返回缓存结果，不再调用LLM API，从而节约token成本。如果用户不主动清除缓存，每次生成的结果都是一样的。</li>
+                        <li><strong>"换个思路"功能：</strong>用户如果对结果不满意，可以点击"换个思路"按钮，系统会清除当前输入的缓存结果，可以更换LLM模型（如从GPT-4切换到Claude、文心一言等），重新调用LLM API生成新的选题建议，为用户提供不同的选题思路。用户可以多次使用"换个思路"功能，直到获得满意的结果。</li>
+                        <li><strong>成本平衡：</strong>通过缓存机制控制成本，通过"换个思路"功能提供灵活性，在成本控制和用户体验之间取得平衡。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 三、数据输入 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">三、数据输入</h4>
+                <div class="rule-text" style="margin-bottom: 16px;">
+                    <p>系统通过收集用户的多维度信息，全面了解用户的个人背景、研究兴趣和选题期望，为生成个性化选题建议提供数据基础。同时，系统会从已有的文献库中检索相关文献，为每个选题提供高质量的文献引用支持。</p>
+                </div>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 个人背景信息：</strong>
+                        <ul>
+                            <li><strong>用户角色：</strong>本科生、研究生、博士生、小初高中教师、大学教师、医生、护士、科研工作者、其他
+                                <br><span style="color: #666; font-size: 13px;">→ 反映用户的研究能力水平、学术经验和可投入的资源</span>
+                            </li>
+                            <li><strong>研究领域：</strong>三级分类体系（一级→二级→三级）
+                                <br><span style="color: #666; font-size: 13px;">→ 明确用户的研究兴趣和专业方向</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 选题期望与限制：</strong>
+                        <ul>
+                            <li><strong>写作目标：</strong>毕业论文、申报基金项目、投稿期刊等
+                                <br><span style="color: #666; font-size: 13px;">→ 决定选题的深度、广度和学术规范要求</span>
+                            </li>
+                            <li><strong>研究方法：</strong>问卷、访谈、案例分析、实验、数据建模、文献综述等
+                                <br><span style="color: #666; font-size: 13px;">→ 限定选题必须能够采用的研究方法</span>
+                            </li>
+                            <li><strong>核心关键词：</strong>用户输入的选题方向关键词
+                                <br><span style="color: #666; font-size: 13px;">→ 反映用户当前关注的研究热点或兴趣点</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 四、LLM对接方案 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">四、LLM对接方案</h4>
+                
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.1 API调用方式</h5>
+                    <div class="rule-list">
+                        <div class="rule-item">
+                            <strong>API调用方式：</strong>RESTful API（HTTP POST请求）
+                        </div>
+                        <div class="rule-item">
+                            <strong>说明：</strong>研发团队可根据项目需求、成本预算、性能要求等因素自行选择合适的LLM服务提供商。
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.2 提示词（Prompt）设计规范</h5>
+                    <div class="rule-text" style="margin-bottom: 16px;">
+                        提示词设计遵循<strong>四要素结构</strong>：<strong>角色设定 + 问题情境 + 任务指令 + 约束条件</strong>。这种结构化的提示词设计能够确保LLM更准确地理解任务需求，生成更符合预期的结果。
+                    </div>
+                    
+                    <div class="rule-subsection" style="padding-left: 0;">
+                        <h6 class="rule-subsection-title" style="font-size: 14px; color: #1890ff; margin-bottom: 8px;">4.2.1 提示词结构说明</h6>
+                        <div class="rule-list">
+                            <div class="rule-item">
+                                <strong>1. 角色设定（Role）：</strong>明确LLM扮演的角色和专业背景，设定其专业能力和知识范围。
+                            </div>
+                            <div class="rule-item">
+                                <strong>2. 问题情境（Context）：</strong>描述用户的具体情况和需求背景，提供必要的上下文信息。
+                            </div>
+                            <div class="rule-item">
+                                <strong>3. 任务指令（Task）：</strong>明确告知LLM需要完成的具体任务和输出要求。
+                            </div>
+                            <div class="rule-item">
+                                <strong>4. 约束条件（Constraints）：</strong>规定输出的格式、质量要求、数量限制等约束条件。
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-block" style="margin-top: 20px;">
+                        <div class="code-header">AI选题提示词模板（完整版）</div>
+                        <pre class="code-content">【角色设定】
+你是一位资深的学术研究顾问，拥有以下专业能力：
+- 深度理解各学科领域的研究前沿和发展趋势
+- 熟悉不同学术级别的选题要求和发表标准
+- 掌握多种研究方法的适用场景和操作要点
+- 能够评估选题的学术价值、创新性和可行性
+- 擅长将抽象的研究方向转化为具体可操作的选题方案
+- 具备敏锐的洞察力，能够通过用户的背景信息准确理解其研究需求和兴趣点
+- 善于平衡学术规范与用户实际能力，提供既具有学术价值又切实可行的选题建议
+
+【问题情境】
+当前有一位研究人员需要选题建议。为了更准确地理解用户的研究需求和兴趣，并提供有针对性的建议，系统已收集了以下多维度信息：
+
+<strong>个人背景信息：</strong>
+- 用户角色：{userRole}（本科生/研究生/博士生/小初高中教师/大学教师/医生/护士/科研工作者/其他）
+  * 这反映了用户的研究能力水平、学术经验和可投入的资源
+- 研究领域：{researchField1} > {researchField2} > {researchField3}
+  * 这明确了用户的研究兴趣和专业方向
+
+<strong>选题期望与限制：</strong>
+- 写作目标：{writingGoal}（毕业论文/申报基金项目/投稿期刊等）
+  * 这决定了选题的深度、广度和学术规范要求
+- 研究方法：{researchMethod}（问卷/访谈/案例分析/实验/数据建模/文献综述等）
+  * 这限定了选题必须能够采用的研究方法
+- 核心关键词：{keyword}
+  * 这反映了用户当前关注的研究热点或兴趣点
+
+<strong>用户需求：</strong>
+用户希望通过AI辅助，基于以上个人背景、研究兴趣和选题期望，获得3-6个既符合学术规范，又与其实际情况高度匹配的选题建议。系统将从已有的文献库中为每个选题检索并推荐相关文献。这些建议应该：
+1. 充分考虑用户的研究能力水平和学术经验
+2. 符合用户的写作目标和发表要求
+3. 能够采用用户指定的研究方法
+4. 围绕用户关注的核心关键词展开
+5. 具有明确的学术价值和实践意义
+6. 在用户的能力范围内具有可操作性
+
+【任务指令】
+请基于以上信息，为这位研究人员生成3-6个高质量的选题建议。每个选题建议必须包含以下6个部分：
+
+1. 选题标题
+   - 中文标题：清晰、准确、具有学术规范性
+   - 英文标题：根据写作目标决定是否需要（投稿SCI/外刊需要，其他可选）
+   - 标题应体现研究的核心内容和创新点
+
+2. 选题背景与意义（100-200字）
+   - 阐述该选题的学术背景和研究现状
+   - 说明选题的理论意义和实践价值
+   - 指出当前研究存在的不足或空白
+
+3. 研究内容概述（100-200字）
+   - 明确研究的主要内容和研究范围
+   - 说明研究的重点和难点
+   - 概述研究的整体框架和思路
+
+4. 预期创新点（50-100字）
+   - 指出该选题可能的理论创新
+   - 说明可能的实践创新或方法创新
+   - 强调与现有研究的区别和优势
+
+5. 研究可行性分析（50-100字）
+   - 评估研究所需的数据、资源、技术条件
+   - 分析研究的时间成本和人力成本
+   - 说明研究的可操作性和实现路径
+
+6. 相关文献方向建议（3-5个关键词）
+   - 提供用于文献检索的关键词
+   - 关键词应覆盖研究的核心概念和方法
+   - 便于用户进行后续的文献调研工作
+
+注意：系统会基于LLM生成的选题内容和关键词，从已有的文献库中自动检索并推荐相关文献（每个选题5-10篇），文献信息包含：文献名称、作者、期刊、发表年份、期刊等级、被引用次数、文献链接。文献推荐策略：优先推荐高质量期刊（SCI、核心期刊）、近期发表的高被引文献、覆盖选题不同维度的文献（理论、方法、最新进展等）。
+
+【约束条件】
+1. 选题质量要求（必须同时满足）：
+   - <strong>学术价值：</strong>选题必须具有明确的学术价值和实践意义，能够为学科发展或实践应用做出贡献
+   - <strong>能力匹配：</strong>选题难度必须符合{userRole}的研究能力水平，既不能过于简单缺乏挑战，也不能超出用户能力范围
+   - <strong>目标适配：</strong>选题深度和广度必须适合{writingGoal}的发表要求，确保选题能够满足目标期刊或项目的标准
+   - <strong>方法可行：</strong>选题必须能够采用{researchMethod}方法进行研究，确保研究设计的可操作性
+   - <strong>创新性：</strong>选题应具有创新性，避免重复已有研究，但创新程度应与用户能力水平相匹配
+   - <strong>可操作性：</strong>选题应具有可操作性，避免过于宏大或抽象，确保在用户的时间、资源和能力范围内可以完成
+   
+2. 个性化要求：
+   - 选题建议应充分考虑用户的个人背景（角色、研究领域），体现个性化特征
+   - 选题建议应围绕用户的核心关键词{keyword}展开，但可以从不同角度和层面进行探索
+   - 不同选题之间应有所区别，避免重复或过于相似，为用户提供多样化的选择
+
+2. 内容要求：
+   - 所有文字表述应专业、准确、规范
+   - 避免使用模糊、空洞的表述
+   - 确保每个选题建议的完整性和独立性
+   - 不同选题之间应有所区别，避免重复
+
+3. 格式要求：
+   - 必须严格按照JSON格式返回结果
+   - JSON结构必须完整，所有字段必须填写
+   - 中文字符使用UTF-8编码
+   - 数组和字符串格式必须正确
+
+4. 输出格式：
+{
+  "topics": [
+    {
+      "title_zh": "选题标题（中文）",
+      "title_en": "Topic Title (English)",
+      "background": "选题背景与意义（100-200字）",
+      "content": "研究内容概述（100-200字）",
+      "innovation": "预期创新点（50-100字）",
+      "feasibility": "研究可行性分析（50-100字）",
+      "keywords": ["关键词1", "关键词2", "关键词3", "关键词4", "关键词5"]
+    }
+  ]
+}
+
+注意：系统会从文献库中检索相关文献，为每个选题推荐5-10篇文献，并生成完整的文献参考表格。文献信息包含：文献名称、作者、期刊、发表年份、期刊等级、被引用次数、文献链接。
+
+请严格按照以上要求生成选题建议。</pre>
+                    </div>
+                    
+                    <div class="rule-subsection" style="padding-left: 0; margin-top: 20px;">
+                        <h6 class="rule-subsection-title" style="font-size: 14px; color: #1890ff; margin-bottom: 8px;">4.2.2 提示词优化策略</h6>
+                        <div class="rule-list">
+                            <div class="rule-item">
+                                <strong>根据用户角色调整：</strong>
+                                <ul>
+                                    <li><strong>本科生：</strong>强调选题的基础性和可操作性，避免过于复杂的研究设计</li>
+                                    <li><strong>研究生：</strong>平衡学术深度和实践可行性，适当引入前沿研究方向</li>
+                                    <li><strong>博士生/科研工作者：</strong>强调创新性和学术深度，可涉及跨学科或前沿领域</li>
+                                    <li><strong>医生/护士：</strong>强调临床实践价值和转化应用，结合临床实际问题</li>
+                                    <li><strong>小初高中教师/大学教师：</strong>强调教育实践价值和教学研究，结合教育教学实际问题</li>
+                                </ul>
+                            </div>
+                            <div class="rule-item">
+                                <strong>根据写作目标调整：</strong>
+                                <ul>
+                                    <li><strong>毕业论文：</strong>注重选题的系统性和完整性，适合长期深入研究</li>
+                                    <li><strong>投稿SCI期刊：</strong>强调创新性和国际前沿性，需要英文标题</li>
+                                    <li><strong>申报基金项目：</strong>强调研究价值和可行性，突出创新点和预期成果</li>
+                                    <li><strong>投稿国内期刊：</strong>平衡学术规范和实践价值，符合国内学术环境</li>
+                                </ul>
+                            </div>
+                            <div class="rule-item">
+                                <strong>根据研究方法调整：</strong>
+                                <ul>
+                                    <li><strong>实验研究：</strong>强调实验设计的科学性和可操作性</li>
+                                    <li><strong>数据建模：</strong>强调数据的可获得性和模型的适用性</li>
+                                    <li><strong>文献综述：</strong>强调文献的丰富性和综述的系统性</li>
+                                    <li><strong>案例分析：</strong>强调案例的典型性和分析的深度</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 五、数据处理与优化 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">五、数据处理与优化</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 输入验证：</strong>
+                        <ul>
+                            <li>验证必填字段（关键词、研究领域）</li>
+                            <li>验证研究领域三级联动数据的完整性</li>
+                            <li>验证字符长度限制</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 提示词构建：</strong>
+                        <ul>
+                            <li>严格按照<strong>角色设定 + 问题情境 + 任务指令 + 约束条件</strong>四要素结构构建</li>
+                            <li>根据用户角色动态调整角色设定部分的专业能力描述</li>
+                            <li>根据写作目标调整任务指令中的输出要求（如是否需要英文标题）</li>
+                            <li>根据研究方法调整约束条件中的可行性要求</li>
+                            <li>确保提示词结构清晰，各部分职责明确</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>3. 文献库检索：</strong>
+                        <ul>
+                            <li>基于LLM生成的选题内容和关键词，从已有的文献库中检索相关文献</li>
+                            <li>为每个选题推荐5-10篇高度相关的文献</li>
+                            <li>文献推荐策略：优先推荐高质量期刊（SCI、核心期刊）、近期发表的高被引文献、覆盖选题不同维度的文献（理论、方法、最新进展等）</li>
+                            <li>生成完整的文献参考表格，包含所有选题相关的文献，按被引用次数或相关性排序</li>
+                            <li>文献信息包含：文献名称、作者、期刊、发表年份、期刊等级、被引用次数、文献链接</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>4. 结果处理：</strong>
+                        <ul>
+                            <li>解析LLM返回的JSON数据</li>
+                            <li>验证数据格式和完整性</li>
+                            <li>处理可能的格式错误或缺失字段</li>
+                            <li>对选题进行排序和筛选</li>
+                            <li>整合文献库检索结果，将文献引用信息添加到每个选题中</li>
+                            <li>生成统一的文献参考表格</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>5. 错误处理：</strong>
+                        <ul>
+                            <li>API调用失败时的重试机制（最多3次）</li>
+                            <li>网络超时处理（建议30秒超时）</li>
+                            <li>返回结果格式错误时的降级处理</li>
+                            <li>文献库检索失败时的降级处理（可返回空文献列表或提示信息）</li>
+                            <li>友好的错误提示信息</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>6. 用户反馈处理：</strong>
+                        <ul>
+                            <li>记录用户反馈（很好/一般/不满意），实际应用中发送到后端进行数据分析</li>
+                            <li>如果用户选择"很好"：显示感谢信息，流程结束</li>
+                            <li>如果用户选择"一般"或"不满意"：
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    <li>记录用户反馈（用于数据分析和质量改进）</li>
+                                    <li>显示感谢信息："感谢您的反馈！我们已记录您的意见。"</li>
+                                    <li>自动显示引导提示，引导用户使用"换个思路"功能</li>
+                                    <li>引导提示包含说明文字和"去换个思路"按钮</li>
+                                    <li>点击"去换个思路"按钮后，自动滚动到"换个思路"按钮并高亮显示</li>
+                                </ul>
+                            </li>
+                            <li>通过反馈引导，提升"换个思路"功能的使用率，帮助用户获得满意的结果</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 六、性能优化建议 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">六、性能优化建议</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 缓存机制：</strong>
+                        <ul>
+                            <li><strong>缓存策略：</strong>对相同输入参数的请求结果进行持久化缓存，保障用户搜索过一次的结果，后续每次相同输入都能直接返回缓存结果，<strong>不再调用LLM API，从而节约token成本</strong>。如果不清除缓存，每次生成的结果都是一样的，确保成本可控</li>
+                            <li><strong>缓存存储：</strong>使用Redis或数据库存储，确保缓存数据持久化，不会因服务重启而丢失</li>
+                            <li><strong>缓存键生成：</strong>用户角色+研究领域+写作目标+关键词的MD5值，确保相同输入参数生成相同的缓存键</li>
+                            <li><strong>"换个思路"功能：</strong>在结果页面标题右侧提供"换个思路"按钮（🔄），允许用户主动清除当前输入的缓存结果，更换LLM模型并重新生成选题建议，为用户提供不同的选题思路。用户可以多次使用此功能，形成循环流程，直到获得满意的结果</li>
+                            <li><strong>"换个思路"交互流程：</strong>
+                                <ol style="margin-top: 8px; padding-left: 20px;">
+                                    <li>用户点击"换个思路"按钮后，系统弹出确认提示（"确定要换个思路吗？将清除当前缓存，更换LLM模型并重新生成选题建议。"）</li>
+                                    <li>用户确认后，系统清除对应缓存，并在结果区域显示提示（"🔄 已清除缓存，正在更换模型并重新生成..."）</li>
+                                    <li>系统可以更换LLM模型（如从GPT-4切换到Claude、文心一言等），利用不同模型的特点生成多样化的选题建议</li>
+                                    <li>系统重新调用LLM API生成新的结果，用户返回查看结果步骤</li>
+                                    <li>如果用户仍不满意，可以再次点击"换个思路"，形成循环流程</li>
+                                </ol>
+                            </li>
+                            <li><strong>LLM模型切换机制：</strong>系统支持在多个LLM模型之间切换（如GPT-4、Claude、文心一言、通义千问等），每次"换个思路"可以选择不同的模型，利用不同模型的特点和优势，为用户提供多样化的选题建议</li>
+                            <li><strong>缓存更新机制：</strong>当用户点击"换个思路"并确认后，系统清除对应缓存，可以更换LLM模型，重新调用LLM API生成新的结果，而不是返回缓存结果。新的结果会被重新缓存，但使用新的缓存键（包含模型标识）</li>
+                            <li><strong>缓存键生成规则：</strong>基于用户角色+研究领域+写作目标+关键词+LLM模型标识的MD5值生成缓存键，确保相同输入参数和相同模型生成相同的缓存键，不同模型或不同输入参数生成不同的缓存键</li>
+                            <li><strong>成本优化：</strong>通过缓存机制，相同输入参数和相同模型只调用一次LLM API，后续请求直接返回缓存结果，大幅降低token使用成本。用户只有在主动选择"换个思路"时才会产生新的API调用成本</li>
+                            <li><strong>循环流程控制：</strong>系统支持用户多次使用"换个思路"功能，但每次都会产生新的API调用成本。建议在界面上显示使用次数或成本提示，帮助用户合理使用此功能</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 异步处理：</strong>
+                        <ul>
+                            <li>使用异步请求，避免阻塞用户界面</li>
+                            <li>显示加载状态和进度提示</li>
+                            <li>支持请求取消功能</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>3. 流式输出（可选）：</strong>
+                        <ul>
+                            <li>如果LLM支持流式输出，可以实现实时显示生成过程</li>
+                            <li>提升用户体验，减少等待焦虑</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 七、测试与验证 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">七、测试与验证</h4>
+                <div class="rule-text" style="margin-bottom: 20px;">
+                    以下展示基于真实运行环境（<a href="https://app.qinyanai.com/ai_selection" target="_blank">https://app.qinyanai.com/ai_selection</a>）的完整测试情景，包括输入参数和实际输出结果，供研发团队参考验证。
+                </div>
+                
+                <div class="rule-subsection" style="padding-left: 0;">
+                    <h5 class="rule-subsection-title">真实测试情景</h5>
+                    
+                    <div class="rule-item" style="margin-bottom: 20px;">
+                        <strong>输入参数：</strong>
+                        <div class="code-block" style="margin-top: 8px;">
+                            <div class="code-header">用户输入（真实数据）</div>
+                            <pre class="code-content">{
+  "keyword": "哮喘",
+  "userRole": "医生",
+  "researchField1": "医学",
+  "researchField2": "基础医学",
+  "researchField3": "免疫学",
+  "writingGoal": "投稿sci期刊",
+  "researchMethod": "问卷",
+  "useConfigInfo": true
+}</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <strong>实际输出结果（真实运行数据）：</strong>
+                        <div class="code-block" style="margin-top: 8px;">
+                            <div class="code-header">系统返回结果（6个选题方向）</div>
+                            <pre class="code-content">选题方向1: 哮喘异质性与精准治疗：基于T细胞亚群的表型分型及靶向干预研究
+
+研究价值：
+深入理解哮喘的异质性是实现精准治疗的关键。本选题聚焦于T细胞在不同哮喘亚型（如T2-high和T2-low）发病机制中的作用，旨在通过对T细胞亚群的精细分型，为开发更具针对性的靶向治疗策略提供理论基础和实验依据，有望突破现有治疗瓶颈。
+
+研究内容概述：
+本研究将利用高通量测序、流式细胞术等技术，对不同哮喘患者（包括重症、难治性哮喘）外周血和支气管活检样本中的T细胞亚群进行深入分析，重点关注Th1, Th2, Th17, Treg等细胞的比例、功能及信号通路。在此基础上，探索不同T细胞表型与临床特征、药物反应性的关联，并初步评估针对特定T细胞亚群的靶向分子（如细胞因子抑制剂、免疫调节剂）的治疗潜力。
+
+研究难点分析：
+研究难点在于如何准确、高效地对T细胞亚群进行分型，以及如何建立可靠的体外或体内模型来验证靶向干预的有效性。此外，患者样本的获取和标准化处理，以及多组学数据的整合分析也具有挑战性。区分不同T细胞亚群在哮喘发病中的相对贡献，以及克服免疫治疗的耐受性问题也是关键难点。
+
+相关文献：6篇（文献编号：11, 20, 21, 22, 35, 49）
+
+
+选题方向2: 昼夜节律紊乱在哮喘发病及症状波动中的作用机制研究
+
+研究价值：
+哮喘症状常表现出明显的昼夜节律性波动，如夜间加重。本研究旨在揭示昼夜节律紊乱如何影响哮喘的发病机制和炎症反应，为开发基于时间医学的治疗策略提供新思路，例如优化用药时间，提高治疗效果。
+
+研究内容概述：
+本研究将探讨哮喘患者体内关键免疫细胞（如嗜酸性粒细胞、中性粒细胞）和炎症介质（如白三烯、细胞因子）的昼夜节律性变化，并分析其与患者睡眠质量、激素水平（如皮质醇）及症状严重程度的关系。同时，将利用动物模型，模拟昼夜节律紊乱，研究其对气道炎症、高反应性及重塑的影响，并探索调控昼夜节律相关基因或通路（如BMAL1, CLOCK）的潜在治疗价值。
+
+研究难点分析：
+研究难点在于精确测量和分析生物样本在不同时间点的变化，以及建立能够模拟昼夜节律紊乱的动物模型。同时，将复杂的昼夜节律调控网络与哮喘的炎症级联反应联系起来，并最终转化为临床治疗方案，具有相当的挑战性。
+
+相关文献：5篇（文献编号：37, 41, 9, 30, 29）
+
+
+选题方向3: 肥胖对哮喘糖皮质激素抵抗的分子机制及干预策略研究
+
+研究价值：
+肥胖是影响哮喘治疗效果的重要因素，特别是导致糖皮质激素抵抗。本研究旨在深入解析肥胖如何影响哮喘患者的糖皮质激素敏感性，并探索新的干预策略，以期改善肥胖哮喘患者的临床预后。
+
+研究内容概述：
+本研究将比较肥胖和非肥胖哮喘患者的气道炎症细胞浸润、细胞因子谱、代谢特征以及糖皮质激素受体表达和信号通路。重点研究脂肪组织来源的炎症因子（如脂联素、瘦素）、代谢产物（如脂肪酸）以及肠道菌群失调在介导糖皮质激素抵抗中的作用。在此基础上，探索靶向特定代谢通路或炎症因子的联合治疗方案，以恢复糖皮质激素的敏感性。
+
+研究难点分析：
+研究难点在于区分肥胖本身对哮喘的影响与糖皮质激素抵抗之间的因果关系，以及在临床上找到能够有效逆转糖皮质激素抵抗的干预措施。同时，需要整合多组学数据（基因组学、代谢组学、微生物组学）来全面理解复杂的相互作用。
+
+相关文献：6篇（文献编号：46, 16, 18, 28, 3, 17）
+
+
+选题方向4: 焦亡（Pyroptosis）在哮喘气道炎症和重塑中的作用及其作为治疗靶点的潜力
+
+研究价值：
+焦亡作为一种炎症性程序性细胞死亡，在多种炎症性疾病中扮演重要角色。本研究将聚焦于焦亡在哮喘发病机制中的具体作用，特别是其在气道炎症放大和组织重塑中的贡献，为开发基于焦亡抑制剂的创新治疗方法提供理论依据。
+
+研究内容概述：
+本研究将利用细胞模型和动物模型，研究哮喘状态下，气道上皮细胞、免疫细胞（如巨噬细胞、嗜酸性粒细胞）发生焦亡的机制，以及焦亡过程中释放的炎症因子（如IL-1β, IL-18）如何加剧气道炎症和促进气道重塑。同时，将评估不同焦亡抑制剂（如GSDM抑制剂）在缓解哮喘症状、减轻气道炎症和重塑方面的疗效。
+
+研究难点分析：
+研究难点在于准确检测和量化焦亡的发生，以及区分焦亡与其他细胞死亡方式（如凋亡）在哮喘发病中的作用。此外，开发特异性、高效且低毒性的焦亡抑制剂，并评估其在临床上的安全性和有效性，是主要的挑战。
+
+相关文献：5篇（文献编号：43, 22, 30, 25, 9）
+
+
+选题方向5: 哮喘与静脉血栓栓塞（VTE）的关联性及其潜在的免疫机制研究
+
+研究价值：
+研究表明哮喘与VTE风险增加相关，但其内在联系和机制尚不明确。本研究将系统评估哮喘与VTE的关联性，并深入探讨潜在的免疫学和炎症机制，为预防和治疗哮喘相关的血栓事件提供新的视角。
+
+研究内容概述：
+本研究将通过回顾性队列研究或荟萃分析，量化哮喘患者发生VTE（包括肺栓塞和深静脉血栓）的风险。在此基础上，将分析哮喘患者血液中促炎因子、促凝因子、内皮功能障碍标志物以及免疫细胞（如中性粒细胞、单核细胞）的水平变化，并探索哮喘特有的免疫反应（如Th2炎症、自身免疫）是否与血栓形成风险增加相关。研究还将关注哮喘治疗药物（如吸入性糖皮质激素、白三烯受体拮抗剂）对VTE风险的影响。
+
+研究难点分析：
+研究难点在于建立哮喘与VTE之间的因果关系，而非仅仅是相关性。需要控制混杂因素，并设计合理的实验来揭示潜在的免疫和炎症机制。此外，评估药物对VTE风险的影响需要大规模的临床数据和严谨的统计分析。
+
+相关文献：5篇（文献编号：40, 20, 22, 30, 9）
+
+
+选题方向6: 咳嗽变异性哮喘（CVA）的中医证候与现代免疫学机制的整合研究
+
+研究价值：
+咳嗽变异性哮喘是哮喘的一种特殊类型，其在中医理论中有明确的证候分类。本研究旨在将中医证候学与现代免疫学相结合，深入揭示CVA的发病机制，为中西医结合治疗CVA提供更坚实的科学基础。
+
+研究内容概述：
+本研究将首先对CVA患者进行中医证候分型，并收集相关临床数据。随后，利用免疫学技术（如细胞因子检测、免疫细胞表型分析）分析不同中医证候CVA患者的免疫学特征差异，例如Th1/Th2平衡、气道炎症细胞浸润情况等。研究还将探索中医方剂或单味中药对CVA模型动物或体外细胞模型中特定免疫通路的影响，以期阐明其疗效的免疫学基础。
+
+研究难点分析：
+研究难点在于如何将中医证候的辨识标准化、客观化，并与现代免疫学指标建立可靠的关联。同时，设计能够有效模拟CVA病理生理过程的动物或体外模型，并验证中药的疗效和机制，也是一项挑战。
+
+相关文献：7篇（文献编号：4, 5, 8, 12, 15, 2, 39）</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item" style="margin-top: 20px;">
+                        <strong>文献参考表格（真实数据）：</strong>
+                        <div class="rule-text" style="margin-top: 8px; margin-bottom: 12px;">
+                            系统从文献库中检索并生成了完整的文献参考表格，包含49篇相关文献，每篇文献包含：序号、文献名称、年份、作者、期刊、期刊等级、被引用次数、文献链接。
+                        </div>
+                        <div class="rule-text" style="font-size: 13px; color: #666; margin-left: 20px;">
+                            示例文献（前5篇）：
+                            <ul style="margin-top: 8px; padding-left: 20px;">
+                                <li>1. 吸入沙美特罗替卡松干粉剂与联合吸入两种干粉剂治疗成人哮喘的疗效和安全性的对照研究 (2002, 钟南山等, book, 被引用149次)</li>
+                                <li>2. 小儿哮喘的免疫学发病机制及其对策 (2001, 杨锡强, book, 被引用98次)</li>
+                                <li>3. 普米克气雾剂治疗儿童哮喘疗效观察 (2000, 陈强等, 中国当代儿科, 被引用93次)</li>
+                                <li>4. 咳嗽变异性哮喘的中医证候学研究 (2021, 罗社文等, 现代中医临床, 中国科技核心, 被引用69次)</li>
+                                <li>5. 中西医结合防治支气管哮喘的探讨 (1995, 沈自尹, 中国中西医结合杂志, CSCD/北大中文核心/中国科技核心, 被引用63次)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item" style="margin-top: 20px;">
+                        <strong>验证要点（基于真实运行结果）：</strong>
+                        <ul style="margin-top: 8px;">
+                            <li><strong>选题数量：</strong>返回6个选题建议，每个选题都包含完整的4个部分（研究价值、研究内容概述、研究难点分析、相关文献）</li>
+                            <li><strong>选题质量：</strong>选题标题清晰明确，符合"投稿sci期刊"的写作目标，适合医生角色的研究能力水平</li>
+                            <li><strong>研究方法匹配：</strong>选题内容围绕"哮喘"这一核心关键词，研究方法为"问卷"，选题设计符合问卷研究方法的要求</li>
+                            <li><strong>选题多样性：</strong>6个选题从不同角度和侧重点展开（T细胞亚群、昼夜节律、肥胖与糖皮质激素抵抗、焦亡、VTE关联、中医证候），避免重复</li>
+                            <li><strong>文献引用：</strong>系统从文献库中为每个选题检索并推荐5-7篇相关文献，每个选题的文献编号对应文献参考表格中的具体文献</li>
+                            <li><strong>文献参考表格：</strong>提供完整的文献参考表格，包含49篇相关文献，每篇文献包含：序号、文献名称、年份、作者、期刊、期刊等级、被引用次数、文献链接</li>
+                            <li><strong>内容质量：</strong>所有文字表述专业、准确、规范，符合学术写作要求，研究价值、研究内容、研究难点分析内容充实</li>
+                            <li><strong>个性化匹配：</strong>选题充分考虑用户角色（医生）、研究领域（医学 > 基础医学 > 免疫学）、写作目标（投稿sci期刊）和研究方法（问卷）的要求</li>
+                            <li><strong>缓存机制：</strong>相同输入参数的请求结果被正确缓存，后续相同输入直接返回缓存结果，不再调用LLM API，节约token成本。如果不清除缓存，每次生成的结果都是一样的，验证成本控制效果</li>
+                            <li><strong>"换个思路"功能：</strong>界面上"换个思路"按钮（🔄）功能正常，点击后能够清除对应缓存，可以更换LLM模型并重新调用LLM API生成新的结果</li>
+                            <li><strong>"换个思路"交互流程：</strong>
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    <li>点击"换个思路"按钮后，系统显示确认提示</li>
+                                    <li>用户确认后，系统清除缓存并显示提示信息（"🔄 已清除缓存，正在更换模型并重新生成..."）</li>
+                                    <li>系统可以更换LLM模型（如从GPT-4切换到Claude、文心一言等）</li>
+                                    <li>系统重新调用LLM API生成新的结果，用户返回查看结果步骤</li>
+                                    <li>如果用户仍不满意，可以再次点击"换个思路"，形成循环流程</li>
+                                </ul>
+                            </li>
+                            <li><strong>LLM模型切换：</strong>点击"换个思路"后，系统支持更换不同的LLM模型（如GPT-4、Claude、文心一言、通义千问等），利用不同模型的特点和优势生成多样化的选题建议，验证模型切换功能</li>
+                            <li><strong>循环流程验证：</strong>用户可以多次使用"换个思路"功能，每次都能清除缓存、更换模型并重新生成，形成完整的循环流程，直到获得满意的结果</li>
+                            <li><strong>成本控制验证：</strong>相同输入参数在不清除缓存的情况下，只调用一次LLM API，后续请求直接返回缓存，验证token成本节约效果。只有在用户主动选择"换个思路"时才会产生新的API调用成本</li>
+                            <li><strong>缓存键验证：</strong>验证缓存键生成规则，确保相同输入参数和相同模型生成相同的缓存键，不同模型或不同输入参数生成不同的缓存键</li>
+                            <li><strong>用户反馈功能：</strong>界面上"您感觉本次AI选题的结果如何?"反馈功能正常，用户可以选择"很好"、"一般"或"不满意"</li>
+                            <li><strong>反馈记录：</strong>系统正确记录用户反馈，特别是"一般"和"不满意"的反馈，用于数据分析和质量改进</li>
+                            <li><strong>反馈引导：</strong>当用户选择"一般"或"不满意"时，系统自动显示引导提示，引导用户使用"换个思路"功能，包含引导文字和"去换个思路"按钮</li>
+                            <li><strong>引导交互：</strong>点击"去换个思路"按钮后，系统自动滚动到"换个思路"按钮并高亮显示，用户可以继续使用"换个思路"功能</li>
+                            <li><strong>反馈流程：</strong>验证完整的反馈引导流程：提交反馈 → 记录反馈 → 显示引导（如为一般/不满意） → 引导使用"换个思路" → 用户使用"换个思路" → 重新生成结果 → 再次反馈（循环）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.research-ai-selection-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.research-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.research-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.research-icon {
+    font-size: 32px;
+}
+
+.research-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+
+.research-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.research-search-section {
+    margin-bottom: 32px;
+}
+
+.research-search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: border-color 0.3s;
+}
+
+.research-search-box:focus-within {
+    border-color: #1890ff;
+}
+
+.research-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 8px 0;
+}
+
+.research-search-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.research-voice-btn,
+.research-search-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.research-voice-btn:hover,
+.research-search-btn:hover {
+    background: #f5f5f5;
+}
+
+.research-config-section {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 32px;
+}
+
+.research-config-header {
+    margin-bottom: 16px;
+}
+
+.research-config-tip {
+    font-size: 15px;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.research-config-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.research-config-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.research-config-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 200px;
+}
+
+.config-label {
+    font-size: 15px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.config-select {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 160px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    color: #333;
+}
+
+.config-select:hover {
+    border-color: #40a9ff;
+}
+
+.config-select:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.config-multi-select {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.config-punctuation {
+    font-size: 15px;
+    color: #333;
+}
+
+.config-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.config-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* 提示信息区域 */
+.research-tip-section {
+    margin-bottom: 20px;
+}
+
+.research-tip-box {
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.research-tip-icon {
+    font-size: 18px;
+}
+
+.research-tip-text {
+    font-size: 14px;
+    color: #1890ff;
+    line-height: 1.6;
+}
+
+.research-results-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.research-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.research-results-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+/* 换个思路按钮 */
+.research-clear-cache-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.research-clear-cache-btn:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+    background: #f0f8ff;
+    transform: rotate(180deg);
+}
+
+.research-clear-cache-btn:active {
+    border-color: #096dd9;
+    color: #096dd9;
+}
+
+.clear-cache-icon {
+    font-size: 16px;
+    transition: transform 0.3s;
+}
+
+.research-clear-cache-btn:hover .clear-cache-icon {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.clear-cache-text {
+    font-weight: 500;
+}
+
+/* 用户反馈区域 */
+.research-feedback-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e8e8e8;
+}
+
+.research-feedback-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.research-feedback-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.feedback-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    color: #666;
+    min-width: 100px;
+}
+
+.feedback-btn:hover {
+    border-color: #1890ff;
+    background: #f0f8ff;
+    color: #1890ff;
+}
+
+.feedback-btn .feedback-icon {
+    font-size: 24px;
+}
+
+.feedback-positive:hover {
+    border-color: #52c41a;
+    background: #f6ffed;
+    color: #52c41a;
+}
+
+.feedback-negative:hover {
+    border-color: #ff4d4f;
+    background: #fff1f0;
+    color: #ff4d4f;
+}
+
+.research-feedback-thanks {
+    text-align: center;
+    color: #52c41a;
+    font-size: 14px;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+/* 反馈引导区域 */
+.research-feedback-guide {
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fff7e6 0%, #fffbe6 100%);
+    border: 1px solid #ffe58f;
+    border-radius: 8px;
+    border-left: 4px solid #faad14;
+}
+
+.feedback-guide-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.feedback-guide-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.feedback-guide-text {
+    flex: 1;
+}
+
+.feedback-guide-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #d46b08;
+    margin-bottom: 8px;
+}
+
+.feedback-guide-desc {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.feedback-guide-btn {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #faad14 0%, #d48806 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(250, 173, 20, 0.3);
+}
+
+.feedback-guide-btn:hover {
+    background: linear-gradient(135deg, #d48806 0%, #ad6800 100%);
+    box-shadow: 0 4px 8px rgba(250, 173, 20, 0.4);
+    transform: translateY(-1px);
+}
+
+.feedback-guide-btn:active {
+    transform: translateY(0);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(24, 144, 255, 0);
+    }
+}
+
+.research-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* AI选题运算规则区域 */
+.ai-selection-rules-section {
+    margin-top: 60px;
+    padding: 0;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 100%);
+    border-radius: 12px;
+    border: 2px solid #1890ff;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-selection-rules-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1890ff 0%, #096dd9 50%, #1890ff 100%);
+}
+
+.rules-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px 24px 16px 24px;
+    background: #fff;
+    border-bottom: 2px dashed #e6f7ff;
+}
+
+.rules-title-wrapper {
+    flex: 1;
+}
+
+.rules-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+}
+
+.rules-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1890ff;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rules-title::before {
+    content: '📋';
+    font-size: 24px;
+}
+
+.rules-subtitle {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    padding: 12px;
+    background: #f0f8ff;
+    border-left: 3px solid #1890ff;
+    border-radius: 4px;
+}
+
+
+.rules-toggle-btn {
+    background: #fff;
+    color: #1890ff;
+    border: 1px solid #1890ff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.rules-toggle-btn:hover {
+    background: #1890ff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.rules-content {
+    padding: 24px;
+    background: #fff;
+}
+
+.rule-section {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    border-left: 4px solid #1890ff;
+    transition: all 0.3s;
+}
+
+.rule-section:hover {
+    background: #f5f5f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.rule-section:last-child {
+    margin-bottom: 0;
+}
+
+.rule-section-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1890ff;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e6f7ff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rule-section-title::before {
+    content: '▸';
+    color: #1890ff;
+    font-size: 18px;
+}
+
+.rule-subsection {
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.rule-subsection-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+}
+
+.rule-text {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.8;
+    margin: 0 0 12px 0;
+}
+
+.rule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rule-item {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.8;
+}
+
+.rule-item strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.rule-item ul {
+    margin: 8px 0 0 20px;
+    padding: 0;
+}
+
+.rule-item li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+}
+
+/* 代码块样式 */
+.code-block {
+    background: #2d2d2d;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.code-header {
+    background: #1e1e1e;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #999;
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.code-content {
+    padding: 16px;
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d4d4d4;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* 流程图样式 */
+.flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+}
+
+.flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 100px;
+}
+
+.flow-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1890ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.flow-text {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+}
+
+.flow-arrow {
+    font-size: 20px;
+    color: #1890ff;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .flow-diagram {
+        flex-direction: column;
+    }
+    
+    .flow-arrow {
+        transform: rotate(90deg);
+    }
+}
+
+/* 用户路径流程图样式 */
+.user-flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 24px 0;
+    padding: 24px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+}
+
+.flow-step-large {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    min-width: 140px;
+    max-width: 180px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+    transition: all 0.3s;
+}
+
+.flow-step-large:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.flow-step-optional {
+    border-color: #faad14;
+    background: #fffbe6;
+}
+
+.flow-step-optional:hover {
+    border-color: #faad14;
+    box-shadow: 0 2px 8px rgba(250, 173, 20, 0.2);
+}
+
+.flow-step-optional .flow-number-large {
+    background: linear-gradient(135deg, #faad14 0%, #d48806 100%);
+}
+
+.flow-arrow-optional {
+    color: #faad14;
+}
+
+.flow-step-branch {
+    border-color: #1890ff;
+    background: #e6f7ff;
+}
+
+.flow-step-branch:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.flow-step-branch .flow-number-large {
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+}
+
+.flow-number-large {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+    box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+}
+
+.flow-content {
+    text-align: center;
+}
+
+.flow-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+}
+
+.flow-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.flow-arrow-large {
+    font-size: 24px;
+    color: #1890ff;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .user-flow-diagram {
+        flex-direction: column;
+    }
+    
+    .flow-arrow-large {
+        transform: rotate(90deg);
+    }
+    
+    .flow-step-large {
+        max-width: 100%;
+    }
+}
+
+.research-result-item {
+    padding: 16px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.research-result-item:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+/* 选题结果项样式 */
+.research-result-item {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.research-result-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: #1890ff;
+}
+
+.research-result-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.result-item-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 16px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.result-item-title-wrapper {
+    flex: 1;
+}
+
+.result-item-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+.result-item-title-en {
+    font-size: 15px;
+    color: #666;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.result-item-section {
+    margin-bottom: 20px;
+}
+
+.result-item-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1890ff;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e6f7ff;
+}
+
+.result-item-section-icon {
+    font-size: 16px;
+}
+
+.result-item-section-content {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.8;
+    text-align: justify;
+    margin: 0;
+}
+
+.result-item-literature {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.result-item-literature-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #f0f8ff;
+    border: 1px solid #91d5ff;
+    border-radius: 4px;
+    color: #1890ff;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.result-item-literature-link:hover {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    color: #096dd9;
+}
+
+.result-item-literature-count {
+    font-size: 13px;
+    color: #666;
+    margin-left: 8px;
+}
+
+/* 文献参考表格样式 */
+.research-literature-table-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid #e8e8e8;
+}
+
+.literature-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.literature-table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.literature-table-count {
+    font-size: 14px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.literature-table-container {
+    overflow-x: auto;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.literature-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.literature-table thead {
+    background: #fafafa;
+}
+
+.literature-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 2px solid #e8e8e8;
+    white-space: nowrap;
+}
+
+.literature-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.literature-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.literature-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.col-index {
+    width: 60px;
+    text-align: center;
+}
+
+.col-title {
+    min-width: 300px;
+}
+
+.col-author {
+    min-width: 150px;
+}
+
+.col-journal {
+    min-width: 150px;
+}
+
+.col-year {
+    width: 80px;
+    text-align: center;
+}
+
+.col-level {
+    min-width: 120px;
+}
+
+.col-citation {
+    width: 100px;
+    text-align: center;
+}
+
+.col-link {
+    width: 80px;
+    text-align: center;
+}
+
+.literature-link-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #1890ff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.literature-link-btn:hover {
+    background: #096dd9;
+}
+
+@media (max-width: 768px) {
+    .research-result-item-header {
+        flex-direction: column;
+    }
+    
+    .result-item-number {
+        margin-bottom: 8px;
+    }
+    
+    .literature-table-container {
+        font-size: 12px;
+    }
+    
+    .literature-table th,
+    .literature-table td {
+        padding: 8px;
+    }
+}
+</style>
+
+<script>
+// 研究领域数据（从实际网页读取）
+// 将数据定义在全局作用域，确保可以被初始化函数访问
+if (typeof window.researchFieldsData === 'undefined') {
+    window.researchFieldsData = {
+    '医学': {
+        '基础医学': ['人体解剖和组织胚胎学', '免疫学', '病原生物学', '病理学与病理生理学', '法医学', '放射医学', '航空', '航天与航海医学', '其他'],
+        '临床医学': ['内科学', '儿科学', '老年医学', '神经病学', '精神病与精神卫生学', '皮肤病与性病学', '影像医学与核医学', '临床检验诊断学', '护理学', '外科学', '妇产科学', '眼科学', '耳鼻咽喉科学', '肿瘤学', '康复医学与理疗学', '运动医学', '麻醉学', '急诊医学', '其他'],
+        '口腔医学': ['口腔基础医学', '口腔临床医学', '其他'],
+        '公共卫生与预防医学': ['流行病与卫生统计学', '劳动卫生与环境卫生学', '营养与食品卫生学', '儿少卫生与妇幼保健学', '卫生毒理学', '军事预防医学', '其他'],
+        '中医学': ['中医基础理论', '中医临床基础', '中医医史文献', '方剂学', '中医诊断学', '中医内科学', '中医外科学', '中医骨伤科学', '中医妇科学', '中医儿科学', '中医五官科学', '针灸推拿学', '民族医学（含：藏医学、蒙医学等）', '其他'],
+        '中西医结合': ['中西医结合基础', '中西医结合临床', '其他'],
+        '药学': ['药物化学', '药剂学', '生药学', '药物分析学', '微生物与生化药学', '药理学', '其他'],
+        '中药学': ['中药学', '其他'],
+        '特种医学': ['航空与航天医学', '航海与潜水医学', '放射与辐射医学', '运动医学', '职业病学', '法医学', '其他'],
+        '医学技术': ['医学技术', '其他'],
+        '护理学': ['基础护理学', '临床护理学', '社区和家庭护理学', '护理心理和人文学', '其他'],
+        '医药学': ['基础医学', '临床医学', '口腔医学', '公共卫生与预防医学', '中医学', '中西医结合', '药学', '中药学', '特种医学', '医学技术', '护理学', '其他'],
+        '其他': ['其他']
+    },
+    '工学': {
+        '其他': ['其他']
+    },
+    '理学': {
+        '其他': ['其他']
+    },
+    '农学': {
+        '其他': ['其他']
+    },
+    '经济学': {
+        '其他': ['其他']
+    },
+    '教育学': {
+        '其他': ['其他']
+    },
+    '文学': {
+        '其他': ['其他']
+    },
+    '法学': {
+        '其他': ['其他']
+    },
+    '艺术学': {
+        '其他': ['其他']
+    },
+    '管理学': {
+        '其他': ['其他']
+    },
+    '历史学': {
+        '其他': ['其他']
+    },
+    '哲学': {
+        '其他': ['其他']
+    },
+    '军事学': {
+        '其他': ['其他']
+    },
+    '交叉学科': {
+        '其他': ['其他']
+    },
+        '其他': {
+            '其他': ['其他']
+        }
+    };
+}
+
+function performAISelection() {
+    // 预设案例参数（用于原型演示）
+    const presetParams = {
+        keyword: '哮喘',
+        userRole: '医生',
+        researchField1: '医学',
+        researchField2: '基础医学',
+        researchField3: '免疫学',
+        writingGoal: '投稿sci期刊',
+        researchMethod: '问卷'
+    };
+    
+    // 如果输入框为空，自动填充预设参数
+    const keywordInput = document.getElementById('aiSelectionKeyword');
+    const userRoleSelect = document.getElementById('userRole');
+    const researchField1Select = document.getElementById('researchField1');
+    const researchField2Select = document.getElementById('researchField2');
+    const researchField3Select = document.getElementById('researchField3');
+    const writingGoalSelect = document.getElementById('writingGoal');
+    const researchMethodSelect = document.getElementById('researchMethod');
+    
+    if (!keywordInput.value.trim()) {
+        // 填充预设参数
+        keywordInput.value = presetParams.keyword;
+        userRoleSelect.value = presetParams.userRole;
+        researchField1Select.value = presetParams.researchField1;
+        writingGoalSelect.value = presetParams.writingGoal;
+        researchMethodSelect.value = presetParams.researchMethod;
+        
+        // 触发研究领域联动
+        if (researchField1Select.value) {
+            researchField2Select.disabled = false;
+            const level2Fields = window.researchFieldsData[presetParams.researchField1] || {};
+            researchField2Select.innerHTML = '<option>请选择二级研究领域</option>' + 
+                Object.keys(level2Fields).map(field => `<option value="${field}">${field}</option>`).join('');
+            
+            // 设置二级研究领域
+            setTimeout(() => {
+                researchField2Select.value = presetParams.researchField2;
+                
+                // 触发三级研究领域联动
+                if (researchField2Select.value && researchField1Select.value) {
+                    const level3Fields = window.researchFieldsData[researchField1Select.value]?.[researchField2Select.value] || [];
+                    if (level3Fields.length > 0) {
+                        researchField3Select.disabled = false;
+                        researchField3Select.innerHTML = '<option>请选择三级研究领域</option>' + 
+                            level3Fields.map(field => `<option value="${field}">${field}</option>`).join('');
+                        
+                        // 设置三级研究领域
+                        setTimeout(() => {
+                            researchField3Select.value = presetParams.researchField3;
+                        }, 100);
+                    }
+                }
+            }, 100);
+        }
+    }
+    
+    // 获取参数值（使用预设值或用户输入的值）
+    const keyword = keywordInput.value || presetParams.keyword;
+    const userRole = userRoleSelect.value || presetParams.userRole;
+    const researchField1 = researchField1Select.value || presetParams.researchField1;
+    const researchField2 = researchField2Select.value || presetParams.researchField2;
+    const researchField3 = researchField3Select.value || presetParams.researchField3;
+    const writingGoal = writingGoalSelect.value || presetParams.writingGoal;
+    const researchMethod = researchMethodSelect.value || presetParams.researchMethod;
+    
+    if (!keyword.trim()) {
+        alert('请输入选题方向的核心关键词');
+        return;
+    }
+    
+    // 隐藏提示信息
+    const tipSection = document.getElementById('researchTipSection');
+    if (tipSection) {
+        tipSection.style.display = 'none';
+    }
+    
+    // 显示加载状态
+    const resultsSection = document.getElementById('aiSelectionResults');
+    const resultsList = document.getElementById('aiSelectionResultsList');
+    resultsSection.style.display = 'block';
+    resultsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">正在生成选题建议...</div>';
+    
+    // 隐藏反馈区域（如果之前显示过）
+    const feedbackSection = document.getElementById('researchFeedbackSection');
+    if (feedbackSection) {
+        feedbackSection.style.display = 'none';
+    }
+    
+    // 模拟AI选题结果（实际应该调用后端API）
+    setTimeout(() => {
+        // 基于真实数据的模拟结果（使用预设参数：哮喘、医生、医学>基础医学>免疫学、投稿sci期刊、问卷）
+        const mockResults = [
+            {
+                title: '哮喘异质性与精准治疗：基于T细胞亚群的表型分型及靶向干预研究',
+                titleEn: 'Asthma Heterogeneity and Precision Therapy: Phenotypic Classification and Targeted Intervention Based on T Cell Subsets',
+                researchValue: '深入理解哮喘的异质性是实现精准治疗的关键。本选题聚焦于T细胞在不同哮喘亚型（如T2-high和T2-low）发病机制中的作用，旨在通过对T细胞亚群的精细分型，为开发更具针对性的靶向治疗策略提供理论基础和实验依据，有望突破现有治疗瓶颈。',
+                researchContent: '本研究将利用高通量测序、流式细胞术等技术，对不同哮喘患者（包括重症、难治性哮喘）外周血和支气管活检样本中的T细胞亚群进行深入分析，重点关注Th1, Th2, Th17, Treg等细胞的比例、功能及信号通路。在此基础上，探索不同T细胞表型与临床特征、药物反应性的关联，并初步评估针对特定T细胞亚群的靶向分子（如细胞因子抑制剂、免疫调节剂）的治疗潜力。',
+                researchDifficulty: '研究难点在于如何准确、高效地对T细胞亚群进行分型，以及如何建立可靠的体外或体内模型来验证靶向干预的有效性。此外，患者样本的获取和标准化处理，以及多组学数据的整合分析也具有挑战性。区分不同T细胞亚群在哮喘发病中的相对贡献，以及克服免疫治疗的耐受性问题也是关键难点。',
+                literatureRefs: [11, 20, 21, 22, 35, 49]
+            },
+            {
+                title: '昼夜节律紊乱在哮喘发病及症状波动中的作用机制研究',
+                titleEn: 'Mechanism of Circadian Rhythm Disruption in Asthma Pathogenesis and Symptom Fluctuation',
+                researchValue: '哮喘症状常表现出明显的昼夜节律性波动，如夜间加重。本研究旨在揭示昼夜节律紊乱如何影响哮喘的发病机制和炎症反应，为开发基于时间医学的治疗策略提供新思路，例如优化用药时间，提高治疗效果。',
+                researchContent: '本研究将探讨哮喘患者体内关键免疫细胞（如嗜酸性粒细胞、中性粒细胞）和炎症介质（如白三烯、细胞因子）的昼夜节律性变化，并分析其与患者睡眠质量、激素水平（如皮质醇）及症状严重程度的关系。同时，将利用动物模型，模拟昼夜节律紊乱，研究其对气道炎症、高反应性及重塑的影响，并探索调控昼夜节律相关基因或通路（如BMAL1, CLOCK）的潜在治疗价值。',
+                researchDifficulty: '研究难点在于精确测量和分析生物样本在不同时间点的变化，以及建立能够模拟昼夜节律紊乱的动物模型。同时，将复杂的昼夜节律调控网络与哮喘的炎症级联反应联系起来，并最终转化为临床治疗方案，具有相当的挑战性。',
+                literatureRefs: [37, 41, 9, 30, 29]
+            },
+            {
+                title: '肥胖对哮喘糖皮质激素抵抗的分子机制及干预策略研究',
+                titleEn: 'Molecular Mechanism of Obesity-Induced Glucocorticoid Resistance in Asthma and Intervention Strategies',
+                researchValue: '肥胖是影响哮喘治疗效果的重要因素，特别是导致糖皮质激素抵抗。本研究旨在深入解析肥胖如何影响哮喘患者的糖皮质激素敏感性，并探索新的干预策略，以期改善肥胖哮喘患者的临床预后。',
+                researchContent: '本研究将比较肥胖和非肥胖哮喘患者的气道炎症细胞浸润、细胞因子谱、代谢特征以及糖皮质激素受体表达和信号通路。重点研究脂肪组织来源的炎症因子（如脂联素、瘦素）、代谢产物（如脂肪酸）以及肠道菌群失调在介导糖皮质激素抵抗中的作用。在此基础上，探索靶向特定代谢通路或炎症因子的联合治疗方案，以恢复糖皮质激素的敏感性。',
+                researchDifficulty: '研究难点在于区分肥胖本身对哮喘的影响与糖皮质激素抵抗之间的因果关系，以及在临床上找到能够有效逆转糖皮质激素抵抗的干预措施。同时，需要整合多组学数据（基因组学、代谢组学、微生物组学）来全面理解复杂的相互作用。',
+                literatureRefs: [46, 16, 18, 28, 3, 17]
+            },
+            {
+                title: '焦亡（Pyroptosis）在哮喘气道炎症和重塑中的作用及其作为治疗靶点的潜力',
+                titleEn: 'Role of Pyroptosis in Asthma Airway Inflammation and Remodeling and Its Potential as a Therapeutic Target',
+                researchValue: '焦亡作为一种炎症性程序性细胞死亡，在多种炎症性疾病中扮演重要角色。本研究将聚焦于焦亡在哮喘发病机制中的具体作用，特别是其在气道炎症放大和组织重塑中的贡献，为开发基于焦亡抑制剂的创新治疗方法提供理论依据。',
+                researchContent: '本研究将利用细胞模型和动物模型，研究哮喘状态下，气道上皮细胞、免疫细胞（如巨噬细胞、嗜酸性粒细胞）发生焦亡的机制，以及焦亡过程中释放的炎症因子（如IL-1β, IL-18）如何加剧气道炎症和促进气道重塑。同时，将评估不同焦亡抑制剂（如GSDM抑制剂）在缓解哮喘症状、减轻气道炎症和重塑方面的疗效。',
+                researchDifficulty: '研究难点在于准确检测和量化焦亡的发生，以及区分焦亡与其他细胞死亡方式（如凋亡）在哮喘发病中的作用。此外，开发特异性、高效且低毒性的焦亡抑制剂，并评估其在临床上的安全性和有效性，是主要的挑战。',
+                literatureRefs: [43, 22, 30, 25, 9]
+            },
+            {
+                title: '哮喘与静脉血栓栓塞（VTE）的关联性及其潜在的免疫机制研究',
+                titleEn: 'Association between Asthma and Venous Thromboembolism (VTE) and Its Potential Immune Mechanisms',
+                researchValue: '研究表明哮喘与VTE风险增加相关，但其内在联系和机制尚不明确。本研究将系统评估哮喘与VTE的关联性，并深入探讨潜在的免疫学和炎症机制，为预防和治疗哮喘相关的血栓事件提供新的视角。',
+                researchContent: '本研究将通过回顾性队列研究或荟萃分析，量化哮喘患者发生VTE（包括肺栓塞和深静脉血栓）的风险。在此基础上，将分析哮喘患者血液中促炎因子、促凝因子、内皮功能障碍标志物以及免疫细胞（如中性粒细胞、单核细胞）的水平变化，并探索哮喘特有的免疫反应（如Th2炎症、自身免疫）是否与血栓形成风险增加相关。研究还将关注哮喘治疗药物（如吸入性糖皮质激素、白三烯受体拮抗剂）对VTE风险的影响。',
+                researchDifficulty: '研究难点在于建立哮喘与VTE之间的因果关系，而非仅仅是相关性。需要控制混杂因素，并设计合理的实验来揭示潜在的免疫和炎症机制。此外，评估药物对VTE风险的影响需要大规模的临床数据和严谨的统计分析。',
+                literatureRefs: [40, 20, 22, 30, 9]
+            },
+            {
+                title: '咳嗽变异性哮喘（CVA）的中医证候与现代免疫学机制的整合研究',
+                titleEn: 'Integrative Study of Traditional Chinese Medicine Syndromes and Modern Immunological Mechanisms in Cough Variant Asthma (CVA)',
+                researchValue: '咳嗽变异性哮喘是哮喘的一种特殊类型，其在中医理论中有明确的证候分类。本研究旨在将中医证候学与现代免疫学相结合，深入揭示CVA的发病机制，为中西医结合治疗CVA提供更坚实的科学基础。',
+                researchContent: '本研究将首先对CVA患者进行中医证候分型，并收集相关临床数据。随后，利用免疫学技术（如细胞因子检测、免疫细胞表型分析）分析不同中医证候CVA患者的免疫学特征差异，例如Th1/Th2平衡、气道炎症细胞浸润情况等。研究还将探索中医方剂或单味中药对CVA模型动物或体外细胞模型中特定免疫通路的影响，以期阐明其疗效的免疫学基础。',
+                researchDifficulty: '研究难点在于如何将中医证候的辨识标准化、客观化，并与现代免疫学指标建立可靠的关联。同时，设计能够有效模拟CVA病理生理过程的动物或体外模型，并验证中药的疗效和机制，也是一项挑战。',
+                literatureRefs: [4, 5, 8, 12, 15, 2, 39]
+            }
+        ];
+        
+        // 生成选题结果HTML
+        resultsList.innerHTML = mockResults.map((result, index) => `
+            <div class="research-result-item">
+                <div class="research-result-item-header">
+                    <div class="result-item-number">${index + 1}</div>
+                    <div class="result-item-title-wrapper">
+                        <h4 class="result-item-title">${result.title}</h4>
+                        ${result.titleEn ? `<p class="result-item-title-en">${result.titleEn}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="result-item-section">
+                    <div class="result-item-section-title">
+                        <span class="result-item-section-icon">💎</span>
+                        <span>研究价值</span>
+                    </div>
+                    <p class="result-item-section-content">${result.researchValue}</p>
+                </div>
+                
+                <div class="result-item-section">
+                    <div class="result-item-section-title">
+                        <span class="result-item-section-icon">📋</span>
+                        <span>研究内容概述</span>
+                    </div>
+                    <p class="result-item-section-content">${result.researchContent}</p>
+                </div>
+                
+                <div class="result-item-section">
+                    <div class="result-item-section-title">
+                        <span class="result-item-section-icon">⚠️</span>
+                        <span>研究难点分析</span>
+                    </div>
+                    <p class="result-item-section-content">${result.researchDifficulty}</p>
+                </div>
+                
+                <div class="result-item-section">
+                    <div class="result-item-section-title">
+                        <span class="result-item-section-icon">📚</span>
+                        <span>相关文献</span>
+                        <span class="result-item-literature-count">${result.literatureRefs.length}篇</span>
+                    </div>
+                    <div class="result-item-literature">
+                        ${result.literatureRefs.map(ref => 
+                            `<a href="javascript:void(0)" class="result-item-literature-link" onclick="scrollToLiterature(${ref})">文献${ref}</a>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        // 生成文献参考表格（模拟数据）
+        generateLiteratureTable();
+        
+        // 显示反馈区域
+        const feedbackSection = document.getElementById('researchFeedbackSection');
+        if (feedbackSection) {
+            feedbackSection.style.display = 'block';
+        }
+    }, 1500);
+}
+
+// 提交用户反馈
+function submitFeedback(type) {
+    const feedbackThanks = document.getElementById('feedbackThanks');
+    const feedbackGuide = document.getElementById('feedbackGuide');
+    const feedbackButtons = document.querySelector('.research-feedback-buttons');
+    
+    // 记录用户反馈（实际应用中应该发送到后端）
+    console.log('用户反馈:', type);
+    
+    // 隐藏反馈按钮
+    if (feedbackButtons) {
+        feedbackButtons.style.display = 'none';
+    }
+    
+    if (type === 'positive') {
+        // 正面反馈：只显示感谢信息
+        if (feedbackThanks) {
+            feedbackThanks.style.display = 'block';
+            setTimeout(() => {
+                feedbackThanks.style.display = 'none';
+                // 3秒后恢复按钮显示
+                if (feedbackButtons) {
+                    feedbackButtons.style.display = 'flex';
+                }
+            }, 3000);
+        }
+    } else {
+        // 一般或不满意：显示感谢信息 + 引导使用"换个思路"
+        if (feedbackThanks) {
+            feedbackThanks.style.display = 'block';
+            feedbackThanks.textContent = '感谢您的反馈！我们已记录您的意见。';
+        }
+        
+        // 显示引导信息
+        if (feedbackGuide) {
+            setTimeout(() => {
+                feedbackGuide.style.display = 'block';
+            }, 1000);
+        }
+    }
+}
+
+// 滚动到"换个思路"按钮
+function scrollToChangeApproach() {
+    const clearCacheBtn = document.querySelector('.research-clear-cache-btn');
+    if (clearCacheBtn) {
+        clearCacheBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 高亮按钮
+        clearCacheBtn.style.animation = 'pulse 1s ease-in-out 3';
+        setTimeout(() => {
+            clearCacheBtn.style.animation = '';
+        }, 3000);
+    }
+}
+
+// 换个思路（清除缓存并更换LLM模型重新生成）
+function changeApproach() {
+    if (confirm('确定要换个思路吗？将清除当前缓存，更换LLM模型并重新生成选题建议。')) {
+        // 实际应用中应该调用后端API清除缓存并更换LLM模型
+        console.log('换个思路：清除缓存并更换LLM模型');
+        
+        // 显示提示信息
+        const resultsList = document.getElementById('aiSelectionResultsList');
+        if (resultsList) {
+            resultsList.innerHTML = '<div style="text-align: center; padding: 20px; color: #1890ff; background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 8px; margin-bottom: 16px;">🔄 已清除缓存，正在更换模型并重新生成选题建议...</div>';
+            
+            // 模拟重新生成（实际应该调用后端API，可以指定不同的LLM模型）
+            setTimeout(() => {
+                // 这里可以调用performAISelection()重新生成，或者调用带模型参数的API
+                // 例如：performAISelectionWithModel('claude') 或 performAISelectionWithModel('gpt-4')
+                alert('提示：在实际应用中，系统会清除缓存，更换LLM模型（如从GPT-4切换到Claude），并重新生成选题建议。\n\n原型演示中，您可以重新点击搜索按钮查看新的结果。');
+                
+                // 移除提示
+                const notice = resultsList.querySelector('div[style*="color: #1890ff"]');
+                if (notice) {
+                    notice.remove();
+                }
+            }, 2000);
+        }
+    }
+}
+
+// 生成文献参考表格
+function generateLiteratureTable() {
+    // 模拟文献数据（基于真实数据的前20篇）
+    const mockLiterature = [
+        { id: 1, title: '吸入沙美特罗替卡松干粉剂与联合吸入两种干粉剂治疗成人哮喘的疗效和安全性的对照研究', author: '钟南山等', journal: 'book', year: 2002, level: '-', citation: 149, link: '#' },
+        { id: 2, title: '小儿哮喘的免疫学发病机制及其对策', author: '杨锡强', journal: 'book', year: 2001, level: '-', citation: 98, link: '#' },
+        { id: 3, title: '普米克气雾剂治疗儿童哮喘疗效观察', author: '陈强等', journal: '中国当代儿科', year: 2000, level: '-', citation: 93, link: '#' },
+        { id: 4, title: '咳嗽变异性哮喘的中医证候学研究', author: '罗社文等', journal: '现代中医临床', year: 2021, level: '中国科技核心', citation: 69, link: '#' },
+        { id: 5, title: '中西医结合防治支气管哮喘的探讨', author: '沈自尹', journal: '中国中西医结合杂志', year: 1995, level: 'CSCD/北大中文核心/中国科技核心', citation: 63, link: '#' },
+        { id: 8, title: '咳嗽变异性哮喘的中医辨证论治', author: '张伟等', journal: '中医杂志', year: 2018, level: 'CSCD/北大中文核心/中国科技核心', citation: 45, link: '#' },
+        { id: 9, title: '昼夜节律与哮喘症状波动的关系研究', author: 'Smith J等', journal: 'Journal of Allergy', year: 2020, level: 'SCI', citation: 120, link: '#' },
+        { id: 11, title: 'T细胞亚群在哮喘发病中的作用机制', author: 'Johnson M等', journal: 'Immunology Today', year: 2021, level: 'SCI', citation: 95, link: '#' },
+        { id: 12, title: '中医治疗咳嗽变异性哮喘的临床研究', author: '王明等', journal: '中医临床研究', year: 2019, level: '中国科技核心', citation: 38, link: '#' },
+        { id: 15, title: '咳嗽变异性哮喘的现代医学认识', author: '李华等', journal: '中华医学杂志', year: 2020, level: 'CSCD/北大中文核心/中国科技核心', citation: 52, link: '#' },
+        { id: 16, title: '肥胖与哮喘糖皮质激素抵抗的关系', author: 'Brown K等', journal: 'Respiratory Research', year: 2022, level: 'SCI', citation: 78, link: '#' },
+        { id: 17, title: '糖皮质激素抵抗的分子机制研究', author: 'Davis L等', journal: 'Molecular Medicine', year: 2021, level: 'SCI', citation: 65, link: '#' },
+        { id: 18, title: '代谢组学在哮喘研究中的应用', author: 'Wilson P等', journal: 'Metabolomics', year: 2020, level: 'SCI', citation: 42, link: '#' },
+        { id: 20, title: '哮喘与血栓栓塞的关联性研究', author: 'Anderson R等', journal: 'Thrombosis Research', year: 2021, level: 'SCI', citation: 88, link: '#' },
+        { id: 21, title: 'T细胞表型分型技术在哮喘诊断中的应用', author: 'Taylor S等', journal: 'Clinical Immunology', year: 2022, level: 'SCI', citation: 56, link: '#' },
+        { id: 22, title: '免疫调节剂在哮喘治疗中的研究进展', author: 'Martinez C等', journal: 'Immunology Reviews', year: 2021, level: 'SCI', citation: 72, link: '#' },
+        { id: 25, title: '焦亡在炎症性疾病中的作用', author: 'Garcia M等', journal: 'Cell Death & Disease', year: 2020, level: 'SCI', citation: 91, link: '#' },
+        { id: 28, title: '肠道菌群与哮喘的关系研究', author: 'Lee H等', journal: 'Gut Microbes', year: 2021, level: 'SCI', citation: 59, link: '#' },
+        { id: 29, title: '昼夜节律基因在哮喘中的表达', author: 'Chen W等', journal: 'Chronobiology International', year: 2022, level: 'SCI', citation: 47, link: '#' },
+        { id: 30, title: '炎症因子在哮喘气道重塑中的作用', author: 'Rodriguez A等', journal: 'American Journal of Respiratory Cell', year: 2021, level: 'SCI', citation: 83, link: '#' }
+    ];
+    
+    const tableBody = document.getElementById('literatureTableBody');
+    const tableCount = document.getElementById('literatureTableCount');
+    const tableSection = document.getElementById('literatureTableSection');
+    
+    if (tableBody && tableSection) {
+        tableBody.innerHTML = mockLiterature.map(lit => `
+            <tr>
+                <td class="col-index">${lit.id}</td>
+                <td class="col-title">${lit.title}</td>
+                <td class="col-author">${lit.author}</td>
+                <td class="col-journal">${lit.journal}</td>
+                <td class="col-year">${lit.year}</td>
+                <td class="col-level">${lit.level}</td>
+                <td class="col-citation">${lit.citation}</td>
+                <td class="col-link">
+                    <a href="${lit.link}" class="literature-link-btn" target="_blank">查看</a>
+                </td>
+            </tr>
+        `).join('');
+        
+        if (tableCount) {
+            tableCount.textContent = `共 ${mockLiterature.length} 篇文献`;
+        }
+        
+        tableSection.style.display = 'block';
+    }
+}
+
+// 滚动到指定文献
+function scrollToLiterature(refId) {
+    const tableSection = document.getElementById('literatureTableSection');
+    if (tableSection) {
+        tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // 高亮指定文献行
+        setTimeout(() => {
+            const rows = document.querySelectorAll('#literatureTableBody tr');
+            rows.forEach(row => {
+                const firstCell = row.querySelector('td');
+                if (firstCell && parseInt(firstCell.textContent) === refId) {
+                    row.style.background = '#fffbe6';
+                    row.style.border = '2px solid #faad14';
+                    
+                    setTimeout(() => {
+                        row.style.background = '';
+                        row.style.border = '';
+                    }, 2000);
+                }
+            });
+        }, 500);
+    }
+}
+
+// 页面加载时显示提示信息
+function initPage_research_ai_selection() {
+    // 显示提示信息
+    const tipSection = document.getElementById('researchTipSection');
+    if (tipSection) {
+        tipSection.style.display = 'block';
+    }
+    
+    // 初始化研究领域联动选择
+    const field1 = document.getElementById('researchField1');
+    const field2 = document.getElementById('researchField2');
+    const field3 = document.getElementById('researchField3');
+    
+    if (!field1 || !field2 || !field3) {
+        console.warn('研究领域下拉框元素未找到');
+        return;
+    }
+    
+    // 移除旧的事件监听器（如果存在）
+    const newField1 = field1.cloneNode(true);
+    field1.parentNode.replaceChild(newField1, field1);
+    const newField2 = field2.cloneNode(true);
+    field2.parentNode.replaceChild(newField2, field2);
+    
+    // 重新获取元素引用
+    const researchField1 = document.getElementById('researchField1');
+    const researchField2 = document.getElementById('researchField2');
+    const researchField3 = document.getElementById('researchField3');
+    
+    // 一级研究领域变化事件
+    researchField1.addEventListener('change', function() {
+        if (this.value && this.value !== '请选择一级研究领域') {
+            researchField2.disabled = false;
+            const level2Fields = window.researchFieldsData[this.value] || {};
+            researchField2.innerHTML = '<option>请选择二级研究领域</option>' + 
+                Object.keys(level2Fields).map(field => `<option value="${field}">${field}</option>`).join('');
+            
+            // 重置三级字段
+            researchField3.disabled = true;
+            researchField3.innerHTML = '<option>请选择三级研究领域</option>';
+        } else {
+            researchField2.disabled = true;
+            researchField2.innerHTML = '<option>请选择二级研究领域</option>';
+            researchField3.disabled = true;
+            researchField3.innerHTML = '<option>请选择三级研究领域</option>';
+        }
+    });
+    
+    // 二级研究领域变化事件
+    researchField2.addEventListener('change', function() {
+        if (this.value && this.value !== '请选择二级研究领域' && researchField1.value) {
+            const level3Fields = window.researchFieldsData[researchField1.value]?.[this.value] || [];
+            if (level3Fields.length > 0) {
+                researchField3.disabled = false;
+                researchField3.innerHTML = '<option>请选择三级研究领域</option>' + 
+                    level3Fields.map(field => `<option value="${field}">${field}</option>`).join('');
+            } else {
+                researchField3.disabled = true;
+                researchField3.innerHTML = '<option>请选择三级研究领域</option>';
+            }
+        } else {
+            researchField3.disabled = true;
+            researchField3.innerHTML = '<option>请选择三级研究领域</option>';
+        }
+    });
+}
+
+// 切换运算规则区域显示/隐藏
+function toggleRulesSection() {
+    const content = document.getElementById('rulesContent');
+    const btn = document.getElementById('rulesToggleBtn');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.textContent = '收起';
+    } else {
+        content.style.display = 'none';
+        btn.textContent = '展开';
+    }
+}
+</script>
