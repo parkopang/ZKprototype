@@ -1,0 +1,801 @@
+<!-- 科研超级智能体：文本润色页面（前端原型） -->
+<div class="text-polish-page">
+    <div class="text-polish-header">
+        <div class="text-polish-title-section">
+            <div class="text-polish-icon">✨</div>
+            <div>
+                <h1 class="text-polish-title">文本润色</h1>
+                <p class="text-polish-subtitle">智能文本润色 · 让学术写作更精准、更地道</p>
+            </div>
+        </div>
+        <div class="text-polish-highlight">
+            <span class="chip chip-primary">科研写作助手</span>
+            <span class="chip chip-outline">语法优化</span>
+            <span class="chip chip-outline">学术表达</span>
+            <span class="chip chip-outline">期刊友好</span>
+        </div>
+    </div>
+
+    <div class="text-polish-main">
+        <div class="text-polish-left">
+            <div class="card-section">
+                <div class="card-header">
+                    <h2 class="card-title">输入参数</h2>
+                    <span class="card-desc">填写待润色内容及引用偏好</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        文本内容
+                        <span class="required">*</span>
+                    </label>
+                    <textarea
+                        id="textPolishInput_page"
+                        class="form-textarea"
+                        rows="10"
+                        placeholder="请粘贴需要润色的中文或英文学术文本，例如：摘要、引言、结果或讨论部分（建议一次不超过 2000 字）"
+                    ></textarea>
+                    <div class="form-helper">
+                        <span id="textPolishCharCount_page">0 字</span>
+                        <span class="form-tip">支持中英混排，建议按章节分段润色，方便对比修改</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        或上传原文 PDF（可选）
+                    </label>
+                    <div class="upload-row">
+                        <input
+                            id="textPolishPdfInput_page"
+                            type="file"
+                            accept=".pdf"
+                            class="form-file-input"
+                            onchange="handleTextPolishPdfChange_page(event)"
+                        >
+                        <div class="upload-summary" id="textPolishPdfSummary_page">
+                            当前未选择文件
+                        </div>
+                    </div>
+                    <div class="form-helper">
+                        <span class="form-tip">
+                            仅作为原型演示：实际接入时需在后端完成 PDF 解析并抽取正文内容（建议限制文件大小和页数）。
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        文献检索和引用
+                        <span class="required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="textPolishCitation_page" value="no-ref" checked>
+                            <span>不引用文献</span>
+                            <span class="radio-desc">只对现有内容进行语言润色，不新增参考文献</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="textPolishCitation_page" value="with-ref">
+                            <span>引用文献</span>
+                            <span class="radio-desc">在保持原意前提下，适度补充典型文献引用（示例级别，仅供参考）</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        润色偏好（可选）
+                    </label>
+                    <div class="pill-group">
+                        <button class="pill-btn" data-style="journal" onclick="toggleTextPolishStyle_page(this)">期刊发表导向</button>
+                        <button class="pill-btn" data-style="grant" onclick="toggleTextPolishStyle_page(this)">基金申报导向</button>
+                        <button class="pill-btn" data-style="concise" onclick="toggleTextPolishStyle_page(this)">简洁精炼</button>
+                        <button class="pill-btn" data-style="formal" onclick="toggleTextPolishStyle_page(this)">正式学术</button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-default" onclick="resetTextPolishForm_page()">清除</button>
+                    <button class="btn btn-primary" onclick="runTextPolish_page()">
+                        立即执行
+                    </button>
+                </div>
+
+                <div class="secure-tip">
+                    <span class="secure-icon">🔒</span>
+                    <div class="secure-text">
+                        <div class="secure-title">数据仅用于当前会话，示例环境不做持久化存储</div>
+                        <div class="secure-desc">实际接入时需遵循院内及平台的数据安全规范，避免上传可识别个人隐私的信息。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-polish-right">
+            <div class="card-section">
+                <div class="card-header">
+                    <div class="card-header-main">
+                        <h2 class="card-title">执行结果与专家推理过程</h2>
+                        <span class="card-desc">展示润色前后对比、修改说明与保留建议</span>
+                    </div>
+                    <button class="btn btn-ghost" id="textPolishChangeApproachBtn" onclick="changeTextPolishApproach_page()" title="换个思路，模拟更换LLM模型或提示词重新生成润色建议">
+                        <span class="btn-ghost-icon">🔄</span>
+                        <span class="btn-ghost-text">换个思路</span>
+                    </button>
+                </div>
+
+                <div id="textPolishInitial_page" class="result-initial">
+                    <div class="result-badge">准备就绪</div>
+                    <h3 class="result-title">请在左侧填写参数并点击「立即执行」</h3>
+                    <p class="result-desc">
+                        文本润色智能体将模拟专家审稿视角，对语言表达、逻辑结构与学术风格进行系统性优化。
+                    </p>
+                    <ul class="result-list">
+                        <li>识别语法、拼写与标点错误</li>
+                        <li>优化句式结构，提升流畅度与可读性</li>
+                        <li>统一术语与用词风格，贴近目标期刊规范</li>
+                        <li>在启用「引用文献」时，给出示例级引用建议（需人工核实）</li>
+                    </ul>
+                </div>
+
+                <div id="textPolishLoading_page" class="result-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <div class="loading-text">正在分析文本并生成润色建议，请稍候…</div>
+                    <div class="loading-subtext">先进行整体质量评估，再逐句给出修改理由与替代表达。</div>
+                </div>
+
+                <div id="textPolishResult_page" class="result-panel" style="display: none;">
+                    <div class="result-summary">
+                        <div class="summary-header">
+                            <span class="summary-badge">示例结果</span>
+                            <span class="summary-score-label">整体可读性提升：<span class="summary-score">↑ 显著改善（示例）</span></span>
+                        </div>
+                        <p class="summary-text">
+                            当前为前端原型示例，未接入真实大模型。
+                            左侧文本将被视为「原文」，右侧区域展示「润色版本」和「修改说明」的排版样式。
+                        </p>
+                    </div>
+
+                    <div class="result-split">
+                        <div class="result-column">
+                            <div class="column-title">原文</div>
+                            <pre id="textPolishOriginal_page" class="code-block"></pre>
+                        </div>
+                        <div class="result-column">
+                            <div class="column-title">润色示例</div>
+                            <pre id="textPolishRewritten_page" class="code-block"></pre>
+                        </div>
+                    </div>
+
+                    <div class="result-detail">
+                        <div class="detail-title">示例修改说明（结构预览）</div>
+                        <ul id="textPolishExplanation_page" class="detail-list"></ul>
+                    </div>
+
+                    <div class="feedback-section" id="textPolishFeedbackSection_page">
+                        <div class="feedback-title">您感觉本次文本润色的结果如何?</div>
+                        <div class="feedback-buttons">
+                            <button class="feedback-btn feedback-positive" onclick="submitTextPolishFeedback_page('positive')">
+                                <span class="feedback-icon">👍</span>
+                                <span>很好</span>
+                            </button>
+                            <button class="feedback-btn feedback-neutral" onclick="submitTextPolishFeedback_page('neutral')">
+                                <span class="feedback-icon">😐</span>
+                                <span>一般</span>
+                            </button>
+                            <button class="feedback-btn feedback-negative" onclick="submitTextPolishFeedback_page('negative')">
+                                <span class="feedback-icon">👎</span>
+                                <span>不满意</span>
+                            </button>
+                        </div>
+                        <div class="feedback-thanks" id="textPolishFeedbackThanks_page" style="display:none;">
+                            感谢您的反馈！我们会结合真实环境中的数据持续优化润色效果。
+                        </div>
+                        <div class="feedback-guide" id="textPolishFeedbackGuide_page" style="display:none;">
+                            <div class="feedback-guide-content">
+                                <div class="feedback-guide-icon">💡</div>
+                                <div class="feedback-guide-text">
+                                    <div class="feedback-guide-title">对当前结果不满意？</div>
+                                    <div class="feedback-guide-desc">
+                                        您可以尝试点击右上角的「换个思路」按钮，模拟更换底层大模型或提示词组合，生成风格略有差异的新版本，<strong>有机会得到更符合您期望的润色结果</strong>。
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文本润色运算规则与需求说明 -->
+    <div class="text-polish-rules-section">
+        <div class="rules-header">
+            <div class="rules-title-wrapper">
+                <div class="rules-badge">📖 原型说明文档</div>
+                <h3 class="rules-title">文本润色运算规则与产品需求</h3>
+                <p class="rules-subtitle">
+                    以下内容对应本页原型的功能设计与实现要求，用于指导后端接入统一 AI 基座的文本润色能力。
+                </p>
+            </div>
+            <button class="rules-toggle-btn" onclick="toggleTextPolishRules()" id="textPolishRulesToggleBtn">收起</button>
+        </div>
+        <div class="rules-content" id="textPolishRulesContent" style="display: block;">
+            <!-- 一、用户路径 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">一、用户路径（从输入到拿结果）</h4>
+                <div class="user-flow-diagram">
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">1</div>
+                        <div class="flow-content">
+                            <div class="flow-title">粘贴原文或上传 PDF</div>
+                            <div class="flow-desc">医生在「文本内容」中粘贴需要润色的段落，或上传一份包含正文的论文/基金 PDF。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">2</div>
+                        <div class="flow-content">
+                            <div class="flow-title">选择引用策略</div>
+                            <div class="flow-desc">勾选「不引用文献」或「引用文献」，决定是否需要模型给出示例级引用建议。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">3</div>
+                        <div class="flow-content">
+                            <div class="flow-title">配置润色偏好</div>
+                            <div class="flow-desc">可选点击若干「期刊发表导向 / 基金申报导向 / 简洁精炼 / 正式学术」标签。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">4</div>
+                        <div class="flow-content">
+                            <div class="flow-title">点击「立即执行」</div>
+                            <div class="flow-desc">前端校验必填项后，调用统一 AI 基座的文本润色工具。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">5</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看左右对比</div>
+                            <div class="flow-desc">左侧展示原文，右侧展示润色后的建议版本。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">6</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看修改说明</div>
+                            <div class="flow-desc">在「示例修改说明」中分点解释主要修改类型与理由，便于医生判断是否采纳。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large flow-arrow-optional">→</div>
+                    <div class="flow-step-large flow-step-optional">
+                        <div class="flow-number-large">7</div>
+                        <div class="flow-content">
+                            <div class="flow-title">换个思路（可选）</div>
+                            <div class="flow-desc">如对当前结果不满意，可点击右上角「换个思路」，清除缓存并尝试不同模型/提示词组合重新生成润色建议。</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rule-text" style="margin-top: 8px; padding: 12px; background: #fff; border-radius: 4px; border-left: 3px solid #1890ff;">
+                    <strong>原型目的：</strong>让医生「一眼看懂」模型对文本做了什么改动，并且可以选择性采纳，而不是被迫整体替换。
+                </div>
+            </div>
+
+            <!-- 二、功能目标与边界 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">二、功能目标与边界</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 功能目标：</strong>
+                        <ul>
+                            <li>面向医学科研场景，对医生已有稿件进行<strong>语言层面的精修</strong>，不改动核心学术结论。</li>
+                            <li>统一文风，提升逻辑清晰度和可读性，贴近期刊/基金评审的语言习惯。</li>
+                            <li>在启用「引用文献」选项时，仅给出<strong>示例级</strong>引用建议和占位符，最终引用仍由医生确认。</li>
+                            <li>支持两种原文来源：直接粘贴文本、上传 PDF；PDF 在后端解析为纯文本后再进入润色流程。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 明确不做：</strong>
+                        <ul>
+                            <li>不擅自更改统计结果、样本量、P 值等<strong>实质性数据</strong>；如需更改，必须在说明中显式提示。</li>
+                            <li>不虚构具体文献、具体期刊或影响因子；如需要示例，用「[示例文献，占位符，需人工替换]」风格输出。</li>
+                            <li>不输出诊疗建议，保持为科研写作工具，而非临床决策工具。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 三、关键交互与前端要求 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">三、关键交互与前端行为</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 表单校验：</strong>
+                        <ul>
+                            <li>文本内容与 PDF 至少填写/上传一项：两者都为空时不允许提交。</li>
+                            <li>直接粘贴的文本长度建议限制在单次 ≤ 4,000 字（具体上限由模型与网关配置），超长应提示拆段润色。</li>
+                            <li>PDF 上传建议限制：单文件大小（例如 ≤ 10MB）、页数（例如 ≤ 20 页），超出需给出明确提示。</li>
+                            <li>文献检索选项为必选，默认「不引用文献」。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 状态切换：</strong>
+                        <ul>
+                            <li>点击「立即执行」后：显示 loading 状态，禁止重复点击，直至返回。</li>
+                            <li>成功返回：展示左右对比与说明，隐藏初始引导卡片。</li>
+                            <li>请求异常：给出明显错误提示，并保留原输入内容便于重试。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>3. 结果展示规范：</strong>
+                        <ul>
+                            <li>「原文」区域原样展示用户输入，不做任何加工。</li>
+                            <li>「润色示例」区域为模型返回的建议版本，可包含适度的结构重组，但不应大幅删减段落。</li>
+                            <li>「修改说明」建议使用分点列举：例如「合并长句」「术语统一」「语态调整」「删除口语化表达」等。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>4. 「换个思路」按钮：</strong>
+                        <ul>
+                            <li>在结果卡片右上提供「换个思路」按钮（🔄），点击后在不修改原始输入的前提下重新触发润色流程。</li>
+                            <li>实际接入时可用于：清除当前缓存结果、切换不同大模型或提示词组合，为医生提供风格略有差异的备选版本。</li>
+                            <li>本原型中通过追加一条说明项的方式进行可视化，方便研发理解交互结构与后端实现预期。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>5. 结果反馈与质量监控：</strong>
+                        <ul>
+                            <li>在结果区域底部提供三档反馈问题：「您感觉本次文本润色的结果如何?」+「很好 / 一般 / 不满意」。</li>
+                            <li>点击任意选项后，前端给出「感谢反馈」提示；当选择「一般 / 不满意」时，额外提示可通过「换个思路」尝试更换底层大模型或提示词组合，重新生成一个<strong>可能更令医生满意</strong>的备选结果。</li>
+                            <li>实际接入时需将反馈类型、时间戳、会话/用户标识等上送后端，用于后续对模型版本、Prompt 方案的 A/B 测试和质量监控。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 四、LLM 对接与 Prompt 设计 -->
+            <div class="rule-section" id="textPolishPromptSection">
+                <h4 class="rule-section-title">四、LLM 对接方案与 Prompt 设计</h4>
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.1 调用方式（给研发）</h5>
+                    <div class="rule-list">
+                        <div class="rule-item">
+                            <strong>接口形态：</strong>统一通过 AI 基座的「文本润色」工具调用，推荐使用 RESTful / MCP 工具形式，参数示意：
+                            <ul>
+                                <li><code>original_text</code>：原文字符串。</li>
+                                <li><code>citation_mode</code>：<code>no_ref</code> 或 <code>with_ref</code>。</li>
+                                <li><code>style_preferences</code>：数组，如 <code>["journal", "concise"]</code>。</li>
+                                <li><code>domain</code>：可选，标记学科（如「肿瘤内科」「呼吸」等），便于后续优化。</li>
+                            </ul>
+                        </div>
+                        <div class="rule-item">
+                            <strong>返回结构（建议）：</strong>
+                            <ul>
+                                <li><code>rewritten_text</code>：润色后的完整文本。</li>
+                                <li><code>change_summary</code>：数组，每项包含 <code>type</code>（语法/逻辑/术语）、<code>before</code>、<code>after</code>、<code>reason</code>。</li>
+                                <li><code>citation_suggestions</code>（可选）：在 <code>with_ref</code> 时返回的占位符信息（不要求真实 DOI）。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.2 Prompt 结构（角色设定 + 问题情境 + 任务指令 + 约束条件）</h5>
+                    <div class="code-block rules-code-block">
+                        <div class="code-header">文本润色 Prompt 模板（示意）</div>
+                        <pre class="code-content">【一、角色设定（谁）】
+你是一名长期服务于医学期刊和科研基金评审委员会的「双语医学科研写作编辑」：
+- 熟悉中英文医学论文、基金本子写作规范（IMRaD 结构、常见期刊要求等）
+- 理解临床与基础医学常见表述方式，但不参与修改科学结论
+- 擅长在不改变事实和数据前提下，提高文本的专业性、清晰度和可读性
+
+【二、问题情境（在什么场景下工作）】
+现在有一段来自医学研究论文或基金申请书的文本，可能属于：摘要、引言、方法、结果或讨论等部分。
+- 原文可能存在：中式英语、长难句、语法错误、术语不统一、逻辑衔接生硬等问题
+- 作者希望用于：{writing_purpose}（如：SCI 期刊投稿 / 国家自然科学基金 / 博士毕业论文等）
+- 作者当前的引用策略偏好为：{citation_mode}（no_ref / with_ref）
+- 作者选择的润色风格偏好为：{style_preferences}（如：期刊发表导向、基金申报导向、简洁精炼、正式学术）
+
+【三、任务指令（你要做什么）】
+在完整保留科学结论和全部数据前提下，对下面的原文进行「语言层面」的专业润色，并产出结构化结果：
+1. 语言优化
+   - 修正语法、拼写和标点错误，删除口语化或模糊表述
+   - 优化句子结构：合理拆分或合并长句，使逻辑层次更清晰
+   - 统一术语和时态，使其符合医学论文常见写法（如：结果用过去时、结论用一般现在时）
+2. 结构与逻辑
+   - 在不增删关键信息的前提下，适度调整句子顺序，使段落更连贯
+   - 如发现明显歧义或逻辑跳跃，用更清晰的表述替换原句，但保持含义不变
+3. 引用建议（仅在 {citation_mode} = with_ref 时执行）
+   - 不生成具体文献条目和 DOI
+   - 仅指出在哪些位置「建议补充哪一类文献」，以占位符形式提示
+4. 变更说明
+   - 对主要修改点进行总结：包括修改类型、修改前后片段和修改原因，便于作者判断是否采纳
+
+【输入原文】
+{original_text}
+
+【四、约束条件（必须遵守什么）】
+1. 数据与结论安全
+   - 严禁修改、推断或虚构：样本量、分组信息、统计方法、P值、置信区间、效应量等任何数值或实质性结果
+   - 如发现原文中数据本身存在自相矛盾，仅在说明中以文字形式温和提示，不要自行“修正数据”
+2. 引文规范
+   - 不虚构具体文献、期刊名称、作者、年份、DOI 等可核查信息
+   - 如需示例，请使用占位符形式，例如：
+     「[此处可补充：近5年关于XXX的系统综述或多中心随机对照试验，需作者自行检索并替换为真实文献]」
+3. 语气与边界
+   - 保持专业、中性、审稿人视角的语气，不发表价值评判（如「非常创新」「质量很差」）
+   - 不提供诊疗建议，不改变研究设计类型（如不把回顾性研究写成随机对照试验）
+4. 输出格式（必须是合法 JSON，不能包含多余说明文字）
+   - 严格按照下面结构输出，不要添加额外字段或注释：
+
+{
+  "rewritten_text": "润色后的完整文本（同一语言，保留原意与全部关键信息）",
+  "change_summary": [
+    {
+      "type": "grammar | wording | structure | terminology",
+      "before": "修改前的局部片段（可截断）",
+      "after": "对应修改后的片段",
+      "reason": "简要说明修改意图，例如：合并重复信息、统一术语、消除歧义、拆分长句等"
+    }
+  ],
+  "citation_suggestions": [
+    {
+      "position_hint": "建议在哪一段或哪一句之后补充文献（自然语言描述即可）",
+      "description": "建议补充何种类型的研究作为支撑，例如：近5年关于XXX的多中心随机对照试验",
+      "note": "只作为占位符提示，需用户后续自行检索并替换为真实文献"
+    }
+  ]
+}
+
+- 如果 {citation_mode} = "no_ref"，请返回空数组："citation_suggestions": []。
+- 请保证 JSON 可以被机器直接解析，不输出任何多余文本。</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 五、患者信息脱敏与输入约束（简要） -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">五、患者信息脱敏与输入约束（简要）</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 文本内容与 PDF：</strong>
+                        <ul>
+                            <li>前端文案需提示医生<strong>尽量脱敏</strong>：避免在文本框或 PDF 中保留可识别患者身份的信息（姓名、手机号、住院号等）。</li>
+                            <li>PDF 上传仅作为原型演示，实际接入时由技术中心统一设计解析与安全方案，此处不展开具体实现。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 六、性能与成本控制（建议） -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">六、性能与成本控制</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 调用频率与字数限制：</strong>
+                        <ul>
+                            <li>同一医生在短时间内（如 30 秒）重复提交相同文本，可直接返回缓存结果。</li>
+                            <li>根据模型上下文长度，对单次最大字数做硬限制，并给出友好提示。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 缓存策略（可选）：</strong>
+                        <ul>
+                            <li>以「文本内容 + 参数组合」做哈希作为缓存 Key，在医生端短期内复用结果。</li>
+                            <li>适用于「多次点错按钮」这类情况，减少不必要的重复调用。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 七、验收要点 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">七、联调与验收要点</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 交互与状态：</strong>
+                        <ul>
+                            <li>不同状态（初始 / 加载中 / 有结果 / 出错）切换正常，无残留 UI 问题。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 结果质量（人工抽检维度）：</strong>
+                        <ul>
+                            <li>随机选取若干真实医生文本，确认润色后无实质性事实错误或数据篡改。</li>
+                            <li>语言明显更为流畅、专业，且不改变原意。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>3. 安全与日志：</strong>
+                        <ul>
+                            <li>关键调用均有日志可查，便于问题追溯与成本分析。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 样式与 js/pages-loader.js 中的 research-text-polish 模板保持一致，便于独立预览 */
+.text-polish-page{padding:24px;max-width:1400px;margin:0 auto}
+.text-polish-header{margin-bottom:24px;display:flex;flex-direction:column;gap:12px}
+.text-polish-title-section{display:flex;align-items:center;gap:12px}
+.text-polish-icon{width:40px;height:40px;border-radius:16px;background:linear-gradient(135deg,#f6ffed,#e6f7ff);display:flex;align-items:center;justify-content:center;font-size:22px}
+.text-polish-title{margin:0;font-size:26px;font-weight:600;color:#1a1a1a}
+.text-polish-subtitle{margin:4px 0 0;font-size:14px;color:#666}
+.text-polish-highlight{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:4px 10px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center}
+.chip-primary{background:#e6f7ff;color:#1890ff;border:1px solid #91d5ff}
+.chip-outline{background:#fff;color:#595959;border:1px solid #d9d9d9}
+.text-polish-main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.2fr);gap:20px;align-items:flex-start}
+@media (max-width:1200px){.text-polish-main{grid-template-columns:1fr}}
+.text-polish-left,.text-polish-right{min-width:0}
+.card-section{background:#fff;border-radius:12px;padding:20px 20px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #f0f0f0}
+.card-header{margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card-header-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.card-title{margin:0 0 4px;font-size:16px;font-weight:600;color:#1f1f1f}
+.card-desc{margin:0;font-size:13px;color:#8c8c8c}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:14px;font-weight:500;color:#333;margin-bottom:6px}
+.required{color:#f5222d;margin-left:4px}
+.form-textarea{width:100%;border-radius:8px;border:1px solid #d9d9d9;padding:10px 12px;font-size:14px;resize:vertical;min-height:200px;line-height:1.6}
+.form-textarea:focus{outline:none;border-color:#1890ff;box-shadow:0 0 0 2px rgba(24,144,255,.15)}
+.form-helper{margin-top:4px;display:flex;justify-content:space-between;font-size:12px;color:#8c8c8c}
+.form-tip{text-align:right}
+.upload-row{display:flex;align-items:center;gap:8px}
+.form-file-input{font-size:12px}
+.upload-summary{font-size:12px;color:#8c8c8c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%}
+.radio-group{display:flex;flex-direction:column;gap:8px}
+.radio-item{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#333}
+.radio-item input[type=radio]{margin-top:3px}
+.radio-desc{font-size:12px;color:#8c8c8c}
+.pill-group{display:flex;flex-wrap:wrap;gap:8px}
+.pill-btn{padding:4px 12px;border-radius:999px;border:1px solid #d9d9d9;background:#fff;font-size:12px;cursor:pointer;color:#595959;transition:all .2s}
+.pill-btn.active{background:#e6f7ff;border-color:#1890ff;color:#1890ff}
+.pill-btn:hover{border-color:#1890ff}
+.form-actions{margin-top:8px;display:flex;justify-content:flex-end;gap:10px}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid #d9d9d9;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-default{background:#fff;color:#333}
+.btn-default:hover{background:#f5f5f5}
+.btn-primary{background:#1890ff;color:#fff;border-color:#1890ff}
+.btn-primary:hover{background:#40a9ff;border-color:#40a9ff}
+.btn-ghost{background:transparent;color:#1890ff;border-color:#1890ff;padding:6px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px}
+.btn-ghost:hover{background:#e6f7ff}
+.btn-ghost-icon{font-size:14px}
+.secure-tip{margin-top:12px;padding:10px 12px;background:#f6ffed;border-radius:8px;border:1px solid #b7eb8f;display:flex;gap:8px}
+.secure-icon{font-size:18px;margin-top:2px}
+.secure-title{font-size:13px;font-weight:500;color:#389e0d}
+.secure-desc{font-size:12px;color:#8c8c8c}
+.result-initial{padding:16px;border-radius:10px;background:linear-gradient(135deg,#f6ffed,#e6f7ff);border:1px solid rgba(24,144,255,.25)}
+.result-badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:12px;color:#096dd9;background:rgba(230,247,255,.9);margin-bottom:8px}
+.result-title{margin:0 0 4px;font-size:16px;font-weight:600;color:#1f1f1f}
+.result-desc{margin:0 0 8px;font-size:13px;color:#595959}
+.result-list{margin:0;padding-left:18px;font-size:13px;color:#595959}
+.result-list li+li{margin-top:2px}
+.result-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
+.spinner{width:32px;height:32px;border-radius:50%;border:3px solid #e6f7ff;border-top-color:#1890ff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:#262626}
+.loading-subtext{font-size:12px;color:#8c8c8c}
+.result-panel{display:flex;flex-direction:column;gap:12px}
+.result-summary{padding:12px 12px 10px;border-radius:8px;background:#f5f5f5}
+.summary-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.summary-badge{font-size:12px;padding:2px 8px;border-radius:999px;background:#fff;border:1px solid #d9d9d9;color:#595959}
+.summary-score-label{font-size:12px;color:#8c8c8c}
+.summary-score{color:#389e0d;font-weight:500}
+.summary-text{margin:0;font-size:12px;color:#595959}
+.result-split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:900px){.result-split{grid-template-columns:1fr}}
+.result-column{display:flex;flex-direction:column;gap:6px}
+.column-title{font-size:13px;font-weight:500;color:#434343}
+.code-block{margin:0;padding:10px 12px;border-radius:8px;background:#fdfdfd;border:1px solid #f0f0f0;font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;max-height:260px;overflow:auto}
+.result-detail{padding-top:4px;border-top:1px dashed #e8e8e8}
+.detail-title{font-size:13px;font-weight:500;color:#434343;margin-bottom:6px}
+.detail-list{margin:0;padding-left:18px;font-size:12px;color:#595959}
+.detail-list li+li{margin-top:2px}
+.feedback-section{margin-top:12px;padding-top:10px;border-top:1px dashed #e8e8e8}
+.feedback-title{font-size:13px;font-weight:500;color:#434343;margin-bottom:8px}
+.feedback-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.feedback-btn{padding:6px 12px;border-radius:16px;border:1px solid #d9d9d9;background:#fff;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;transition:all .2s}
+.feedback-btn:hover{border-color:#1890ff;color:#1890ff}
+.feedback-positive{border-color:#52c41a;color:#389e0d}
+.feedback-negative{border-color:#ff4d4f;color:#cf1322}
+.feedback-icon{font-size:14px}
+.feedback-thanks{margin-top:8px;font-size:12px;color:#8c8c8c}
+.feedback-guide{margin-top:8px}
+.feedback-guide-content{display:flex;gap:8px;padding:8px 10px;background:#f0f8ff;border-radius:6px;border:1px solid #bae7ff}
+.feedback-guide-icon{font-size:18px}
+.feedback-guide-title{font-size:12px;font-weight:500;color:#1f1f1f;margin-bottom:2px}
+.feedback-guide-desc{font-size:12px;color:#595959;line-height:1.6}
+
+/* 复用 AI 选题规则区域的样式，命名保持一致以便前端统一风格 */
+.text-polish-rules-section{margin-top:40px;padding:0;background:linear-gradient(135deg,#f0f8ff 0%,#e6f7ff 100%);border-radius:12px;border:2px solid #1890ff;box-shadow:0 4px 12px rgba(24,144,255,.15);position:relative;overflow:hidden}
+.text-polish-rules-section::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1890ff 0%,#096dd9 50%,#1890ff 100%)}
+.rules-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:24px 24px 16px;background:#fff;border-bottom:2px dashed #e6f7ff}
+.rules-title-wrapper{flex:1}
+.rules-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(135deg,#1890ff 0%,#096dd9 100%);color:#fff;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:12px;box-shadow:0 2px 4px rgba(24,144,255,.3)}
+.rules-title{font-size:20px;font-weight:600;color:#1890ff;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.rules-title::before{content:'📋';font-size:24px}
+.rules-subtitle{font-size:14px;color:#666;line-height:1.6;margin:0;padding:12px;background:#f0f8ff;border-left:3px solid #1890ff;border-radius:4px}
+.rules-toggle-btn{background:#fff;color:#1890ff;border:1px solid #1890ff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;transition:all .3s;flex-shrink:0;white-space:nowrap}
+.rules-toggle-btn:hover{background:#1890ff;color:#fff;box-shadow:0 2px 8px rgba(24,144,255,.3)}
+.rules-content{padding:24px;background:#fff}
+.rule-section{margin-bottom:24px;padding:20px;background:#fafafa;border-radius:8px;border-left:4px solid #1890ff;transition:all .3s}
+.rule-section:hover{background:#f5f5f5;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.rule-section:last-child{margin-bottom:0}
+.rule-section-title{font-size:16px;font-weight:600;color:#1890ff;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #e6f7ff;display:flex;align-items:center;gap:8px}
+.rule-section-title::before{content:'▸';color:#1890ff;font-size:18px}
+.rule-subsection{margin-bottom:16px;padding-left:0}
+.rule-subsection-title{font-size:14px;font-weight:600;color:#1a1a1a;margin:0 0 8px}
+.rule-text{font-size:14px;color:#666;line-height:1.8;margin:0 0 8px}
+.rule-list{display:flex;flex-direction:column;gap:10px}
+.rule-item{font-size:14px;color:#333;line-height:1.8}
+.rule-item strong{color:#1a1a1a;font-weight:600}
+.rule-item ul{margin:6px 0 0 20px;padding:0}
+.rule-item li{margin-bottom:4px;line-height:1.6}
+.code-block{background:#2d2d2d;border-radius:6px;overflow:hidden;margin:12px 0}
+.rules-code-block{max-height:none;overflow:auto}
+.code-header{background:#1e1e1e;padding:8px 12px;font-size:12px;color:#999;border-bottom:1px solid #3d3d3d}
+.code-content{padding:16px;margin:0;font-family:Monaco,Menlo,"Ubuntu Mono",monospace;font-size:13px;line-height:1.6;color:#d4d4d4;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word}
+.user-flow-diagram{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;margin:16px 0;padding:16px;background:#fff;border-radius:12px;border:1px solid #e8e8e8}
+.flow-step-large{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:140px;max-width:180px;padding:14px;background:#fafafa;border-radius:8px;border:1px solid #e8e8e8;transition:all .3s}
+.flow-step-large:hover{border-color:#1890ff;box-shadow:0 2px 8px rgba(24,144,255,.15)}
+.flow-step-branch{border-color:#1890ff;background:#e6f7ff}
+.flow-step-branch .flow-number-large{background:linear-gradient(135deg,#1890ff 0%,#096dd9 100%)}
+.flow-step-optional{border-color:#faad14;background:#fff7e6}
+.flow-step-optional .flow-number-large{background:linear-gradient(135deg,#faad14 0%,#d46b08 100%)}
+.flow-number-large{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1890ff 0%,#096dd9 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;box-shadow:0 2px 4px rgba(24,144,255,.3)}
+.flow-content{text-align:center}
+.flow-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.flow-desc{font-size:13px;color:#666;line-height:1.5}
+.flow-arrow-large{font-size:22px;color:#1890ff;font-weight:bold;flex-shrink:0}
+.flow-arrow-optional{color:#faad14}
+@media (max-width:768px){.user-flow-diagram{flex-direction:column}.flow-arrow-large{transform:rotate(90deg)}.flow-step-large{max-width:100%}}
+</style>
+
+<script>
+function updateTextPolishCharCount_page(){
+    var t=document.getElementById('textPolishInput_page');
+    var c=document.getElementById('textPolishCharCount_page');
+    if(!t||!c)return;
+    var v=t.value||'';
+    c.textContent=v.length+' 字';
+}
+function toggleTextPolishStyle_page(btn){
+    if(!btn)return;
+    btn.classList.toggle('active');
+}
+
+function handleTextPolishPdfChange_page(e){
+    var summary=document.getElementById('textPolishPdfSummary_page');
+    if(!summary)return;
+    var file=e&&e.target&&e.target.files&&e.target.files[0];
+    if(file){
+        summary.textContent='已选择：'+file.name+'（示例环境不解析，仅展示交互结构）';
+    }else{
+        summary.textContent='当前未选择文件';
+    }
+}
+function resetTextPolishForm_page(){
+    var t=document.getElementById('textPolishInput_page');
+    if(t)t.value='';
+    updateTextPolishCharCount_page();
+    var f=document.getElementById('textPolishPdfInput_page');
+    if(f)f.value='';
+    handleTextPolishPdfChange_page({target:{files:[]}})
+    document.querySelectorAll('input[name="textPolishCitation_page"]').forEach(function(r){
+        if(r.value==='no-ref')r.checked=true;
+    });
+    document.querySelectorAll('.pill-btn.active').forEach(function(el){el.classList.remove('active')});
+    var i=document.getElementById('textPolishInitial_page');
+    var l=document.getElementById('textPolishLoading_page');
+    var r=document.getElementById('textPolishResult_page');
+    if(i)i.style.display='block';
+    if(l)l.style.display='none';
+    if(r)r.style.display='none';
+}
+function runTextPolish_page(){
+    var t=document.getElementById('textPolishInput_page');
+    var f=document.getElementById('textPolishPdfInput_page');
+    if(!t)return;
+    var v=t.value.trim();
+    var hasPdf=f&&f.files&&f.files[0];
+    if(!v && !hasPdf){
+        alert('请先输入需要润色的文本内容，或上传一份原文 PDF');
+        return;
+    }
+    var i=document.getElementById('textPolishInitial_page');
+    var l=document.getElementById('textPolishLoading_page');
+    var r=document.getElementById('textPolishResult_page');
+    if(i)i.style.display='none';
+    if(r)r.style.display='none';
+    if(l)l.style.display='flex';
+    setTimeout(function(){
+        if(l)l.style.display='none';
+        if(r)r.style.display='flex';
+        var o=document.getElementById('textPolishOriginal_page');
+        var w=document.getElementById('textPolishRewritten_page');
+        var e=document.getElementById('textPolishExplanation_page');
+        if(o)o.textContent=v;
+        if(w)w.textContent='【示例展示】\\n此处将展示接入真实「科研文本润色模型」后的润色结果。\\n\\n在实际环境中，系统会：\\n1）保留原始学术含义不变；\\n2）统一时态、语态与术语；\\n3）优化长句与重复表达，使其更符合目标期刊的语言风格；\\n4）在启用「引用文献」时，为关键论点补充示例级的参考文献占位符（需人工核实与替换）。';
+        if(e){
+            e.innerHTML='';
+            ['本页为「科研超级智能体」下的文本润色原型页面，尚未与后端模型真实联通。','左侧表单用于收集待润色文本与引用偏好，未来可直接透传给统一 AI 基座的相关工具。','右侧区域采用「原文 / 润色版本 / 修改说明」三层结构，方便医生逐句对照与选择性采纳。','后续接入时，建议在返回结果中标记修改强度，并支持一键复制 / 导出为 Word 或 Markdown。'].forEach(function(t){
+                var li=document.createElement('li');
+                li.textContent=t;
+                e.appendChild(li);
+            });
+        }
+    },900);
+}
+
+// 「换个思路」：在不修改输入的前提下，模拟切换模型或提示词重新给出润色建议
+function changeTextPolishApproach_page(){
+    var l=document.getElementById('textPolishLoading_page');
+    var r=document.getElementById('textPolishResult_page');
+    var i=document.getElementById('textPolishInitial_page');
+    if(i)i.style.display='none';
+    if(r)r.style.display='none';
+    if(l)l.style.display='flex';
+    setTimeout(function(){
+        if(l)l.style.display='none';
+        if(r)r.style.display='flex';
+        var e=document.getElementById('textPolishExplanation_page');
+        if(e){
+            var li=document.createElement('li');
+            li.textContent='【示例】您点击了“换个思路”后，实际系统可以尝试切换不同的大模型或提示词组合，生成风格略有差异的润色结果（如更简洁、更加正式等），本原型仅展示交互结构。';
+            e.appendChild(li);
+        }
+    },750);
+}
+
+// 文本润色结果三档反馈（很好 / 一般 / 不满意）
+function submitTextPolishFeedback_page(type){
+    var thanks=document.getElementById('textPolishFeedbackThanks_page');
+    var guide=document.getElementById('textPolishFeedbackGuide_page');
+    if(thanks)thanks.style.display='block';
+    if(guide)guide.style.display=(type==='neutral'||type==='negative')?'block':'none';
+    // 原型中不做实际上报，仅预留接口说明：
+    // 实际接入时可在此处调用后端 API，上送页面ID、反馈类型、时间戳等，用于质量监控与Prompt/模型优化。
+}
+document.addEventListener('DOMContentLoaded',function(){
+    var t=document.getElementById('textPolishInput_page');
+    if(t){
+        t.addEventListener('input',updateTextPolishCharCount_page);
+        updateTextPolishCharCount_page();
+    }
+});
+
+// 快速滚动到 Prompt 模板位置，方便在嵌入后台时查看
+function scrollToTextPolishPrompt(){
+    try{
+        var section=document.getElementById('textPolishPromptSection');
+        if(section){
+            section.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+    }catch(e){
+        // 静默失败即可
+    }
+}
+
+function toggleTextPolishRules(){
+    var content=document.getElementById('textPolishRulesContent');
+    var btn=document.getElementById('textPolishRulesToggleBtn');
+    if(!content||!btn)return;
+    if(content.style.display==='none'){
+        content.style.display='block';
+        btn.textContent='收起';
+    }else{
+        content.style.display='none';
+        btn.textContent='展开';
+    }
+}
+</script>
+

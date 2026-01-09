@@ -8353,6 +8353,722 @@ function initPage_research_literature_search() {
 }
 </script>
 `,
+        'research-text-polish': `<!-- 科研超级智能体：文本润色页面（参考 MedSci 文本润色页面：https://ai.medsci.cn/tool/text-polish） -->
+<div class="text-polish-page">
+    <!-- 头部区域 -->
+    <div class="text-polish-header">
+        <div class="text-polish-title-section">
+            <div class="text-polish-icon">✨</div>
+            <div>
+                <h1 class="text-polish-title">文本润色</h1>
+                <p class="text-polish-subtitle">智能文本润色 · 让学术写作更精准、更地道</p>
+            </div>
+        </div>
+        <div class="text-polish-highlight">
+            <span class="chip chip-primary">科研写作助手</span>
+            <span class="chip chip-outline">语法优化</span>
+            <span class="chip chip-outline">学术表达</span>
+            <span class="chip chip-outline">期刊友好</span>
+        </div>
+    </div>
+
+    <!-- 主体双栏布局 -->
+    <div class="text-polish-main">
+        <!-- 左侧：参数配置 -->
+        <div class="text-polish-left">
+            <div class="card-section">
+                <div class="card-header">
+                    <h2 class="card-title">输入参数</h2>
+                    <span class="card-desc">填写待润色内容及引用偏好</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        文本内容
+                        <span class="required">*</span>
+                    </label>
+                    <textarea
+                        id="textPolishInput"
+                        class="form-textarea"
+                        rows="10"
+                        placeholder="请粘贴需要润色的中文或英文学术文本，例如：摘要、引言、结果或讨论部分（建议一次不超过 2000 字）"
+                    ></textarea>
+                    <div class="form-helper">
+                        <span id="textPolishCharCount">0 字</span>
+                        <span class="form-tip">支持中英混排，建议按章节分段润色，方便对比修改</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        文献检索和引用
+                        <span class="required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="textPolishCitation" value="no-ref" checked>
+                            <span>不引用文献</span>
+                            <span class="radio-desc">只对现有内容进行语言润色，不新增参考文献</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="textPolishCitation" value="with-ref">
+                            <span>引用文献</span>
+                            <span class="radio-desc">在保持原意前提下，适度补充典型文献引用（示例级别，仅供参考）</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        润色偏好（可选）
+                    </label>
+                    <div class="pill-group">
+                        <button class="pill-btn" data-style="journal" onclick="toggleTextPolishStyle(this)">期刊发表导向</button>
+                        <button class="pill-btn" data-style="grant" onclick="toggleTextPolishStyle(this)">基金申报导向</button>
+                        <button class="pill-btn" data-style="concise" onclick="toggleTextPolishStyle(this)">简洁精炼</button>
+                        <button class="pill-btn" data-style="formal" onclick="toggleTextPolishStyle(this)">正式学术</button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-default" onclick="resetTextPolishForm()">清除</button>
+                    <button class="btn btn-primary" onclick="runTextPolish()">
+                        立即执行
+                    </button>
+                </div>
+
+                <div class="secure-tip">
+                    <span class="secure-icon">🔒</span>
+                    <div class="secure-text">
+                        <div class="secure-title">数据仅用于当前会话，示例环境不做持久化存储</div>
+                        <div class="secure-desc">实际接入时需遵循院内及平台的数据安全规范，避免上传可识别个人隐私的信息。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：推理过程与结果 -->
+        <div class="text-polish-right">
+            <div class="card-section">
+                <div class="card-header">
+                    <h2 class="card-title">执行结果与专家推理过程</h2>
+                    <span class="card-desc">展示润色前后对比、修改说明与保留建议</span>
+                </div>
+
+                <!-- 初始状态 -->
+                <div id="textPolishInitial" class="result-initial">
+                    <div class="result-badge">准备就绪</div>
+                    <h3 class="result-title">请在左侧填写参数并点击「立即执行」</h3>
+                    <p class="result-desc">
+                        文本润色智能体将模拟专家审稿视角，对语言表达、逻辑结构与学术风格进行系统性优化。
+                    </p>
+                    <ul class="result-list">
+                        <li>识别语法、拼写与标点错误</li>
+                        <li>优化句式结构，提升流畅度与可读性</li>
+                        <li>统一术语与用词风格，贴近目标期刊规范</li>
+                        <li>在启用「引用文献」时，给出示例级引用建议（需人工核实）</li>
+                    </ul>
+                </div>
+
+                <!-- 加载中状态 -->
+                <div id="textPolishLoading" class="result-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <div class="loading-text">正在分析文本并生成润色建议，请稍候…</div>
+                    <div class="loading-subtext">先进行整体质量评估，再逐句给出修改理由与替代表达。</div>
+                </div>
+
+                <!-- 结果展示区域 -->
+                <div id="textPolishResult" class="result-panel" style="display: none;">
+                    <div class="result-summary">
+                        <div class="summary-header">
+                            <span class="summary-badge">示例结果</span>
+                            <span class="summary-score-label">整体可读性提升：<span class="summary-score">↑ 显著改善（示例）</span></span>
+                        </div>
+                        <p class="summary-text">
+                            当前为前端原型示例，未接入真实大模型。
+                            左侧文本将被视为「原文」，右侧区域展示「润色版本」和「修改说明」的排版样式。
+                        </p>
+                    </div>
+
+                    <div class="result-split">
+                        <div class="result-column">
+                            <div class="column-title">原文</div>
+                            <pre id="textPolishOriginal" class="code-block"></pre>
+                        </div>
+                        <div class="result-column">
+                            <div class="column-title">润色示例</div>
+                            <pre id="textPolishRewritten" class="code-block"></pre>
+                        </div>
+                    </div>
+
+                    <div class="result-detail">
+                        <div class="detail-title">示例修改说明（结构预览）</div>
+                        <ul id="textPolishExplanation" class="detail-list">
+                            <!-- 通过 JavaScript 注入示例说明 -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-polish-page {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.text-polish-header {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.text-polish-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.text-polish-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f6ffed, #e6f7ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.text-polish-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.text-polish-subtitle {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.text-polish-highlight {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.chip-primary {
+    background: #e6f7ff;
+    color: #1890ff;
+    border: 1px solid #91d5ff;
+}
+
+.chip-outline {
+    background: #fff;
+    color: #595959;
+    border: 1px solid #d9d9d9;
+}
+
+.text-polish-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+    gap: 20px;
+    align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .text-polish-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+.text-polish-left,
+.text-polish-right {
+    min-width: 0;
+}
+
+.card-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 20px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #f0f0f0;
+}
+
+.card-header {
+    margin-bottom: 16px;
+}
+
+.card-title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f1f1f;
+}
+
+.card-desc {
+    margin: 0;
+    font-size: 13px;
+    color: #8c8c8c;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.required {
+    color: #f5222d;
+    margin-left: 4px;
+}
+
+.form-textarea {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #d9d9d9;
+    padding: 10px 12px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.6;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24,144,255,0.15);
+}
+
+.form-helper {
+    margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.form-tip {
+    text-align: right;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.radio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.radio-item input[type="radio"] {
+    margin-top: 3px;
+}
+
+.radio-desc {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pill-btn {
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    color: #595959;
+    transition: all 0.2s;
+}
+
+.pill-btn.active {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.pill-btn:hover {
+    border-color: #1890ff;
+}
+
+.form-actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-default {
+    background: #fff;
+    color: #333;
+}
+
+.btn-default:hover {
+    background: #f5f5f5;
+}
+
+.btn-primary {
+    background: #1890ff;
+    color: #fff;
+    border-color: #1890ff;
+}
+
+.btn-primary:hover {
+    background: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.secure-tip {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f6ffed;
+    border-radius: 8px;
+    border: 1px solid #b7eb8f;
+    display: flex;
+    gap: 8px;
+}
+
+.secure-icon {
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.secure-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #389e0d;
+}
+
+.secure-desc {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.result-initial {
+    padding: 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f6ffed, #e6f7ff);
+    border: 1px solid rgba(24, 144, 255, 0.25);
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #096dd9;
+    background: rgba(230, 247, 255, 0.9);
+    margin-bottom: 8px;
+}
+
+.result-title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f1f1f;
+}
+
+.result-desc {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: #595959;
+}
+
+.result-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: #595959;
+}
+
+.result-list li + li {
+    margin-top: 2px;
+}
+
+.result-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    gap: 8px;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid #e6f7ff;
+    border-top-color: #1890ff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    font-size: 14px;
+    color: #262626;
+}
+
+.loading-subtext {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.result-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.result-summary {
+    padding: 12px 12px 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.summary-badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    color: #595959;
+}
+
+.summary-score-label {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.summary-score {
+    color: #389e0d;
+    font-weight: 500;
+}
+
+.summary-text {
+    margin: 0;
+    font-size: 12px;
+    color: #595959;
+}
+
+.result-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .result-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+.result-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.column-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #434343;
+}
+
+.code-block {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 260px;
+    overflow: auto;
+}
+
+.result-detail {
+    padding-top: 4px;
+    border-top: 1px dashed #e8e8e8;
+}
+
+.detail-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #434343;
+    margin-bottom: 6px;
+}
+
+.detail-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12px;
+    color: #595959;
+}
+
+.detail-list li + li {
+    margin-top: 2px;
+}
+</style>
+
+<script>
+function updateTextPolishCharCount() {
+    const textarea = document.getElementById('textPolishInput');
+    const counter = document.getElementById('textPolishCharCount');
+    if (!textarea || !counter) return;
+    const value = textarea.value || '';
+    counter.textContent = value.length + ' 字';
+}
+
+function toggleTextPolishStyle(btn) {
+    if (!btn) return;
+    btn.classList.toggle('active');
+}
+
+function resetTextPolishForm() {
+    const textarea = document.getElementById('textPolishInput');
+    if (textarea) textarea.value = '';
+    updateTextPolishCharCount();
+
+    const radios = document.querySelectorAll('input[name="textPolishCitation"]');
+    radios.forEach(r => {
+        if (r.value === 'no-ref') r.checked = true;
+    });
+
+    document.querySelectorAll('.pill-btn.active').forEach(el => el.classList.remove('active'));
+
+    // 重置结果区域
+    const initial = document.getElementById('textPolishInitial');
+    const loading = document.getElementById('textPolishLoading');
+    const result = document.getElementById('textPolishResult');
+    if (initial) initial.style.display = 'block';
+    if (loading) loading.style.display = 'none';
+    if (result) result.style.display = 'none';
+}
+
+function runTextPolish() {
+    const textarea = document.getElementById('textPolishInput');
+    if (!textarea) return;
+    const text = textarea.value.trim();
+    if (!text) {
+        alert('请先输入需要润色的文本内容');
+        return;
+    }
+
+    const initial = document.getElementById('textPolishInitial');
+    const loading = document.getElementById('textPolishLoading');
+    const result = document.getElementById('textPolishResult');
+
+    if (initial) initial.style.display = 'none';
+    if (result) result.style.display = 'none';
+    if (loading) loading.style.display = 'flex';
+
+    // 这里仅做前端示例，使用 setTimeout 模拟调用大模型的耗时
+    setTimeout(() => {
+        if (loading) loading.style.display = 'none';
+        if (result) result.style.display = 'flex';
+
+        const originalEl = document.getElementById('textPolishOriginal');
+        const rewrittenEl = document.getElementById('textPolishRewritten');
+        const explanationEl = document.getElementById('textPolishExplanation');
+
+        if (originalEl) originalEl.textContent = text;
+
+        if (rewrittenEl) {
+            rewrittenEl.textContent =
+`【示例展示】\n` +
+`此处将展示接入真实「科研文本润色模型」后的润色结果。\n` +
+`\n` +
+`在实际环境中，系统会：\n` +
+`1）保留原始学术含义不变；\n` +
+`2）统一时态、语态与术语；\n` +
+`3）优化长句与重复表达，使其更符合目标期刊的语言风格；\n` +
+`4）在启用「引用文献」时，为关键论点补充示例级的参考文献占位符（需人工核实与替换）。`;
+        }
+
+        if (explanationEl) {
+            explanationEl.innerHTML = '';
+            const points = [
+                '本页为「科研超级智能体」下的文本润色原型页面，尚未与后端模型真实联通。',
+                '左侧表单用于收集待润色文本与引用偏好，未来可直接透传给统一 AI 基座的相关工具。',
+                '右侧区域采用「原文 / 润色版本 / 修改说明」三层结构，方便医生逐句对照与选择性采纳。',
+                '后续接入时，建议在返回结果中标记修改强度，并支持一键复制 / 导出为 Word 或 Markdown。'
+            ];
+            points.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = t;
+                explanationEl.appendChild(li);
+            });
+        }
+    }, 900);
+}
+
+function initPage_research_text_polish() {
+    console.log('文本润色页面已加载');
+    const textarea = document.getElementById('textPolishInput');
+    if (textarea) {
+        textarea.addEventListener('input', updateTextPolishCharCount);
+        updateTextPolishCharCount();
+    }
+}
+</script>
+`,
         'sys-account': `<!-- 系统管理：账号管理页面 -->
 <div class="breadcrumb">
     <a href="#" onclick="showPage('home'); return false;">首页</a> / 系统管理 / 账号管理

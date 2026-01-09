@@ -56,8 +56,8 @@
         </div>
     </div>
     
-    <!-- 热门任务 -->
-    <div class="hot-tasks-section">
+    <!-- 热门任务（当前版本整体置灰，仅展示信息） -->
+    <div class="hot-tasks-section section-disabled">
         <div class="section-title">
             <span class="title-icon">🔥</span>
             <h2>热门任务</h2>
@@ -102,7 +102,7 @@
         </div>
     </div>
     
-    <!-- 可以从这里开始 -->
+    <!-- 可以从这里开始（当前版本仅开放“详细提纲”，其余置灰展示） -->
     <div class="start-here-section" id="startHereSection">
         <div class="section-title">
             <h2>可以从这里开始</h2>
@@ -135,27 +135,27 @@
                 </div>
             </div>
             
-            <!-- 写作与发表 -->
+            <!-- 写作与发表（详细提纲已上线，其余功能占位展示） -->
             <div class="category-column">
                 <div class="category-title">写作与发表</div>
                 <div class="category-items">
-                    <div class="category-item" onclick="openFeature('generate-outline')">
+                    <div class="category-item enabled-item" onclick="openFeature('generate-outline')">
                         <div class="item-icon">📄</div>
-                        <div class="item-text">出提纲</div>
+                        <div class="item-text">详细提纲</div>
                     </div>
-                    <div class="category-item" onclick="openFeature('writing')">
+                    <div class="category-item disabled" title="功能开发中">
                         <div class="item-icon">✏️</div>
                         <div class="item-text">写作</div>
                     </div>
-                    <div class="category-item" onclick="openFeature('polish')">
+                    <div class="category-item disabled" title="功能开发中">
                         <div class="item-icon">⭐</div>
                         <div class="item-text">润色</div>
                     </div>
-                    <div class="category-item" onclick="openFeature('translate')">
+                    <div class="category-item disabled" title="功能开发中">
                         <div class="item-icon">🌐</div>
                         <div class="item-text">翻译</div>
                     </div>
-                    <div class="category-item" onclick="openFeature('literature-review')">
+                    <div class="category-item disabled" title="功能开发中">
                         <div class="item-icon">📊</div>
                         <div class="item-text">文献综述</div>
                     </div>
@@ -477,6 +477,16 @@
 /* 可以从这里开始 */
 .start-here-section {
     margin-bottom: 40px;
+}
+
+/* 区域整体置灰禁用（仅展示），但允许通过 enabled-item 单独激活子项） */
+.section-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+.section-disabled .enabled-item {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .start-here-grid {
@@ -925,13 +935,13 @@ const featureConfig = {
     },
     // 写作与发表
     'generate-outline': {
-        title: '出提纲',
-        desc: '输入研究主题或论文方向, 获得逻辑清晰的提纲',
-        placeholder: '输入研究主题或论文方向, 获得逻辑清晰的提纲',
+        title: '详细提纲',
+        desc: '输入研究主题或论文方向, 生成带逻辑树结构的详细提纲',
+        placeholder: '请输入研究主题 + 目标期刊/论文类型，例如：围绕“社交媒体对青少年心理健康的影响”制作详细提纲（含逻辑树、要点与预计篇幅）',
         examples: [
-            '论文逻辑树状提纲设计',
-            '问题导向型论文提纲构建',
-            '突出创新点的提纲设计'
+            '请为我的研究论文“社交媒体对青少年心理健康的影响”制作详细提纲，要求：1）给出逻辑树结构 2）每个部分包含主要论点和支撑材料 3）标注重要程度和预计篇幅 4）保证论证逻辑严密。',
+            '请为“肿瘤患者互联网随访干预对生活质量的影响”生成一份详细提纲，标清每章小结、核心证据类型和大致字数分配。',
+            '帮我为国家自然科学基金项目初稿设计详细提纲，突出研究创新点和方法学部分的论证逻辑。'
         ]
     },
     'writing': {
@@ -979,6 +989,12 @@ const featureConfig = {
 // 打开功能（在输入框内显示功能按钮）
 function openFeature(featureType) {
     try {
+        // 详细提纲：跳转到独立页面原型
+        if (featureType === 'generate-outline') {
+            window.location.href = 'research-assistant-outline.html';
+            return;
+        }
+
         // 处理所有配置的功能
         if (!featureConfig[featureType]) {
             alert(`打开功能：${featureType}\n\n（实际应用中应跳转到对应功能页面）`);

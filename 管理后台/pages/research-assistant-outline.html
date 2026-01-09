@@ -1,0 +1,980 @@
+<!-- 科研超级智能体：详细提纲页面（前端原型） -->
+<div class="outline-page">
+    <!-- 顶部标题与返回 -->
+    <div class="outline-header">
+        <div class="outline-breadcrumb">
+            <button class="breadcrumb-back-btn" onclick="history.back()">
+                ← 返回辅助写作
+            </button>
+        </div>
+        <div class="outline-title-section">
+            <div class="outline-icon">📚</div>
+            <div>
+                <h1 class="outline-title">详细提纲</h1>
+                <p class="outline-subtitle">输入研究主题或论文方向，自动生成逻辑树结构的详细提纲</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体区域：上输入，下结果 -->
+    <div class="outline-main">
+        <!-- 输入卡片 -->
+        <div class="outline-card">
+            <div class="outline-card-header">
+                <h2 class="outline-card-title">输入需求</h2>
+                <p class="outline-card-desc">尽量一次性说清论文/课题的主题、研究对象、期刊或文体要求</p>
+            </div>
+
+            <div class="outline-input-container">
+                <textarea
+                    id="outlineInput"
+                    class="outline-input"
+                    rows="5"
+                    placeholder="示例：请为我的研究论文“社交媒体对青少年心理健康的影响”制作详细提纲，要求：1）给出逻辑树结构 2）每章包含主要论点和支撑材料 3）标注重要程度和预计篇幅 4）保证论证逻辑严密。"
+                ></textarea>
+                <div class="outline-input-actions">
+                    <button class="btn btn-default" onclick="openOutlineKBModal()">
+                        <span>📁</span>
+                        <span>添加知识库</span>
+                    </button>
+                    <div class="outline-input-icons">
+                        <button class="icon-btn" onclick="attachOutlineFile()" title="附件">
+                            📎
+                        </button>
+                        <button class="icon-btn" onclick="startOutlineVoice()" title="语音输入">
+                            🎤
+                        </button>
+                        <button class="icon-btn icon-btn-primary" onclick="runGenerateOutline()" title="生成详细提纲">
+                            →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 示例提示 -->
+            <div class="outline-examples">
+                <div class="outline-example-item" onclick="useOutlineExample(1)">
+                    <span class="outline-example-tag">示例</span>
+                    <span class="outline-example-text">出提纲：讨论哮喘的区域差异化</span>
+                    <span class="outline-example-arrow">→</span>
+                </div>
+                <div class="outline-example-item" onclick="useOutlineExample(2)">
+                    <span class="outline-example-tag">示例</span>
+                    <span class="outline-example-text">问题导向型临床研究论文提纲：互联网随访干预对肿瘤患者生活质量的影响</span>
+                    <span class="outline-example-arrow">→</span>
+                </div>
+                <div class="outline-example-item" onclick="useOutlineExample(3)">
+                    <span class="outline-example-tag">示例</span>
+                    <span class="outline-example-text">突出创新点的国自然项目详细提纲设计</span>
+                    <span class="outline-example-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果卡片 -->
+        <div class="outline-card">
+            <div class="outline-card-header">
+                <div class="outline-card-header-main">
+                    <h2 class="outline-card-title">详细提纲结果与思路解析</h2>
+                    <p class="outline-card-desc">展示逻辑树结构提纲、各部分要点与预计篇幅分配</p>
+                </div>
+                <button class="btn btn-ghost" onclick="changeOutlineApproach()" title="换个思路，尝试不同模型或提示词生成另一版提纲">
+                    <span>🔄</span>
+                    <span>换个思路</span>
+                </button>
+            </div>
+
+            <!-- 初始状态 -->
+            <div id="outlineInitial" class="outline-initial">
+                <div class="outline-badge">准备就绪</div>
+                <h3 class="outline-initial-title">请在上方输入研究主题或论文方向，然后点击「→」生成详细提纲</h3>
+                <p class="outline-initial-desc">
+                    详细提纲智能体会帮助你把零散想法整理成逻辑树结构，明确每一章、每一节要讲什么、引用什么类型的资料，以及大致写多少字。
+                </p>
+                <ul class="outline-initial-list">
+                    <li>自动拆解研究主题，生成 3–5 层的章节/小节结构</li>
+                    <li>每个节点附带主要论点、支撑材料类型（文献/数据/案例等）</li>
+                    <li>标注重要程度和预计篇幅，便于后续写作时间与篇幅规划</li>
+                    <li>整体保证论证逻辑自洽，从研究背景 → 问题 → 方法 → 结果 → 讨论 → 结论</li>
+                </ul>
+            </div>
+
+            <!-- loading 状态 -->
+            <div id="outlineLoading" class="outline-loading" style="display:none;">
+                <div class="spinner"></div>
+                <div class="loading-text">正在为你分析研究主题并构建逻辑树结构，请稍候…</div>
+                <div class="loading-subtext">会先整体规划章节，再向下展开每个节点的要点与支撑材料。</div>
+            </div>
+
+            <!-- 结果状态 -->
+            <div id="outlineResult" class="outline-result" style="display:none;">
+                <div class="outline-result-summary">
+                    <div class="summary-header">
+                        <span class="summary-badge">示例结果</span>
+                        <span class="summary-meta">当前为前端原型示例，尚未接入真实模型。</span>
+                    </div>
+                    <p class="summary-text">
+                        下方结构仅用于展示「逻辑树 + 论点/支撑材料 + 重要程度 + 预计篇幅」的排版样式，实际环境中请由后端根据 Prompt 规范接入统一 AI 基座。
+                    </p>
+                </div>
+
+                <div class="outline-result-grid">
+                    <div class="outline-tree-column">
+                        <div class="column-title">一、逻辑树状提纲结构（示例）</div>
+                        <pre id="outlineTree" class="code-block">📋 哮喘的区域差异化 - 讨论提纲
+
+一、引言（重要程度：★★★，预计 1500–2000 字）
+  1. 哮喘的全球公共卫生意义
+  2. 区域差异化研究的重要性
+  3. 提纲主要内容概述
+
+二、哮喘患病率的地理分布差异（重要程度：★★★，预计 3000–3500 字）
+  2.1 全球范围内的地理差异
+    - 西班牙儿童哮喘症状患病率的地区差异
+    - 拉丁美洲儿童哮喘患病率的区域变异
+    - 欧美发达国家与发展中国家的差异对比
+  2.2 中国国内的区域差异
+    - 东、中、西部地区的患病率差异（中老年人群）
+    - 各省份儿童青少年哮喘疾病负担分布（1990-2019年数据）
+    - 城市与农村地区的患病差异
+  2.3 同一国家内的微观地理差异
+    - 加拿大安大略省地区间的急诊就诊率差异
+    - 美国严重持续性哮喘的地理分布变异
+    - 英格兰和苏格兰的地理与社会经济差异
+
+三、区域差异的影响因素分析（重要程度：★★★，预计 3500–4000 字）
+  3.1 气候与环保因素
+    - 气温对哮喘发作的影响（河北石家庄地区研究）
+    - 季节性分布特征（中国7个地理区域研究）
+    - 地理纬度与日照辐射的关系
+    - 空气质量与污染水平的区域差异
+  3.2 过敏原分布差异
+    - 地区特异性过敏原分布（福建闽南地区研究）
+    - 珠三角地区的过敏原特征
+    - 尘螨致敏蛋白的地域差异
+    - 环境因素与过敏原的相关性
+  3.3 遗传与人群特征
+    - 地区人群遗传背景差异
+    - IL-27p28基因多态性的地区分布
+    - 性别差异与地理位置的交互作用
+  3.4 医疗卫生资源与社会经济因素
+    - 医疗卫生资源分布不均
+    - 地区医疗水平与服务质量差异
+    - 社会经济地位的地理分布
+    - 医疗可及性的区域差异
+
+四、区域特异性临床特征（重要程度：★★，预计 2000–2500 字）
+  4.1 症状表现的地理差异
+    - 不同地区的主要症状分布
+    - 过敏性鼻炎合并哮喘的地区特点
+    - 华南地区局部变应性鼻炎的临床特征
+  4.2 疾病严重程度的区域分布
+    - 轻、中、重度哮喘的地理分布
+    - 急性发作的区域特异性
+    - 住院率与地理位置的关系
+  4.3 治疗反应的地理差异
+    - 皮下特异性免疫治疗依从性（珠三角地区）
+    - 生物制剂治疗效果的地理变异
+    - 中医体质与中医证型的地区分布
+
+五、区域差异的机制探讨（重要程度：★★，预计 2000–2500 字）
+  5.1 多因素综合作用
+    - 气候、环保、遗传、社会经济因素的交互作用
+    - 地理环境与生活方式的影响
+    - 医疗服务可及性的作用
+  5.2 地理-环境-遗传的相互关系
+    - 不同地区环保暴露与遗传易感性
+    - 纬度与免疫功能的关系
+    - 地方病流行规律的应用
+
+六、区域差异化管理与防控策略（重要程度：★★★，预计 2500–3000 字）
+  6.1 地区特异性诊疗方案
+    - 基于地方过敏原的个体化治疗
+    - 区域气候特点的预防策略
+    - 地区人群特征的优化管理
+  6.2 医疗资源的合理配置
+    - 不同地区医疗卫生资源的优化分配
+    - 区域医疗协作机制
+    - 医疗水平均衡发展
+  6.3 公共卫生政策
+    - 地区特异性防控指南的制定
+    - 环保与健康的综合干预
+    - 健康教育的地域适应性
+
+七、存在的主要问题与研究空白（重要程度：★★，预计 1500–2000 字）
+  - 区域差异的深层机制认识不足
+  - 跨地区纵向研究数据缺乏
+  - 医疗资源分布不均的持续存在
+  - 不同地区防控策略的标准化程度低
+  - 社会经济因素的量化分析需加强
+
+八、结论与展望（重要程度：★★★，预计 2000–2500 字）
+  8.1 主要结论
+    - 哮喘患病率存在明显的地理分布差异
+    - 多种环境、遗传、社会经济因素共同作用
+    - 区域差异化管理的必要性
+  8.2 未来研究方向
+    - 建立全国统一的哮喘监测体系
+    - 加强多学科交叉研究
+    - 发展个性化、精准化防控策略
+    - 推动医疗资源均衡配置</pre>
+                    </div>
+                    <div class="outline-meta-column">
+                        <div class="column-title">二、各部分要点与支撑材料说明（示例）</div>
+                        <ul id="outlineMeta" class="detail-list">
+                            <li><strong>引言部分：</strong>强调哮喘的全球公共卫生意义和区域差异化研究的重要性，支撑材料以全球流行病学统计数据和政策文件为主。</li>
+                            <li><strong>患病率地理分布：</strong>需要按照「全球 → 国家 → 微观地理」的层次组织，支撑材料为中国区域流行病学研究、国际地理差异对比研究。</li>
+                            <li><strong>影响因素分析：</strong>从气候环保、过敏原、遗传人群、医疗资源四个维度展开，支撑材料为气候与环保因素研究、过敏原分布学研究、医疗资源与卫生政策研究。</li>
+                            <li><strong>临床特征：</strong>重点描述不同地区的症状表现、疾病严重程度和治疗反应差异，支撑材料为地区特异性临床研究。</li>
+                            <li><strong>机制探讨：</strong>分析多因素综合作用和地理-环境-遗传相互关系，支撑材料为机制性研究和多因素交互作用分析。</li>
+                            <li><strong>防控策略：</strong>提出地区特异性诊疗方案、医疗资源配置和公共卫生政策建议，支撑材料为政策研究和实践案例。</li>
+                            <li><strong>问题与研究空白：</strong>指出当前研究的不足和未来需要填补的空白，为后续研究指明方向。</li>
+                            <li><strong>结论与展望：</strong>总结主要发现，强调区域差异化管理的必要性，并提出未来研究方向。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 引用文献区域 -->
+                <div class="outline-references-section">
+                    <div class="references-header">
+                        <div class="references-title-wrapper">
+                            <div class="references-icon">📚</div>
+                            <div>
+                                <h3 class="references-title">三、相关参考文献</h3>
+                                <p class="references-subtitle">基于提纲主题自动检索的相关文献，支持一键下载</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="references-list" id="outlineReferencesList">
+                        <!-- 示例文献列表 -->
+                        <div class="reference-item">
+                            <div class="reference-content">
+                                <div class="reference-title">Regional differences in asthma prevalence among children in Spain</div>
+                                <div class="reference-meta">
+                                    <span class="reference-authors">García-Marcos L, et al.</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-journal">Allergy</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-year">2021</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-doi">DOI: 10.1111/all.14567</span>
+                                </div>
+                                <div class="reference-abstract">研究分析了西班牙不同地区儿童哮喘症状患病率的差异，发现存在明显的地理分布特征...</div>
+                            </div>
+                            <div class="reference-actions">
+                                <button class="reference-btn reference-download-btn" onclick="downloadReference('ref1')" title="下载文献">
+                                    <span>⬇️</span>
+                                    <span>下载</span>
+                                </button>
+                                <button class="reference-btn reference-view-btn" onclick="viewReference('ref1')" title="查看详情">
+                                    <span>👁️</span>
+                                    <span>详情</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <div class="reference-content">
+                                <div class="reference-title">中国中老年人群哮喘患病率的区域差异分析</div>
+                                <div class="reference-meta">
+                                    <span class="reference-authors">张某某, 李某某, 等.</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-journal">中华医学杂志</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-year">2023</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-doi">DOI: 10.3760/cma.j.cn112137-20230101-00001</span>
+                                </div>
+                                <div class="reference-abstract">基于全国性调查数据，分析了东、中、西部地区中老年人群哮喘患病率的差异及其影响因素...</div>
+                            </div>
+                            <div class="reference-actions">
+                                <button class="reference-btn reference-download-btn" onclick="downloadReference('ref2')" title="下载文献">
+                                    <span>⬇️</span>
+                                    <span>下载</span>
+                                </button>
+                                <button class="reference-btn reference-view-btn" onclick="viewReference('ref2')" title="查看详情">
+                                    <span>👁️</span>
+                                    <span>详情</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <div class="reference-content">
+                                <div class="reference-title">Temperature effects on asthma exacerbations: A regional study in Shijiazhuang, China</div>
+                                <div class="reference-meta">
+                                    <span class="reference-authors">Wang Y, et al.</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-journal">Environmental Research</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-year">2022</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-doi">DOI: 10.1016/j.envres.2022.113456</span>
+                                </div>
+                                <div class="reference-abstract">探讨了河北石家庄地区气温对哮喘急性发作的影响，发现季节性变化与哮喘发作率显著相关...</div>
+                            </div>
+                            <div class="reference-actions">
+                                <button class="reference-btn reference-download-btn" onclick="downloadReference('ref3')" title="下载文献">
+                                    <span>⬇️</span>
+                                    <span>下载</span>
+                                </button>
+                                <button class="reference-btn reference-view-btn" onclick="viewReference('ref3')" title="查看详情">
+                                    <span>👁️</span>
+                                    <span>详情</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <div class="reference-content">
+                                <div class="reference-title">地区特异性过敏原分布与哮喘发病关系研究——以福建闽南地区为例</div>
+                                <div class="reference-meta">
+                                    <span class="reference-authors">陈某某, 等.</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-journal">中国变态反应学杂志</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-year">2022</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-doi">DOI: 10.3760/cma.j.cn112137-20220101-00001</span>
+                                </div>
+                                <div class="reference-abstract">分析了福建闽南地区特异性过敏原的分布特征，探讨了其与当地哮喘发病的关系...</div>
+                            </div>
+                            <div class="reference-actions">
+                                <button class="reference-btn reference-download-btn" onclick="downloadReference('ref4')" title="下载文献">
+                                    <span>⬇️</span>
+                                    <span>下载</span>
+                                </button>
+                                <button class="reference-btn reference-view-btn" onclick="viewReference('ref4')" title="查看详情">
+                                    <span>👁️</span>
+                                    <span>详情</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="reference-item">
+                            <div class="reference-content">
+                                <div class="reference-title">Healthcare resource allocation and asthma management: A geographic perspective</div>
+                                <div class="reference-meta">
+                                    <span class="reference-authors">Smith J, Brown K, et al.</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-journal">Health Policy</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-year">2023</span>
+                                    <span class="reference-separator">·</span>
+                                    <span class="reference-doi">DOI: 10.1016/j.healthpol.2023.104567</span>
+                                </div>
+                                <div class="reference-abstract">从地理视角分析了医疗卫生资源配置与哮喘管理的关系，提出了区域差异化管理的政策建议...</div>
+                            </div>
+                            <div class="reference-actions">
+                                <button class="reference-btn reference-download-btn" onclick="downloadReference('ref5')" title="下载文献">
+                                    <span>⬇️</span>
+                                    <span>下载</span>
+                                </button>
+                                <button class="reference-btn reference-view-btn" onclick="viewReference('ref5')" title="查看详情">
+                                    <span>👁️</span>
+                                    <span>详情</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="references-footer">
+                        <div class="references-tip">
+                            <span class="tip-icon">💡</span>
+                            <span class="tip-text">系统会根据提纲主题自动检索相关文献。支持批量下载选中的文献。</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="batchDownloadReferences()" id="batchDownloadBtn">
+                            <span>📥</span>
+                            <span>批量下载</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 结果反馈 -->
+                <div class="feedback-section">
+                    <div class="feedback-title">您感觉本次详细提纲的结果如何?</div>
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn feedback-positive" onclick="submitOutlineFeedback('positive')">
+                            <span class="feedback-icon">👍</span>
+                            <span>很好</span>
+                        </button>
+                        <button class="feedback-btn feedback-neutral" onclick="submitOutlineFeedback('neutral')">
+                            <span class="feedback-icon">😐</span>
+                            <span>一般</span>
+                        </button>
+                        <button class="feedback-btn feedback-negative" onclick="submitOutlineFeedback('negative')">
+                            <span class="feedback-icon">👎</span>
+                            <span>不满意</span>
+                        </button>
+                    </div>
+                    <div id="outlineFeedbackThanks" class="feedback-thanks" style="display:none;">
+                        感谢您的反馈！我们会在真实环境中结合反馈持续优化提纲生成质量。
+                    </div>
+                    <div id="outlineFeedbackGuide" class="feedback-guide" style="display:none;">
+                        <div class="feedback-guide-content">
+                            <div class="feedback-guide-icon">💡</div>
+                            <div class="feedback-guide-text">
+                                <div class="feedback-guide-title">对当前提纲不够满意？</div>
+                                <div class="feedback-guide-desc">
+                                    您可以尝试点击右上角的「换个思路」按钮，模拟更换底层大模型或提示词组合，生成风格略有差异的新版本，有机会得到更贴合您期望的提纲结构。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详细提纲运算规则与产品需求 -->
+    <div class="outline-rules-section">
+        <div class="rules-header">
+            <div class="rules-title-wrapper">
+                <div class="rules-badge">📖 原型说明文档</div>
+                <h3 class="rules-title">详细提纲运算规则与产品需求</h3>
+                <p class="rules-subtitle">
+                    以下内容用于指导后端基于统一 AI 基座实现「详细提纲」能力，遵循 `imdt_admin_index.html` 中的 7 个规范小节。
+                </p>
+            </div>
+            <button class="rules-toggle-btn" onclick="toggleOutlineRules()" id="outlineRulesToggleBtn">收起</button>
+        </div>
+        <div class="rules-content" id="outlineRulesContent" style="display:block;">
+            <!-- 1. 用户路径 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">一、用户路径（从输入到拿结果）</h4>
+                <div class="user-flow-diagram">
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">1</div>
+                        <div class="flow-content">
+                            <div class="flow-title">进入「详细提纲」功能</div>
+                            <div class="flow-desc">用户在辅助写作首页点击「详细提纲」入口，跳转到本独立页面。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">2</div>
+                        <div class="flow-content">
+                            <div class="flow-title">输入研究主题与要求</div>
+                            <div class="flow-desc">在输入框中描述论文/课题主题、研究对象、写作要求，可选添加知识库或附件。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">3</div>
+                        <div class="flow-content">
+                            <div class="flow-title">点击「→」生成提纲</div>
+                            <div class="flow-desc">前端校验必填输入后，调用统一 AI 基座的「详细提纲」工具。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">4</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看逻辑树提纲</div>
+                            <div class="flow-desc">在结果区左侧查看章节/小节的树状结构、重要程度和预计篇幅。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">5</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看要点与支撑材料</div>
+                            <div class="flow-desc">在结果区右侧查看每一部分的主要论点、支撑材料类型等说明。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">6</div>
+                        <div class="flow-content">
+                            <div class="flow-title">查看相关参考文献</div>
+                            <div class="flow-desc">系统自动检索并展示相关文献，支持单篇下载和批量下载。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large">→</div>
+                    <div class="flow-step-large">
+                        <div class="flow-number-large">7</div>
+                        <div class="flow-content">
+                            <div class="flow-title">评价本次提纲结果</div>
+                            <div class="flow-desc">通过「很好 / 一般 / 不满意」对本次提纲质量进行主观评价。</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow-large flow-arrow-optional">→</div>
+                    <div class="flow-step-large flow-step-optional">
+                        <div class="flow-number-large">8</div>
+                        <div class="flow-content">
+                            <div class="flow-title">换个思路（可选）</div>
+                            <div class="flow-desc">在一般/不满意时点击「换个思路」，清除缓存并尝试不同模型或提示词组合重新生成提纲。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 功能目标与边界 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">二、功能目标与边界</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 功能目标：</strong>
+                        <ul>
+                            <li>将用户的论文/课题主题转化为<strong>结构清晰的逻辑树提纲</strong>（至少 3 层，通常 4–5 层）。</li>
+                            <li>为每个章节/小节给出主要论点和建议使用的支撑材料类型（文献、数据、案例、政策等）。</li>
+                            <li>为各部分标注重要程度（★–★★★）和预计篇幅范围，帮助用户进行字数和时间规划。</li>
+                            <li>整体保证论证逻辑严密，符合医学科研论文或基金申请的常见结构习惯。</li>
+                            <li><strong>自动文献检索：</strong>生成详细提纲后，系统自动根据提纲主题和关键词检索相关学术文献（5–10 篇），并提供文献下载功能，帮助用户快速获取支撑材料。</li>
+                            <li><strong>数据来源说明：</strong>原型中的示例输入和输出数据（如"出提纲：讨论哮喘的区域差异化"及其生成的完整八章节提纲）可从实际产品页面爬取真实案例，确保示例数据的真实性和代表性。运营团队可在后台配置示例数据，定期更新以反映最新的AI生成效果。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 明确不做：</strong>
+                        <ul>
+                            <li>不直接生成完整论文正文内容，仅提供结构与要点层面的提纲。</li>
+                            <li>不虚构具体文献条目、具体数据结果，只描述需要哪一类支撑材料。</li>
+                            <li>不替代用户做研究设计决策（如样本量计算等具体数值决策）。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 关键交互与前端行为 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">三、关键交互与前端行为</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 表单校验：</strong>
+                        <ul>
+                            <li>输入框为必填项，长度建议 ≥ 20 字，鼓励用户描述清楚主题和要求。</li>
+                            <li>知识库与附件为可选项，本原型仅展示入口，实际接入时由技术中心实现。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 状态切换：</strong>
+                        <ul>
+                            <li>点击生成后：展示 loading 状态，禁止重复点击按钮。</li>
+                            <li>成功返回：展示逻辑树提纲和要点说明，隐藏初始引导内容。</li>
+                            <li>异常：显示错误提示，保留用户输入内容便于重试。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>3. 结果展示规范：</strong>
+                        <ul>
+                            <li>左列展示树状结构，使用章节编号 + 标题 + 重要程度 + 预计篇幅。</li>
+                            <li>右列展示各部分的主要论点和支撑材料建议，以列表形式呈现。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>4. 「换个思路」按钮：</strong>
+                        <ul>
+                            <li>始终显示在结果卡片右上角，点击后在不修改用户输入的前提下重新触发提纲生成。</li>
+                            <li>实际接入时用于清除当前缓存结果，并尝试不同模型或 Prompt 组合生成新提纲。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>5. 文献检索与引用：</strong>
+                        <ul>
+                            <li><strong>自动检索：</strong>生成详细提纲后，系统自动根据提纲主题和关键词调用文献检索工具，检索相关学术文献（建议检索 5–10 篇代表性文献）。</li>
+                            <li><strong>文献展示：</strong>在结果区域下方展示「三、相关参考文献」区域，每篇文献显示：标题、作者、期刊、年份、DOI、摘要（前2行）。</li>
+                            <li><strong>文献操作：</strong>每篇文献提供「下载」和「详情」按钮，支持单篇下载和批量下载（选中多篇后点击「批量下载」）。</li>
+                            <li><strong>文献选择：</strong>点击文献项（非按钮区域）可选中/取消选中，选中的文献会高亮显示，用于批量下载。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>6. 结果反馈与质量监控：</strong>
+                        <ul>
+                            <li>在结果底部展示「您感觉本次详细提纲的结果如何?」+「很好 / 一般 / 不满意」。</li>
+                            <li>选择「一般 / 不满意」时，引导用户尝试「换个思路」，说明可以通过更换模型/Prompt 获得更满意结果。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. LLM 对接与 Prompt 设计 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">四、LLM 对接与 Prompt 设计</h4>
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.1 调用方式（给研发）</h5>
+                    <div class="rule-list">
+                        <div class="rule-item">
+                            <strong>接口形态：</strong>
+                            <ul>
+                                <li>通过统一 AI 基座的「generate_detailed_outline」工具调用。</li>
+                                <li>入参示例：
+                                    <ul>
+                                        <li><code>topic</code>：用户输入的主题与需求描述。</li>
+                                        <li><code>discipline</code>：学科领域（如「医学」「护理」「公共卫生」等，可选）。</li>
+                                        <li><code>target_type</code>：论文 / 基金 / 报告 等类型。</li>
+                                        <li><code>knowledge_base_ids</code>：选中的知识库 ID 列表（可选）。</li>
+                                    </ul>
+                                </li>
+                                <li>出参建议结构：
+                                    <ul>
+                                        <li><code>outline_tree</code>：树状结构列表，每个节点包含 <code>title / level / importance / word_range</code>。</li>
+                                        <li><code>section_notes</code>：每个章节的要点说明和支撑材料建议。</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="rule-item">
+                            <strong>文献检索调用：</strong>
+                            <ul>
+                                <li><strong>自动触发：</strong>在生成详细提纲成功后，自动调用统一 AI 基座的「literature_search」工具，根据提纲主题和关键词检索相关文献。</li>
+                                <li><strong>检索参数：</strong>
+                                    <ul>
+                                        <li><code>keywords</code>：从提纲主题和章节标题中提取的关键词（建议 3–5 个）。</li>
+                                        <li><code>discipline</code>：学科领域（与提纲生成时保持一致）。</li>
+                                        <li><code>limit</code>：检索数量限制（建议 5–10 篇）。</li>
+                                        <li><code>sort_by</code>：排序方式（如「relevance」「year_desc」等）。</li>
+                                    </ul>
+                                </li>
+                                <li><strong>检索结果：</strong>返回文献列表，每篇文献包含：<code>title / authors / journal / year / doi / abstract / download_url</code> 等字段。</li>
+                                <li><strong>文献下载：</strong>点击「下载」或「批量下载」时，调用「literature_download」工具，传入文献 DOI 或 download_url，返回 PDF 文件或下载链接。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="rule-subsection">
+                    <h5 class="rule-subsection-title">4.2 Prompt 结构（角色设定 + 问题情境 + 任务指令 + 约束条件）</h5>
+                    <div class="code-block rules-code-block">
+                        <div class="code-header">详细提纲 Prompt 模板（示意）</div>
+                        <pre class="code-content">【一、角色设定（谁）】
+你是一名长期辅导医学科研论文和国家自然科学基金项目的高级科研写作导师，擅长把模糊的研究想法梳理为结构清晰、逻辑严谨的写作提纲。
+
+【二、问题情境（在什么场景下工作）】
+用户希望撰写一篇关于 {topic} 的研究论文或基金申请，希望你帮助他：
+- 把研究主题拆解为多级章节/小节组成的逻辑树结构；
+- 为每一部分明确主要论点和建议使用的支撑材料类型；
+- 合理分配各部分的篇幅，避免某些章节过长或过短；
+- 整体结构要符合医学科研写作的常见规范。
+
+【三、任务指令（你要做什么）】
+1. 根据用户输入的主题与要求，先设计 3–5 个一级章节，再向下细化为 2–3 级小节，形成树状结构。
+2. 对每个章节/小节，写出一句话概括「主要论点」和「建议使用的支撑材料类型」。
+3. 为每个章节设置「重要程度」（★/★★/★★★）和「预计篇幅范围」（例如 1500–2000 字）。
+4. 整体结构要保证逻辑自洽：可以采用“背景→问题→方法→结果→讨论→结论”或适合该学科的经典结构。
+
+【四、约束条件（必须遵守什么）】
+1. 不要生成论文正文，只生成提纲和要点说明。
+2. 不虚构具体的研究数据和具体文献，只描述需要哪一类支撑材料。
+3. 在推荐或引用文献时，应优先使用近 1–3 年内（如无特殊说明默认近 3 年）的真实文献，并在真实环境中通过文献检索工具返回的元数据生成，不得凭空捏造。
+4. 输出格式必须是 JSON，包含：
+{
+  "outline_tree": [...],
+  "section_notes": [...],
+  "keywords": ["关键词1", "关键词2", ...]  // 用于后续文献检索的关键词列表
+}
+
+【五、后续处理（生成提纲后）】
+生成详细提纲后，系统会自动：
+1. 从提纲主题和 keywords 字段中提取检索关键词。
+2. 调用「literature_search」工具检索相关文献（5–10 篇）。
+3. 将检索结果展示在「三、相关参考文献」区域，供用户查看和下载。</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 患者信息脱敏与输入约束（简要） -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">五、患者信息脱敏与输入约束（简要）</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 文本输入：</strong>
+                        <ul>
+                            <li>提示用户不要在输入中写入真实患者姓名、电话、住院号等敏感信息。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 性能与成本控制 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">六、性能与成本控制（建议）</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 缓存策略：</strong>
+                        <ul>
+                            <li>以「topic + discipline + target_type」做哈希作为缓存 Key，相同输入在短时间内直接复用结果。</li>
+                            <li>用户点击「换个思路」时清除缓存，重新调用模型。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 频率与长度限制：</strong>
+                        <ul>
+                            <li>建议对单个用户在单位时间内的调用次数做频控（例如 30 秒内不超过 3 次）。</li>
+                            <li>对输入长度做上限限制（如 ≤ 1000 字），超出时提示用户简化问题描述。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. 联调与验收要点 -->
+            <div class="rule-section">
+                <h4 class="rule-section-title">七、联调与验收要点</h4>
+                <div class="rule-list">
+                    <div class="rule-item">
+                        <strong>1. 交互与状态：</strong>
+                        <ul>
+                            <li>验证初始 / 加载中 / 有结果 / 出错四种状态切换是否正常。</li>
+                        </ul>
+                    </div>
+                    <div class="rule-item">
+                        <strong>2. 结果质量（人工抽检）：</strong>
+                        <ul>
+                            <li>使用若干真实主题测试，检查提纲是否逻辑清晰、覆盖关键要素。</li>
+                            <li>重点关注是否出现论文正文内容、虚构数据或具体文献信息。</li>
+                            <li><strong>示例数据来源：</strong>原型中的示例数据（如"出提纲：讨论哮喘的区域差异化"及其生成的完整提纲结构）可从实际产品页面爬取真实案例，确保示例数据的真实性和代表性。运营团队可在后台配置示例数据，定期更新以反映最新的AI生成效果。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.outline-page{padding:24px;max-width:1200px;margin:0 auto}
+.outline-header{margin-bottom:24px}
+.outline-breadcrumb{margin-bottom:8px}
+.breadcrumb-back-btn{border:none;background:transparent;color:#1890ff;font-size:13px;cursor:pointer;padding:0}
+.outline-title-section{display:flex;align-items:center;gap:12px}
+.outline-icon{width:40px;height:40px;border-radius:16px;background:linear-gradient(135deg,#f6ffed,#e6f7ff);display:flex;align-items:center;justify-content:center;font-size:22px}
+.outline-title{margin:0;font-size:24px;font-weight:600;color:#1a1a1a}
+.outline-subtitle{margin:4px 0 0;font-size:14px;color:#666}
+.outline-main{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}
+.outline-card{background:#fff;border-radius:12px;border:1px solid #f0f0f0;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px}
+.outline-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.outline-card-header-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.outline-card-title{margin:0;font-size:16px;font-weight:600;color:#1f1f1f}
+.outline-card-desc{margin:0;font-size:13px;color:#8c8c8c}
+.outline-input-container{position:relative}
+.outline-input{width:100%;border-radius:8px;border:1px solid #d9d9d9;padding:12px 14px;font-size:14px;min-height:120px;resize:vertical;line-height:1.6}
+.outline-input:focus{outline:none;border-color:#1890ff;box-shadow:0 0 0 2px rgba(24,144,255,.15)}
+.outline-input-actions{margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.outline-input-icons{display:flex;gap:8px}
+.icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid #d9d9d9;background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.icon-btn-primary{background:#1890ff;color:#fff;border-color:#1890ff}
+.icon-btn-primary:hover{background:#40a9ff;border-color:#40a9ff}
+.outline-examples{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.outline-example-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#595959;cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .2s}
+.outline-example-item:hover{background:#f5f5f5}
+.outline-example-tag{padding:2px 6px;border-radius:4px;background:#f0f0f0;color:#8c8c8c}
+.outline-example-arrow{margin-left:auto;color:#bfbfbf}
+.outline-initial{padding:12px;border-radius:8px;background:linear-gradient(135deg,#f6ffed,#e6f7ff);border:1px solid rgba(24,144,255,.25)}
+.outline-badge{display:inline-flex;padding:2px 8px;border-radius:999px;background:#e6f7ff;color:#096dd9;font-size:12px;margin-bottom:4px}
+.outline-initial-title{margin:0 0 4px;font-size:15px;font-weight:600;color:#1f1f1f}
+.outline-initial-desc{margin:0 0 6px;font-size:13px;color:#595959}
+.outline-initial-list{margin:0;padding-left:18px;font-size:13px;color:#595959}
+.outline-loading{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 12px}
+.spinner{width:28px;height:28px;border-radius:50%;border:3px solid #e6f7ff;border-top-color:#1890ff;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:#262626}
+.loading-subtext{font-size:12px;color:#8c8c8c}
+.outline-result{display:flex;flex-direction:column;gap:12px}
+.outline-result-summary{padding:10px 12px;border-radius:8px;background:#f5f5f5}
+.summary-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.summary-badge{font-size:12px;padding:2px 8px;border-radius:999px;background:#fff;border:1px solid #d9d9d9;color:#595959}
+.summary-meta{font-size:12px;color:#8c8c8c}
+.summary-text{margin:0;font-size:12px;color:#595959}
+.outline-result-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px}
+.outline-tree-column,.outline-meta-column{min-width:0;display:flex;flex-direction:column;gap:6px}
+.column-title{font-size:13px;font-weight:500;color:#434343}
+.code-block{margin:0;padding:10px 12px;border-radius:8px;background:#fdfdfd;border:1px solid #f0f0f0;font-family:SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;max-height:260px;overflow:auto}
+.detail-list{margin:0;padding-left:18px;font-size:12px;color:#595959}
+.detail-list li+li{margin-top:2px}
+.outline-references-section{margin-top:20px;padding:16px;background:#fafafa;border-radius:8px;border:1px solid #e8e8e8}
+.references-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.references-title-wrapper{display:flex;align-items:center;gap:10px;flex:1}
+.references-icon{font-size:24px}
+.references-title{margin:0 0 4px;font-size:16px;font-weight:600;color:#1a1a1a}
+.references-subtitle{margin:0;font-size:13px;color:#8c8c8c}
+.references-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.reference-item{display:flex;justify-content:space-between;gap:16px;padding:14px;background:#fff;border:1px solid #e8e8e8;border-radius:6px;transition:all .2s;cursor:pointer}
+.reference-item:hover{border-color:#1890ff;box-shadow:0 2px 6px rgba(24,144,255,.1)}
+.reference-item.selected{border-color:#1890ff;background:#f0f8ff;box-shadow:0 2px 8px rgba(24,144,255,.15)}
+.reference-content{flex:1;min-width:0}
+.reference-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:6px;line-height:1.5}
+.reference-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;color:#666;margin-bottom:6px}
+.reference-separator{color:#bfbfbf}
+.reference-authors{color:#1890ff}
+.reference-journal{font-style:italic}
+.reference-year{color:#8c8c8c}
+.reference-doi{color:#8c8c8c;font-family:monospace}
+.reference-abstract{font-size:12px;color:#595959;line-height:1.6;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.reference-actions{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.reference-btn{padding:6px 12px;border-radius:6px;border:1px solid #d9d9d9;background:#fff;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.reference-btn:hover{border-color:#1890ff;color:#1890ff}
+.reference-download-btn{border-color:#52c41a;color:#389e0d}
+.reference-download-btn:hover{border-color:#73d13d;background:#f6ffed}
+.reference-view-btn{border-color:#1890ff;color:#1890ff}
+.reference-view-btn:hover{background:#e6f7ff}
+.references-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:12px;border-top:1px solid #e8e8e8}
+.references-tip{display:flex;align-items:center;gap:6px;font-size:12px;color:#8c8c8c;flex:1}
+.tip-icon{font-size:14px}
+.tip-text{line-height:1.5}
+.feedback-section{margin-top:10px;padding-top:8px;border-top:1px dashed #e8e8e8}
+.feedback-title{font-size:13px;font-weight:500;color:#434343;margin-bottom:6px}
+.feedback-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.feedback-btn{padding:6px 12px;border-radius:16px;border:1px solid #d9d9d9;background:#fff;font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;transition:all .2s}
+.feedback-btn:hover{border-color:#1890ff;color:#1890ff}
+.feedback-positive{border-color:#52c41a;color:#389e0d}
+.feedback-negative{border-color:#ff4d4f;color:#cf1322}
+.feedback-icon{font-size:14px}
+.feedback-thanks{margin-top:6px;font-size:12px;color:#8c8c8c}
+.feedback-guide{margin-top:6px}
+.feedback-guide-content{display:flex;gap:8px;padding:8px 10px;background:#f0f8ff;border-radius:6px;border:1px solid #bae7ff}
+.feedback-guide-icon{font-size:18px}
+.feedback-guide-title{font-size:12px;font-weight:500;color:#1f1f1f;margin-bottom:2px}
+.feedback-guide-desc{font-size:12px;color:#595959;line-height:1.6}
+.outline-rules-section{margin-top:32px;padding:0;background:linear-gradient(135deg,#f0f8ff 0%,#e6f7ff 100%);border-radius:12px;border:2px solid #1890ff;overflow:hidden}
+.rules-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:20px 24px 14px;background:#fff;border-bottom:2px dashed #e6f7ff}
+.rules-title-wrapper{flex:1}
+.rules-badge{display:inline-flex;align-items:center;padding:4px 10px;background:linear-gradient(135deg,#1890ff,#096dd9);color:#fff;border-radius:16px;font-size:12px;font-weight:600;margin-bottom:8px}
+.rules-title{margin:0 0 6px;font-size:18px;font-weight:600;color:#1890ff}
+.rules-subtitle{margin:0;font-size:13px;color:#666;line-height:1.6}
+.rules-toggle-btn{background:#fff;color:#1890ff;border:1px solid #1890ff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.rules-content{padding:20px 24px;background:#fff}
+.rule-section{margin-bottom:20px;padding:16px;background:#fafafa;border-radius:8px;border-left:4px solid #1890ff}
+.rule-section-title{margin:0 0 8px;font-size:15px;font-weight:600;color:#1890ff}
+.rule-list{display:flex;flex-direction:column;gap:8px}
+.rule-item{font-size:13px;color:#333;line-height:1.7}
+.rule-item ul{margin:4px 0 0 18px;padding:0}
+.rule-item li{margin-bottom:2px}
+.rule-subsection{margin-bottom:16px}
+.rules-code-block{max-height:none;overflow:auto}
+.user-flow-diagram{display:flex;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-top:12px;background:#fff;border-radius:8px;border:1px solid #e8e8e8;padding:12px}
+.flow-step-large{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:150px;max-width:180px;padding:10px;background:#fafafa;border-radius:6px;border:1px solid #e8e8e8}
+.flow-number-large{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1890ff,#096dd9);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px}
+.flow-content{text-align:center}
+.flow-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px}
+.flow-desc{font-size:12px;color:#666}
+.flow-arrow-large{font-size:20px;color:#1890ff;font-weight:bold;align-self:center}
+.flow-step-optional{border-color:#faad14;background:#fff7e6}
+.flow-step-optional .flow-number-large{background:linear-gradient(135deg,#faad14,#d46b08)}
+.flow-arrow-optional{color:#faad14}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid #d9d9d9;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.btn-default{background:#fff;color:#333}
+.btn-ghost{background:transparent;color:#1890ff;border-color:#1890ff}
+@media (max-width:900px){
+  .outline-result-grid{grid-template-columns:1fr}
+}
+</style>
+
+<script>
+function useOutlineExample(type){
+  var input=document.getElementById('outlineInput');
+  if(!input)return;
+  var text='';
+  if(type===1){
+    text='出提纲：讨论哮喘的区域差异化';
+  }else if(type===2){
+    text='请为“肿瘤患者互联网随访干预对生活质量的影响”生成一份详细提纲，标清每章小结、核心证据类型和大致字数分配。';
+  }else{
+    text='帮我为国家自然科学基金项目初稿设计一份详细提纲，突出研究创新点和方法学部分的论证逻辑，并给出各部分的重要程度和预计篇幅。';
+  }
+  input.value=text;
+  input.focus();
+  // 自动滚动到输入框，确保用户能看到填充的内容
+  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function runGenerateOutline(){
+  var input=document.getElementById('outlineInput');
+  if(!input)return;
+  var v=input.value.trim();
+  if(!v){
+    alert('请先输入研究主题或论文方向，再生成详细提纲。');
+    return;
+  }
+  var initial=document.getElementById('outlineInitial');
+  var loading=document.getElementById('outlineLoading');
+  var result=document.getElementById('outlineResult');
+  if(initial)initial.style.display='none';
+  if(result)result.style.display='none';
+  if(loading)loading.style.display='flex';
+  setTimeout(function(){
+    if(loading)loading.style.display='none';
+    if(result)result.style.display='flex';
+  },900);
+}
+
+function changeOutlineApproach(){
+  var loading=document.getElementById('outlineLoading');
+  var result=document.getElementById('outlineResult');
+  if(result)result.style.display='none';
+  if(loading)loading.style.display='flex';
+  setTimeout(function(){
+    if(loading)loading.style.display='none';
+    if(result)result.style.display='flex';
+    var meta=document.getElementById('outlineMeta');
+    if(meta){
+      var li=document.createElement('li');
+      li.textContent='【示例】点击“换个思路”后，实际系统可尝试更换底层大模型或 Prompt 组合，生成结构略有不同的备选提纲供对比选择。';
+      meta.appendChild(li);
+    }
+  },800);
+}
+
+function submitOutlineFeedback(type){
+  var thanks=document.getElementById('outlineFeedbackThanks');
+  var guide=document.getElementById('outlineFeedbackGuide');
+  if(thanks)thanks.style.display='block';
+  if(guide)guide.style.display=(type==='neutral'||type==='negative')?'block':'none';
+}
+
+function toggleOutlineRules(){
+  var c=document.getElementById('outlineRulesContent');
+  var b=document.getElementById('outlineRulesToggleBtn');
+  if(!c||!b)return;
+  if(c.style.display==='none'){
+    c.style.display='block';
+    b.textContent='收起';
+  }else{
+    c.style.display='none';
+    b.textContent='展开';
+  }
+}
+
+// 文献下载和查看功能
+function downloadReference(refId){
+  alert('下载文献：' + refId + '\n\n（实际应用中应调用文献下载API，支持PDF/EPUB等格式）');
+}
+
+function viewReference(refId){
+  alert('查看文献详情：' + refId + '\n\n（实际应用中应跳转到文献详情页或打开详情弹窗）');
+}
+
+function batchDownloadReferences(){
+  var items=document.querySelectorAll('.reference-item');
+  var selected=[];
+  items.forEach(function(item){
+    if(item.classList.contains('selected')){
+      var title=item.querySelector('.reference-title').textContent;
+      selected.push(title);
+    }
+  });
+  if(selected.length===0){
+    alert('请先选择要下载的文献（点击文献项可选中）');
+    return;
+  }
+  alert('批量下载 ' + selected.length + ' 篇文献：\n\n' + selected.join('\n') + '\n\n（实际应用中应调用批量下载API，支持ZIP打包下载）');
+}
+
+// 文献项点击选中功能
+document.addEventListener('DOMContentLoaded',function(){
+  var refList=document.getElementById('outlineReferencesList');
+  if(refList){
+    refList.addEventListener('click',function(e){
+      var item=e.target.closest('.reference-item');
+      if(item&&!e.target.closest('.reference-actions')){
+        item.classList.toggle('selected');
+        if(item.classList.contains('selected')){
+          item.style.borderColor='#1890ff';
+          item.style.background='#f0f8ff';
+        }else{
+          item.style.borderColor='#e8e8e8';
+          item.style.background='#fff';
+        }
+      }
+    });
+  }
+});
+
+// 以下为示意性占位，实际接入时由技术中心实现
+function openOutlineKBModal(){alert('添加知识库（原型占位）');}
+function attachOutlineFile(){alert('添加附件（原型占位）');}
+function startOutlineVoice(){alert('语音输入（原型占位）');}
+</script>
+

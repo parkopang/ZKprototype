@@ -43,7 +43,8 @@ const App = {
         'research-literature-reading': '文献阅读',
         'research-academic-qa': '学术问答',
         'research-assistant-writing': '辅助写作',
-        'research-ai-cloud': 'AI 云盘'
+        'research-ai-cloud': 'AI 云盘',
+        'research-text-polish': '文本润色'
     },
 
     /**
@@ -98,42 +99,27 @@ const App = {
      * @param {HTMLElement} container - 页面容器元素
      */
     loadPageContent(pageName, container) {
-        // 优先使用内联的页面内容
-        if (this.pageContents[pageName]) {
-            container.innerHTML = this.pageContents[pageName];
-            
-            // 执行页面内容中的script标签（innerHTML不会自动执行script）
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(script => {
-                const newScript = document.createElement('script');
-                if (script.src) {
-                    newScript.src = script.src;
-                } else {
-                    newScript.textContent = script.textContent;
-                }
-                document.body.appendChild(newScript);
-                document.body.removeChild(newScript);
-            });
-            
-            // 执行页面特定的初始化脚本（如果存在）
-            // 将页面名中的连字符替换为下划线以匹配函数名
-            const initFuncName = `initPage_${pageName.replace(/-/g, '_')}`;
-            if (window[initFuncName]) {
-                // 延迟执行，确保脚本已加载
-                setTimeout(() => {
-                    window[initFuncName]();
-                }, 0);
-            }
+        const isFileProtocol = window.location.protocol === 'file:';
+
+        // 本地直接 file:// 打开时，统一用 iframe 嵌入对应的静态原型页面，避免 CORS 和 XHR 限制
+        if (isFileProtocol) {
+            container.innerHTML = `
+                <iframe 
+                    src="pages/${pageName}.html" 
+                    class="embedded-page-frame" 
+                    frameborder="0"
+                ></iframe>
+            `;
             return;
         }
 
-        // 使用 XMLHttpRequest 同步加载（避免 fetch CORS 问题）
+        // 非 file:// 场景（如挂到本地/线上静态服务器），使用 XMLHttpRequest 同步加载
         try {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', `pages/${pageName}.html`, false); // 同步请求
             xhr.send(null);
             
-            if (xhr.status === 200 || xhr.status === 0) { // 0 表示 file:// 协议成功
+            if (xhr.status === 200) {
                 const html = xhr.responseText;
                 container.innerHTML = html;
                 
@@ -149,23 +135,10 @@ const App = {
                     document.body.appendChild(newScript);
                     document.body.removeChild(newScript);
                 });
-                
-                // 缓存到 pageContents
-                this.pageContents[pageName] = html;
-                // 执行页面特定的初始化脚本（如果存在）
-                // 将页面名中的连字符替换为下划线以匹配函数名
-                const initFuncName = `initPage_${pageName.replace(/-/g, '_')}`;
-                if (window[initFuncName]) {
-                    // 延迟执行，确保脚本已加载
-                    setTimeout(() => {
-                        window[initFuncName]();
-                    }, 0);
-                }
             } else {
                 this.showPageNotFound(container, pageName);
             }
         } catch (error) {
-            // 加载失败，显示提示信息
             console.warn(`无法加载页面 ${pageName}:`, error);
             this.showPageNotFound(container, pageName, error);
         }
